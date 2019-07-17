@@ -1,0 +1,510 @@
+<?php
+/**
+ * @var \Base\Controller\BaseFunctions $function
+ */
+$function = new \Base\Controller\BaseFunctions();
+
+$title  =   "Painel de Authorizações";
+$key    =   $function->strToFriendlyUrl($title);
+
+$form = $this->form;
+
+?>
+
+<div class="g-hidden-sm-down g-bg-gray-light-v8 g-pa-20">
+    <ul class="u-list-inline g-color-gray-dark-v6">
+
+        <li class="list-inline-item g-mr-10">
+            <a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle"
+               href="<?=$this->url('admin');?>">
+                Dashboard
+            </a>
+            <i class="hs-admin-angle-right g-font-size-12 g-color-gray-light-v6 g-valign-middle g-ml-10"></i>
+        </li>
+        <li class="list-inline-item">
+            <span class="g-valign-middle">
+                Painel de Autorização
+            </span>
+        </li>
+    </ul>
+</div>
+<div ng-app="panel-authorize" class="g-pa-20 ">
+    <h1 class="g-font-weight-300 g-font-size-28 g-color-black g-mb-30">
+        <i class="fa-fw fa fa-lock"></i> Painel de Authorizações <span>> Gerencie as Autorizações</span>
+    </h1>
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <?php $this->getFlashMessenger();?>
+        </div>
+    </div>
+    <hr class="d-flex g-brd-gray-light-v7 ">
+    <div class="g-mb-40">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active"
+                   id="s1-tab"
+                   data-toggle="tab"
+                   href="#s1"
+                   role="tab"
+                   aria-controls="s1"
+                   aria-selected="true">
+                    Gerenciador de Privilégios
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link"
+                   id="s2-tab"
+                   data-toggle="tab"
+                   href="#s2"
+                   role="tab"
+                   aria-controls="s2"
+                   aria-selected="false">
+                    Gerenciador de Possibilidades
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active"
+                 id="s1"
+                 role="tabpanel"
+                 aria-labelledby="s1-tab">
+                <div class="row">
+                    <?=$this->partial('auth-privileges');?>
+                </div>
+            </div>
+            <div class="tab-pane fade"
+                 id="s2"
+                 role="tabpanel"
+                 aria-labelledby="s2-tab">
+                <div class="row">
+                    <?=$this->partial('auth-possibility');?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    angular.module('panel-authorize', [])
+        .controller('AuthorizeController', ['$scope','$http','$timeout', function($scope,$http,$timeout) {
+            $scope.data             =   {};
+
+            $scope.resources        =   [];
+            $scope.actions          =   [];
+            $scope.acts             =   [];
+            $scope.possibilities    =   [];
+
+            $scope.resource         =   null;
+            $scope.action           =   null;
+
+            $scope.btnadd           =   true;
+            $scope.btnedit          =   false;
+            $scope.has_error        =   false;
+
+            $http({
+                url: "/api/resource",
+                async: false,
+                type: "GET",
+                dataType: "json"
+            }).then(function successCallback(response) {
+                $scope.resources = response.data._embedded.resource;
+            }, function errorCallback(response) {
+                errorNotify("Ops, houve um erro ao consultar os recursos!");
+            });
+
+            $http({
+                url: "/api/action",
+                async: false,
+                type: "GET",
+                dataType: "json"
+            }).then(function successCallback(response) {
+                $scope.actions = response.data._embedded.action;
+            }, function errorCallback(response) {
+                errorNotify("Ops, houve um erro ao consultar as ações!");
+            });
+
+            $scope.load = function () {
+                $http({
+                    url: "/admin/get-possibilities",
+                    async: false,
+                    type: "GET",
+                    dataType: "json"
+                }).then(function successCallback(response) {
+                    $scope.possibilities = response.data;
+                }, function errorCallback(response) {
+                    errorNotify('Ops, houve um erro ao consultar as possibilidades!');
+                });
+            };
+
+            $scope.load();
+
+            $scope.addPossibility = function () {
+                var error = false;
+
+                $.ajax({
+                    url: "/api/possibility",
+                    type: "GET",
+                    data: {
+                        'filter'    :   [
+                            {
+                                'type' : 'andx',
+                                'conditions' : [
+                                    {'field' :'action', 'type':'eq', 'value' : $scope.action},
+                                    {'field' :'resource', 'type':'eq', 'value' : $scope.resource},
+                                ],
+                                'where'  :  'and'
+                            }
+                        ]
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        //Não pode ser definida a ação mais de uma vez para o mesmo recurso.
+                        if(response.total_items > 0)
+                        {
+                            errorNotify('Ops, já foi definida essa ação para o recurso!');
+                            error = true;
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log(textStatus, errorThrown);
+                    }
+                });
+
+                $timeout(function () {
+                    if(error === false) {
+                        $http({
+                            url: "/api/action/" + $scope.action,
+                            async: false,
+                            type: "GET",
+                            dataType: "json"
+                        }).then(function successCallback(response) {
+                            for(var j = 0;j < $scope.acts.length; j++)
+                            {
+                                let act = $scope.acts[j];
+
+                                if(act.id == response.data.id){
+                                    errorNotify('Ops, você não pode incluir a mesma ação mais de uma vez!');
+                                    return false;
+                                }
+                            }
+                            $scope.acts.push(response.data);
+                            $scope.action = '';
+                        }, function errorCallback(response) {
+                            errorNotify('Ops, houve um erro ao consultar a ação!');
+                        });
+                    }
+                },300);
+            };
+
+            $scope.rmv = function (action) {
+                $scope.acts.splice($scope.acts.indexOf(action), 1);
+            };
+
+            $scope.del = function (resource,action) {
+                bootbox.confirm({
+                    message: "Deseja excluir esse item?",
+                    buttons: {
+                        cancel: {
+                            label: 'Não',
+                            className: 'btn-danger'
+                        },
+                        confirm: {
+                            label: 'Sim',
+                            className: 'btn-success btnConfirm',
+                        }
+                    },
+                    callback: function (result) {
+                        if(!result){
+                            this.modal('hide');
+                        }else{
+
+                            $.ajax({
+                                url: "/api/possibility",
+                                type: "GET",
+                                data: {
+                                    'filter'    :   [
+                                        {
+                                            'type' : 'andx',
+                                            'conditions' : [
+                                                {'field' :'action', 'type':'eq', 'value' : action},
+                                                {'field' :'resource', 'type':'eq', 'value' : resource},
+                                            ],
+                                            'where'  :  'and'
+                                        }
+                                    ]
+                                },
+                                dataType: "json",
+                                success: function (response) {
+                                    let possibilities = response._embedded.possibility;
+
+                                    $http({
+                                        url: '/api/possibility/'+possibilities[0].id,
+                                        method: "DELETE"
+                                    }).then(function(response) {
+                                            errorNotify('Registro deletado com sucesso!');
+                                            $scope.load();
+                                        },
+                                        function(response) {
+                                            // failed
+                                            if(response.status == 422)
+                                            {
+                                                errorNotify("Houve erro na exclusão do cadastro, erro: "+response.statusText);
+                                            }
+                                        });
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.log(textStatus, errorThrown);
+                                }
+                            });
+
+                        }
+                    }
+                });
+            };
+
+            $scope.add = function () {
+                var actions = $scope.acts;
+
+                if($scope.resource == null || $scope.resource == '' || $scope.acts.length < 1){
+                    $scope.has_error = true;
+                }
+
+                var resource = null;
+
+                if($scope.resource != null && $scope.resource != ''){
+                    resource = $scope.getResource($scope.resource);
+                    if(resource === null)
+                        $scope.has_error = true;
+                }
+
+                if(!$scope.has_error) {
+                    if (actions.length > 0) {
+                        for (var i = 0; i < actions.length; i++) {
+                            var action = actions[i];
+                            $scope.data = {};
+                            $scope.data.resource = resource.id;
+                            $scope.data.action  = action.id;
+
+                            $http({
+                                url: '/api/possibility',
+                                method: "POST",
+                                data: $scope.data
+                            }).then(function (response) {
+                                    successNotify('Possibilidades cadastrada com sucesso!');
+                                    $scope.load();
+                                    $scope.clear();
+                                },
+                                function (response) {
+                                    // failed
+                                    if (response.status == 422) {
+                                        errorNotify("Houve erro na inclusão do cadastro erro: " + response.statusText);
+
+                                    }
+                                });
+                        }
+                    }
+                }
+            };
+
+            $scope.edit = function(id) {
+
+            };
+
+            $scope.clear = function() {
+                $scope.id       =   null;
+                $scope.resouce  =   '';
+                $scope.action   =   '';
+                $scope.acts     =   [];
+            };
+
+            $scope.getAction = function(id)
+            {
+                var data = null;
+
+                $.ajax({
+                    url: "/api/action/" + id,
+                    async: false,
+                    type: "GET",
+                    dataType: "json"
+                }).done(function(response) {
+                    var data = response;
+                });
+
+                return data;
+            };
+
+            $scope.getResource = function(id)
+            {
+                var data = null;
+                $.ajax({
+                    url: "/api/resource/" + id,
+                    async: false,
+                    type: "GET",
+                    dataType: "json"
+                }).done(function(response) {
+                    data = response;
+                    return response;
+                });
+
+                return data;
+            };
+        }])
+        .controller('PrivilegeController', ['$scope','$http','$timeout', function($scope,$http,$timeout) {
+            $scope.data             =   {};
+
+            $scope.roles            =   [];
+            $scope.resources        =   [];
+            $scope.actions          =   [];
+            $scope.privileges       =   [];
+            $scope.possibilities    =   [];
+
+            $scope.role           =   null;
+            $scope.resource         =   null;
+            $scope.action           =   null;
+
+            $scope.btnadd           =   true;
+            $scope.btnedit          =   false;
+            $scope.has_error        =   false;
+
+            $scope.load = function () {
+                $http({
+                    url: "/api/role",
+                    async: false,
+                    type: "GET",
+                    dataType: "json"
+                }).then(function successCallback(response) {
+                    $scope.roles = response.data._embedded.role;
+                }, function errorCallback(response) {
+                    errorNotify('Ops, houve um erro ao consultar os perfis!');
+                });
+
+                $http({
+                    url: "/api/resource",
+                    async: false,
+                    type: "GET",
+                    dataType: "json"
+                }).then(function successCallback(response) {
+                    $scope.resources = response.data._embedded.resource;
+                }, function errorCallback(response) {
+                    errorNotify('Ops, houve um erro ao consultar os recursos!');
+                });
+
+                $http({
+                    url: "/api/privilege",
+                    async: false,
+                    type: "GET",
+                    dataType: "json"
+                }).then(function successCallback(response) {
+                    $scope.privileges = response.data._embedded.privilege;
+                    console.log($scope.privileges);
+                }, function errorCallback(response) {
+                    errorNotify('Ops, houve um erro ao consultar os perfis!');
+                });
+            };
+
+            $scope.load();
+
+            $scope.changeResource = function() {
+                var data = [];
+                $scope.possibilities = [];
+                $scope.action = '';
+                $.ajax({
+                    url: "/api/possibility",
+                    type: "GET",
+                    data: {
+                        'filter'    :   [
+                            {
+                                'type' : 'andx',
+                                'conditions' : [
+                                    {'field' :'resource', 'type':'eq', 'value' : $scope.resource},
+                                ],
+                                'where'  :  'and'
+                            }
+                        ]
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        data = response._embedded.possibility;
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log(textStatus, errorThrown);
+                    }
+                });
+
+                $timeout(function(){
+                    $scope.possibilities = data;
+                },1000);
+            };
+
+            $scope.del = function (id) {
+                bootbox.confirm({
+                    message: "Deseja excluir esse item?",
+                    buttons: {
+                        cancel: {
+                            label: 'Não',
+                            className: 'btn-danger'
+                        },
+                        confirm: {
+                            label: 'Sim',
+                            className: 'btn-success btnConfirm',
+                        }
+                    },
+                    callback: function (result) {
+                        if(!result){
+                            this.modal('hide');
+                        }else{
+                            $http({
+                                url: '/api/privilege/' + id,
+                                method: "DELETE"
+                            }).then(function(response) {
+
+                                successNotify('Registro deletado com sucesso!');
+
+                                $scope.load();
+                            },
+                            function(response) {
+                                // failed
+                                if(response.status == 422)
+                                {
+                                    errorNotify("Houve erro na exclusão do cadastro, erro: "+response.statusText);
+                                }
+                            });
+                        }
+                    }
+                });
+            };
+
+            $scope.add = function () {
+                $scope.data = {};
+                $scope.data.role        = $scope.role;
+                $scope.data.resource    = $scope.resource;
+                $scope.data.name        = $scope.action;
+                console.log($scope.data);
+                $http({
+                    url: '/api/privilege',
+                    method: "POST",
+                    data: $scope.data
+                }).then(function (response) {
+
+                    successNotify('Privilégio cadastrado com sucesso!');
+
+                    $scope.load();
+                    $scope.action = '';
+                },
+                function (response) {
+                    // failed
+                    if (response.status == 422) {
+                        errorNotify("Houve erro na inclusão do cadastro erro: " + response.statusText);
+                    }
+                });
+            };
+
+            $scope.clear = function() {
+                $scope.id           =   null;
+                $scope.role         =   '';
+                $scope.resource     =   '';
+                $scope.action       =   '';
+                $scope.possibilities      =   [];
+            };
+        }]);
+</script>

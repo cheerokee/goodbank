@@ -1,0 +1,18 @@
+<?php
+$element = $this->element;
+$file = $element->getValue();
+$class_input = 'form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10 ui-autocomplete-input';
+?>
+<input type="file" accept="<?=$element->getAttribute('accept');?>" name="<?=$element->getName();?>" class="<?=$class_input?>">
+<?php
+if($file != '' && file_exists("public/uploads/$file")){
+    ?>
+    <p class="mt-2">
+        <a target="_blank" href="/uploads/<?=$file?>">
+            Visualizar Arquivo
+        </a>
+    </p>
+    <?php
+}
+?>
+

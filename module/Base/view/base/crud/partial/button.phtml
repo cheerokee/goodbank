@@ -1,0 +1,74 @@
+<?php
+$action = $this->action;
+$entity = $this->entity;
+$em     = $this->em;
+$identifyMethod = $this->identifyMethod;
+
+/**
+ * @var \Base\Controller\BaseFunctions $functions
+ */
+$functions = new \Base\Controller\BaseFunctions();
+
+if ($action['where']) {
+    eval("\$where = " . $action['where'] . ";");
+}
+
+$icon = '';
+if ($action['icon']) {
+    $icon = "<i class='$action[icon]'></i>";
+}
+
+$options = array();
+    
+if ($action['query']) {
+    $options['query'] = $action['query'];
+}
+
+if (isset($action['controller']) || $this->rota('controller')) {
+    $url['controller'] = (isset($action['controller'])) ? $action['controller'] : $this->rota('controller');
+}
+
+if (isset($action['action'])) {
+    $url['action'] = $action['action'];
+}
+
+if ($entity->$identifyMethod() != null) {
+    $url['id'] = $entity->$identifyMethod();
+}
+
+$rota = (isset($action['rota'])) ? $action['rota'] : $this->rota();
+
+$db_join_entity = array();
+if(isset($action['join'])){
+    $method_find = 'findBy'.$functions->toCamelCase($action['join']['fk']);
+    $method_get = 'get' .  $functions->toCamelCase($action['join']['pk']);
+    $db_join_entity = $em->getRepository($action['join']['entity'])->$method_find($entity->$method_get());
+    $url['fk'] = $action['join']['fk'];
+    $url['fk_id'] = $entity->$method_get();
+}
+
+if ( $action['authorize'] === false && $this->authorized($this->listView['title'],$action['title'])) {
+    ?>
+    <li>
+        <a title="<?=($action['title'])?$action['title']:''?>"
+           href="<?=$this->url($rota,$url,$options);?>?<?=$this->param?>"
+           class="button_custom d-flex align-items-center u-link-v5 g-bg-gray-light-v8--hover g-font-size-12 g-font-size-default--md g-color-gray-dark-v6 g-px-25 g-py-14">
+            <i class="<?=$action['icon']?> g-font-size-18 g-color-gray-light-v6 g-mr-10 g-mr-15--md"></i>
+            <?=$action['title']?> <?=(!empty($db_join_entity))?'<span class="text-danger">( '.count($db_join_entity).' )</span>':'';?>
+        </a>
+    </li>
+    <?php
+}else{
+    ?>
+    <li>
+        <a title="<?=($action['title'])?$action['title']:''?>"
+           href="<?=$this->url($rota,$url,$options);?>?<?=$this->param?>"
+           class="button_custom d-flex align-items-center u-link-v5 g-bg-gray-light-v8--hover g-font-size-12 g-font-size-default--md g-color-gray-dark-v6 g-px-25 g-py-14">
+            <i class="<?=$icon?> g-font-size-18 g-color-gray-light-v6 g-mr-10 g-mr-15--md"></i>
+            <?=$action['label']?> <?=($action['appear-title'])?$action['title']:''?> <?=(!empty($db_join_entity))?'<span class="text-danger">( '.count($db_join_entity).' )</span>':'';?>
+        </a>
+    </li>
+    <?php
+}
+?>
+

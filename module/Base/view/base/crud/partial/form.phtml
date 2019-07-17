@@ -1,0 +1,247 @@
+<?php
+
+if(isset($this->route) && isset($this->controller) && isset($this->action) && isset($this->id))
+{
+    $action = $this->url($this->route,array(
+        'controller' => $this->controller,
+        'action' => $this->action,
+        'id' => $this->id
+    ));
+}
+
+/** DECLARAÇÕES **/
+$user = $this->userIdentity('User');
+$form = $this->form;
+$chave = ($this->controller == 'people')?'user':$this->controller;
+
+/** new ou edit **/
+$type = $this->type;
+
+/** adicionar registro ou editar registro **/
+$acao = $this->acao;
+
+$form->setAttribute('action', $this->url($this->route, array(
+    'controller' => $this->controller,
+    'action' => $type
+)))->prepare();
+
+/**
+ * @var \Base\Controller\BaseFunctions $functions
+ */
+$functions = new \Base\Controller\BaseFunctions();
+if($this->fk != null && $this->fk_id != null)
+{
+    $link['return'] = $this->url($functions->camel2dashed($controller).'-join',array('fk' => $fk,'fk_id' => $fk_id));
+}
+
+if($fk != null && $fk_id != null) {
+    $form->setAttribute('action', $this->url($functions->camel2dashed($controller) . '-join-' . $type, array('fk' => $fk, 'fk_id' => $fk_id, 'id' => $this->id)));
+}
+
+if(isset($action)){
+    $form->setAttribute('action',$action);
+}
+
+if($link['return'] == '') {
+    $link['return'] = $this->url();
+}
+
+?>
+
+<div class="g-hidden-sm-down g-bg-gray-light-v8 g-pa-20">
+    <ul class="u-list-inline g-color-gray-dark-v6">
+
+        <li class="list-inline-item g-mr-10">
+            <a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle"
+               href="<?=$this->url('admin');?>">
+                Dashboard
+            </a>
+            <i class="hs-admin-angle-right g-font-size-12 g-color-gray-light-v6 g-valign-middle g-ml-10"></i>
+        </li>
+        <?php
+        if(isset($_GET['profile']))
+        {
+            $url = $this->url($_GET['profile'].'/default',array(
+                'controller' => 'user',
+                'action' => $_GET['profile']
+            ));
+            ?>
+            <li class="list-inline-item g-mr-10">
+                <a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle"
+                   href="<?=$url?>">
+                    <i class="<?=$this->icon?>"></i> <?=$this->title?>
+                </a>
+                <i class="hs-admin-angle-right g-font-size-12 g-color-gray-light-v6 g-valign-middle g-ml-10"></i>
+            </li>
+            <?php
+        }else{
+            $url = $this->url($controller.'/default',array(
+                'controller' => 'user'
+            ));
+            ?>
+            <li class="list-inline-item g-mr-10">
+                <a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle"
+                   href="<?=$url?>">
+                    <i class="<?=$this->icon?>"></i> <?=$this->title?>
+                </a>
+                <i class="hs-admin-angle-right g-font-size-12 g-color-gray-light-v6 g-valign-middle g-ml-10"></i>
+            </li>
+            <?php
+        }
+        ?>
+        <li class="list-inline-item">
+            <span class="g-valign-middle">
+                <?=$acao?>
+            </span>
+        </li>
+    </ul>
+</div>
+<div class="g-pa-20">
+    <h1 class="g-font-weight-300 g-font-size-28 g-color-black g-mb-30">
+        <i class="<?=$this->_listView['icon']?>"></i> <?=$this->_listView['title']?> > <small><?=$acao?></small>
+    </h1>
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <?php $this->getFlashMessenger();?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <?=$this->form()->openTag($form);?>
+                <?php
+                if(isset($_REQUEST['return_to']) && $_REQUEST['return_to'] != '') {
+                    switch ($_REQUEST['return_to']) {
+                        case 'admin_home':
+                            ?>
+                            <input type="hidden" name="return_to" value="<?=$this->url('admin')?>"/>
+                            <?php
+                            break;
+                    }
+                }
+
+                if(isset($_REQUEST['page']) && $_REQUEST['page'] != '') {
+                    ?>
+                    <input type="hidden" name="page_number" value="<?=$_REQUEST['page']?>"/>
+                    <?php
+                }
+
+                ?>
+                <div class="col-md-12 ">
+                    <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md g-mb-30 row">
+                        <?php
+                        $hidden = array(
+                            'hidden' => 1,
+                            'submit' => 1
+                        );
+
+                        /**
+                         * @var \Zend\Form\Element $element
+                         */
+
+                        foreach ($form as $element) {
+                            $type = $element->getAttributes()['type'];
+
+                            $element->setAttribute('form',$form->getName());
+                            $element->setAttribute('class',$element->getAttribute('class').' form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10');
+
+                            $id = 'input'.$element->getName();
+
+                            $style = ($hidden[$type])?'display:none':'display:block';
+
+                            //SE FOR JOIN
+                            if($this->fk != null && $this->fk_id != null && $element->getName() == $this->fk)
+                            {
+                                $element->setAttribute('value',$this->fk_id);
+                                $element->setAttribute('readonly','readonly');
+                            }
+
+                            if(is_object($element->getValue()) && method_exists($element->getValue(),'getId')){
+                                $element->setValue($element->getValue()->getId());
+                            }
+
+                            switch ($type){
+                                case ($element instanceof \Zend\Form\Element\Textarea):
+                                    $column = "col-md-12";
+                                    break;
+                                case "radio":
+                                    $column = "col-md-12";
+                                    break;
+                                default:
+                                    $column = "col-md-4";
+                            }
+
+                            $component = $element->getAttribute('component');
+                            $component_params = $element->getAttribute('component_params'); //Deve ser um Json
+
+                            $customs = array(
+                                'rich-text',
+                                'icon-change',
+                                'crop-image',
+                                'autocomplete',
+                                'file',
+                                'datetime',
+                                'join-select'
+                            );
+
+                            if(!empty($customs) && in_array($component,$customs)){
+                                ?>
+                                <div id="<?=$id?>" class="form-group g-mb-30 <?=$column?>" style="<?=$style?>">
+                                    <label class="g-mb-10" for="inputGroup-2_1">
+                                        <?=$element->getLabel();?>
+                                    </label>
+                                    <div class="g-pos-rel">
+                                    <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                        <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                                    </span>
+                                        <?php
+                                        try {
+                                            echo $this->partial('partial/components/component-' . $component, array(
+                                                'entity_name' => $this->entity,
+                                                'entity_id' => $this->id,
+                                                'element' => $element,
+                                                'component_params' => json_decode($component_params,true)
+                                            ));
+                                        }catch (Exception $e){
+                                            echo '<p>Componente (component-' . $custom . ') não definido!</p>';
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+                                <?php
+                                continue;
+                            }
+
+                            ?>
+                            <div id="<?=$id?>" class="form-group g-mb-30 <?=$column?>" style="<?=$style?>">
+                                <label class="g-mb-10" for="inputGroup-2_1">
+                                    <?=$element->getLabel();?>
+                                </label>
+                                <div class="g-pos-rel">
+                                    <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                        <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                                    </span>
+                                    <?= $this->formelement($element);?>
+                                </div>
+                            </div>
+                            <?php
+                        }
+
+                        ?>
+                        <div class=" col-md-12">
+                            <div class="d-flex justify-content-end input-group g-pos-rel">
+                                <a class="text-white mr-3 pull-right btn btn-xl g-brd-around g-rounded-50 u-btn-red g-width-160--md g-font-size-default"
+                                   onclick="window.history.back();">
+                                    <i class="fa fa-arrow-left"></i>&nbsp;Retornar
+                                </a>
+                                <button type="submit" class="pull-right btn btn-xl g-brd-around g-rounded-50 u-btn-gradient-v1 g-width-160--md g-font-size-default">
+                                    <i class="fa fa-save"></i>&nbsp;Salvar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?=$this->form()->closeTag();?>
+        </div>
+    </div>
+</div>
+

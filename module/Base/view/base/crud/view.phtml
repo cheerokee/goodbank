@@ -1,0 +1,111 @@
+<?php
+/**
+ * @var \Zend\Form\Element[] $form
+ */
+$form   =   $this->form;
+$route  =   $this->route;
+$entity =  $this->entity;
+$controller = $this->controller;
+
+
+$url_params = [];
+
+if(!empty($_GET))
+{
+    foreach ($_GET as $k => $item) {
+        $url_params[] = $k . '=' . $item;
+    }
+}
+
+$url_params = (!empty($url_params)) ? '?' . implode('&',$url_params): '';
+
+$url_edit = $this->url($route,array(
+    'controller' => $controller,
+    'action'        =>  'edit',
+    'id' => $entity->getId()
+)) . $url_params;
+?>
+<div class="g-hidden-sm-down g-bg-gray-light-v8 g-pa-20">
+    <ul class="u-list-inline g-color-gray-dark-v6">
+        <li class="list-inline-item g-mr-10">
+            <a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle"
+               href="<?=$this->url('admin');?>">
+                Dashboard
+            </a>
+            <i class="hs-admin-angle-right g-font-size-12 g-color-gray-light-v6 g-valign-middle g-ml-10"></i>
+        </li>
+        <li class="list-inline-item g-mr-10">
+            <a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle"
+               href="<?=$this->url($route,array('action' => 'index','page' => $_GET['page']));?>">
+                <?=$this->_listView['title']?>
+            </a>
+            <i class="hs-admin-angle-right g-font-size-12 g-color-gray-light-v6 g-valign-middle g-ml-10"></i>
+        </li>
+        <li class="list-inline-item">
+            <span class="g-valign-middle">
+                <?=$entity?>
+            </span>
+        </li>
+    </ul>
+</div>
+<div class="g-pa-20">
+    <h1 class="g-font-weight-300 g-font-size-28 g-color-black g-mb-30">
+        <i class="<?=$this->_listView['icon']?>"></i> <?=$entity?>
+    </h1>
+    <hr class="d-flex g-brd-gray-light-v7 ">
+    <div class="g-mb-40 row">
+        <?php
+        if(!empty($form))
+        {
+            foreach ($form as $element)
+            {
+                if($element->getAttribute('type') == 'hidden' || $element->getAttribute('type') == 'submit')continue;
+
+                $collumn    = 'col-md-4';
+                $value      =   '';
+
+                switch (get_class($element)) {
+                    case 'Zend\Form\Element\Select';
+                        $collumn = 'col-md-4';
+                        $value = $element->getValue();
+                        break;
+                    case 'Zend\Form\Element\Text';
+                        $collumn = 'col-md-4';
+                        $value = $element->getValue();
+                        break;
+                    case 'Zend\Form\Element\Textarea';
+                        $collumn = 'col-md-12';
+                        $value = $element->getValue();
+                        break;
+                    case 'Zend\Form\Element\File';
+                        $collumn = 'col-md-4';
+                        $value = $element->getValue();
+                        break;
+                    default:
+                        $collumn = 'col-md-4';
+                        $value = $element->getValue();
+                }
+
+                ?>
+                <div class="<?=$collumn?>">
+                    <label><?=$element->getLabel()?></label>
+                    <p><?=$value?></p>
+                </div>
+                <?php
+            }
+        }
+        ?>
+        <div class="col-md-12">
+            <hr class="d-flex g-brd-gray-light-v7 ">
+            <a href="<?=$url_edit?>" class=" pull-right btn btn-xl g-brd-around g-rounded-50 u-btn-gradient-v1 g-width-160--md g-font-size-default">
+                <i class="hs-admin-save"></i>&nbsp;Editar
+            </a>
+            <a class="text-white mr-3 pull-right btn btn-xl g-brd-around g-rounded-50 u-btn-red g-width-160--md g-font-size-default"
+               onclick="window.history.back();">
+                <i class="fa fa-arrow-left"></i>&nbsp;Retornar
+            </a>
+        </div>
+    </div>
+</div>
+
+

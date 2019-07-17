@@ -1,0 +1,116 @@
+<?php
+$tmp = explode('?', $_SERVER['REQUEST_URI']);
+$urlPattern = $tmp[0];
+$formatUrl = function ($page) use($urlPattern) {
+    if (! preg_match('/page/', $urlPattern))
+        return $urlPattern . '/page/' . (int) $page;
+    else
+        return preg_replace('@/page/\d+@', '/page/' . (int) $page, $urlPattern);
+};
+
+$params = '';
+if (isset($_GET['field']) && isset($_GET['orderby'])) {
+
+    $params = '?field=' . $_GET['field'] . '&orderby=' . $_GET['orderby'];
+}
+
+if ($this->pageCount) {
+    ?>
+    <nav id="datatablePagination1"
+         class="d-flex ml-auto"
+         aria-label="Page Navigation">
+        <ul class="list-inline text-right mb-0">
+            <?php
+            if (isset($this->previous)) {
+                ?>
+                <li class="list-inline-item">
+                    <a id="datatablePagination1Prev"
+                       class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                       href="<?=$formatUrl($this->previous).$params; ?>"
+                       aria-label="Previous">
+                        <span class="g-line-height-1 g-valign-middle" aria-hidden="true">
+                            <i class="hs-admin-angle-left"></i>
+                        </span>
+                        <span class="sr-only">Anterior</span>
+                    </a>
+                </li>
+                <?php
+            } else {
+                ?>
+                <li class="list-inline-item">
+                    <a id="datatablePagination1Prev"
+                       class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12  g-bg-secondary g-color-white"
+                       href="<?=$formatUrl($this->previous).$params; ?>"
+                       aria-label="Anterior">
+                        <span class="g-line-height-1 g-valign-middle" aria-hidden="true">
+                            <i class="hs-admin-angle-left"></i>
+                        </span>
+                        <span class="sr-only">Anterior</span>
+                    </a>
+                </li>
+                <?php
+            }
+
+            foreach ($this->pagesInRange as $page)
+            {
+                if ($page != $this->current) {
+                    ?>
+                    <li class="list-inline-item g-hidden-sm-down">
+                        <a id="datatablePaginationPage0" class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-brd-secondary--active g-rounded-4 g-py-8 g-px-15 active"
+                           href="<?php echo $formatUrl($page).$params; ?>"
+                           data-dt-page-to="0">
+                            <?=$page; ?>
+                        </a>
+                    </li>
+                    <?php
+                } else {
+                    ?>
+                    <li class="list-inline-item g-hidden-sm-down disabled">
+                        <a id="datatablePaginationPage0" class="u-pagination-v1__item u-pagination-v1-2 g-bg-secondary--active g-color-white--active g-brd-gray-light-v7 g-brd-secondary--hover g-brd-secondary--active g-rounded-4 g-py-8 g-px-15 active"
+                           href="<?php echo $formatUrl($page).$params; ?>"
+                           data-dt-page-to="0">
+                            <?=$page; ?>
+                        </a>
+                    </li>
+                    <?php
+                }
+            }
+
+            if (isset($this->next))
+            {
+                ?>
+                <li class="list-inline-item">
+                    <a id="datatablePagination1Next"
+                       class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                       href="<?=$formatUrl($this->next).$params; ?>"
+                       aria-label="Next">
+                            <span class="g-line-height-1 g-valign-middle" aria-hidden="true">
+                                <i class="hs-admin-angle-right"></i>
+                            </span>
+                        <span class="sr-only">Próximo</span>
+                    </a>
+                </li>
+                <?php
+            }else{
+                ?>
+                <li class="list-inline-item disabled">
+                    <a id="datatablePagination1Next"
+                       class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12 g-bg-secondary g-color-white"
+                       href="<?=$formatUrl($this->next).$params; ?>"
+                       aria-label="Next">
+                            <span class="g-line-height-1 g-valign-middle" aria-hidden="true">
+                                <i class="hs-admin-angle-right"></i>
+                            </span>
+                        <span class="sr-only">Próximo</span>
+                    </a>
+                </li>
+                <?php
+            }
+            ?>
+        </ul>
+    </nav>
+    <?php
+}
+?>
+
+

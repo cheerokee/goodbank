@@ -1,0 +1,91 @@
+<section class="g-bg-gray-light-v5 height-100">
+    <div class="container g-py-100">
+        <div class="row justify-content-center">
+            <div class="col-sm-8 col-lg-5">
+                <div class="u-shadow-v21 g-bg-white rounded g-py-40 g-px-30">
+                    <header class="text-center mb-4">
+                        <img class="img-fluid g-mb-40" src="/assets/logo.png">
+                        <h2 class="h2 g-color-black g-font-weight-600">Área Restrita</h2>
+                    </header>
+                    <?=$this->getFlashMessenger()?>
+
+                    <?php
+                    if(isset($this->login) && is_object($this->login)) {
+                        ?>
+                        <h3 class="text-center"><?='Bem vindo<br /><strong>'.$this->login->getName().'</strong>';?></h3>
+                        <p>Você está logado no sistema, clique no botão abaixo para acessar a área administrativa</p>
+                        <div class="mb-4">
+                            <a href="<?=$this->url('admin');?>" type="button" id="login" class="btn btn-md btn-block u-btn-primary rounded g-py-13">
+                                Entrar
+                            </a>
+                        </div>
+                        <footer class="text-center">
+                            <p class="g-color-gray-dark-v5 g-font-size-13 mb-0">
+                                Deseja entrar com outra conta?
+                                <a href="<?=$this->url('user-logout')?>" class="g-font-weight-600">
+                                    Deslogar
+                                </a>
+                            </p>
+                        </footer>
+                        <?php
+                    }else{
+                        ?>
+                        <form class="form-signin form-validate g-py-15" method="post" action="">
+                            <div class="mb-4">
+                                <label for="email" class="g-color-gray-dark-v2 g-font-weight-600 g-font-size-13">
+                                    Email:
+                                </label>
+                                <input id="email"
+                                       type="email"
+                                       name="email"
+                                       class="form-control g-color-black g-bg-white g-bg-white--focus g-brd-gray-light-v4 g-brd-primary--hover rounded g-py-15 g-px-15"
+                                       placeholder="Digite o e-mail" required autofocus>
+                            </div>
+                            <div class="g-mb-35">
+                                <label for="password" class="g-color-gray-dark-v2 g-font-weight-600 g-font-size-13">
+                                    Password:
+                                </label>
+                                <input id="password"
+                                       type="password"
+                                       name="password"
+                                       required
+                                       data-msg="Por favor entre com a senha"
+                                       class="form-control g-color-black g-bg-white g-bg-white--focus g-brd-gray-light-v4 g-brd-primary--hover rounded g-py-15 g-px-15 mb-3"
+                                       placeholder="Digite sua senha">
+
+                                <div class="row justify-content-between">
+                                    <div class="col align-self-center">
+
+                                    </div>
+                                    <div class="col align-self-center text-right">
+                                        <a href="<?=$this->url('lostpassword')?>" class="g-font-size-12">
+                                            Esqueceu a senha?
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <button type="submit" id="login" class="btn btn-md btn-block u-btn-primary rounded g-py-13">
+                                    Entrar
+                                </button>
+                            </div>
+                        </form>
+                        <footer class="text-center">
+                            <p class="g-color-gray-dark-v5 g-font-size-13 mb-0">
+                                Ainda não está cadastrado?
+                                <a href="<?=$this->url('user-register')?>" class="g-font-weight-600">
+                                    Cadastre-se
+                                </a>
+                            </p>
+                        </footer>
+                        <?php
+                    }
+                    ?>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

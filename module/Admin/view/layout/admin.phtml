@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <?php
+    $user = $this->userIdentity('User');
+    if(!($user instanceof \Register\Entity\User)){
+        header('Location: /auth');
+        die;
+    }
+    ?>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <base href="<?php echo $this->basePath(); ?>" />
+
+    <?=$this->partial('partials/styles.phtml');?>
+
+    <title><?=$this->getConfiguration('NOMEEMPRESA');?></title>
+
+    <?php
+    if ($user instanceof \Register\Entity\User) {
+        $foto = ($user->getImage() != '' && file_exists('public/' . $user->getImage())) ? $user->getImage() : '/assets/sem_imagem.jpg';
+    }
+    ?>
+
+    <script src="/admin/assets/js/jquery.min.js"></script>
+    <script src="/admin/assets/js/jquery-ui.js"></script>
+    <script src="/admin/assets/js/angular.min.js"></script>
+    <script src="/assets/js/bootbox.js"></script>
+    <script src="/assets/js/moment.min.js"></script>
+
+</head>
+<body>
+<header id="js-header" class="u-header u-header--sticky-top">
+    <div class="u-header__section u-header__section--admin-dark g-min-height-65">
+        <nav class="navbar no-gutters g-pa-0">
+            <div class="col-auto d-flex flex-nowrap u-header-logo-toggler g-py-12">
+                <a href="<?=$this->url('admin')?>" class="navbar-brand d-flex align-self-center g-hidden-xs-down g-line-height-1 py-0 g-mt-5">
+                    <img class="img-fluid" src="/assets/logo.png" />
+                </a>
+
+                <!-- Sidebar Toggler -->
+                <a class="js-side-nav u-header__nav-toggler d-flex align-self-center ml-auto" href="#" data-hssm-class="u-side-nav--mini u-sidebar-navigation-v1--mini" data-hssm-body-class="u-side-nav-mini" data-hssm-is-close-all-except-this="true" data-hssm-target="#sideNav">
+                    <i class="hs-admin-align-left"></i>
+                </a>
+                <!-- End Sidebar Toggler -->
+            </div>
+
+            <div class="col-auto d-flex g-py-12 g-pl-40--lg ml-auto">
+                <a id="searchInvoker" class="g-hidden-sm-up text-uppercase u-header-icon-v1 g-pos-rel g-width-40 g-height-40 rounded-circle g-font-size-20" href="#" aria-controls="searchMenu" aria-haspopup="true" aria-expanded="false" data-is-mobile-only="true" data-dropdown-event="click"
+                   data-dropdown-target="#searchMenu" data-dropdown-type="css-animation" data-dropdown-duration="300" data-dropdown-animation-in="fadeIn" data-dropdown-animation-out="fadeOut">
+                    <i class="hs-admin-search g-absolute-centered"></i>
+                </a>
+
+                <!-- Top User -->
+                <div class="col-auto d-flex g-pt-5 g-pt-0--sm g-pl-10 g-pl-20--sm">
+                    <div class="g-pos-rel g-px-10--lg">
+                        <a id="profileMenuInvoker"
+                           class="d-block"
+                           href="#"
+                           aria-controls="profileMenu"
+                           aria-haspopup="true"
+                           aria-expanded="false"
+                           data-dropdown-event="click"
+                           data-dropdown-target="#profileMenu"
+                           data-dropdown-type="css-animation"
+                           data-dropdown-duration="300"
+                           data-dropdown-animation-in="fadeIn"
+                           data-dropdown-animation-out="fadeOut">
+                            <span class="g-pos-rel">
+                                <span class="u-badge-v2--xs u-badge--top-right g-hidden-sm-up g-bg-secondary g-mr-5">
+                                </span>
+                                <img class="g-width-30 g-width-40--md g-height-30 g-height-40--md rounded-circle g-mr-10--sm"
+                                     src="<?=$foto?>"
+                                     alt="<?=$user->getName()?>">
+                            </span>
+                            <span class="g-pos-rel g-top-2">
+                                <span class="g-hidden-sm-down"><?=$user->getName()?></span>
+                                <i class="hs-admin-angle-down g-pos-rel g-top-2 g-ml-10"></i>
+                            </span>
+                        </a>
+                        <!-- Top User Menu -->
+                        <ul id="profileMenu" class="g-pos-abs g-left-0 g-width-100x--lg g-nowrap g-font-size-14 g-py-20 g-mt-17 rounded" aria-labelledby="profileMenuInvoker">
+                            <li class="g-hidden-sm-up g-mb-10">
+                                <a class="media g-py-5 g-px-20" href="#">
+                                    <span class="d-flex align-self-center g-pos-rel g-mr-12">
+                                        <span class="u-badge-v1 g-top-minus-3 g-right-minus-3 g-width-18 g-height-18 g-bg-secondary g-font-size-10 g-color-white rounded-circle p-0">10</span>
+                                        <i class="hs-admin-comment-alt"></i>
+                                    </span>
+                                    <span class="media-body align-self-center">
+                                        Unread Messages
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="g-hidden-sm-up g-mb-10">
+                                <a class="media g-py-5 g-px-20" href="#">
+                                    <span class="d-flex align-self-center g-mr-12">
+                                        <i class="hs-admin-bell"></i>
+                                    </span>
+                                    <span class="media-body align-self-center">Notifications</span>
+                                </a>
+                            </li>
+                            <li class="g-mb-10">
+                                <?php
+                                $link = $this->url('user-view',array('id' => $user->getId()));
+                                ?>
+                                <a class="media g-color-primary--hover g-py-5 g-px-20"
+                                   href="<?=$link?>">
+                                    <span class="d-flex align-self-center g-mr-12">
+                                        <i class="hs-admin-user"></i>
+                                    </span>
+                                    <span class="media-body align-self-center">
+                                        Meu Perfil
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="mb-0">
+                                <a class="media g-color-primary--hover g-py-5 g-px-20"
+                                   href="<?=$this->url('user-logout')?>">
+                                    <span class="d-flex align-self-center g-mr-12">
+                                        <i class="hs-admin-shift-right"></i>
+                                    </span>
+                                    <span class="media-body align-self-center">
+                                        Deslogar
+                                    </span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>
+<main class="container-fluid px-0 g-pt-65">
+    <div class="row no-gutters g-pos-rel g-overflow-x-hidden">
+        <!-- Sidebar Nav -->
+        <div id="sideNav" class="col-auto u-sidebar-navigation-v1 u-sidebar-navigation--dark">
+            <ul id="sideNavMenu" class="u-sidebar-navigation-v1-menu u-side-nav--top-level-menu g-min-height-100vh mb-0">
+                <li class="u-sidebar-navigation-v1-menu-item u-side-nav--top-level-menu-item">
+                    <a class="media u-side-nav--top-level-menu-link u-side-nav--hide-on-hidden g-px-15 g-py-12 <?=($_SERVER['REDIRECT_URL'] == '/admin-home')?'active':''?>"
+                       href="<?=$this->url('admin')?>">
+                        <span class="d-flex align-self-center g-font-size-18 g-mr-18">
+                            <i class="hs-admin-dashboard"></i>
+                        </span>
+                        <span class="media-body align-self-center">Dashboard</span>
+                    </a>
+                </li>
+                <?php
+
+                if(!empty($this->getMenu()))
+                {
+                    foreach($this->getMenu() as $a => $menu)
+                    {
+                        if(!isset($menu['itens']))
+                        {
+                            ?>
+                            <li class="u-sidebar-navigation-v1-menu-item u-side-nav--top-level-menu-item">
+                                <a class="media u-side-nav--top-level-menu-link u-side-nav--hide-on-hidden g-px-15 g-py-12 <?=($_SERVER['REDIRECT_URL'] == $menu['rota'])?'active':''?>"
+                                   href="<?=$menu['rota']?>">
+                                    <span class="d-flex align-self-center g-font-size-18 g-mr-18">
+                                        <i class="<?=$menu['icon']?>"></i>
+                                    </span>
+                                    <span class="media-body align-self-center"><?=$menu['titulo']?></span>
+                                </a>
+                            </li>
+                            <?
+                        }else{
+                            $somenu = true;
+                            $active = false;
+                            $active_menu = false;
+                            ob_start();
+                            foreach($menu['itens'] as $k => $item)
+                            {
+                                if($item['authorize'] === false){
+                                    $authorized = false;
+
+                                    try {
+                                        if ($this->authorized($item['titulo'], 'Visualizar') || $this->authorize($item['titulo'], 'Listar')) {
+                                            $authorized = true;
+                                        } else {
+                                            continue;
+                                        }
+                                    }catch(Exception $e){
+                                        continue;
+                                    }
+                                }
+
+                                if($_SERVER['REDIRECT_URL'] == $item['rota']){
+                                    $active = true;
+                                    $active_menu = true;
+
+                                }
+
+                                $somenu = false;
+                                ?>
+                                <li class="u-sidebar-navigation-v1-menu-item u-side-nav--second-level-menu-item">
+                                    <a class="media u-side-nav--second-level-menu-link g-px-15 g-py-12 <?=($active)?'active':'';?>"
+                                       href="<?=$item['rota']?>"
+                                       title="<?=$item['titulo']?>">
+                                        <span class="d-flex align-self-center g-mr-15 g-mt-minus-1">
+                                            <i class="<?=$item['icon']?>"></i>
+                                        </span>
+                                        <span class="media-body align-self-center">
+                                            <?=$item['titulo']?>
+                                        </span>
+                                    </a>
+                                </li>
+                                <?php
+                                $active = false;
+                            }
+
+                            $submenu = ob_get_contents();
+                            ob_end_clean();
+
+                            if($somenu){
+                                continue;
+                            }
+
+                            $active = $active_menu;
+                            ?>
+                            <li id="menu_<?=$a?>" class="u-sidebar-navigation-v1-menu-item u-side-nav--has-sub-menu u-side-nav--top-level-menu-item <?=($active)?'u-side-nav-opened has-active':''?>">
+                                <a class="media u-side-nav--top-level-menu-link u-side-nav--hide-on-hidden g-px-15 g-py-12 <?=($active)?'active':''?>"
+                                   href="#"
+                                   data-hssm-target="#submenu_<?=$a?>">
+                                    <span class="d-flex align-self-center g-pos-rel g-font-size-18 g-mr-18">
+                                        <i class="<?=$menu['icon']?>"></i>
+                                    </span>
+                                    <span class="media-body align-self-center"><?=$menu['titulo']?></span>
+                                    <span class="d-flex align-self-center u-side-nav--control-icon">
+                                        <i class="hs-admin-angle-right"></i>
+                                    </span>
+                                    <span class="u-side-nav--has-sub-menu__indicator"></span>
+                                </a>
+                                <!-- Dashboards: Submenu-1 -->
+                                <ul id="submenu_<?=$a?>" class="u-sidebar-navigation-v1-menu u-side-nav--second-level-menu mb-0" <?=($active)?'style="display: block"':''?>>
+                                    <?=$submenu?>
+                                </ul>
+                            </li>
+                            <?php
+                        }
+
+                    }
+                }
+                ?>
+            </ul>
+        </div>
+        <!-- End Sidebar Nav -->
+        <div class="col g-ml-45 g-ml-0--lg g-pb-65--md">
+            <?=$this->content;?>
+            <!-- Footer -->
+            <footer id="footer" class="u-footer--bottom-sticky g-bg-white g-color-gray-dark-v6 g-brd-top g-brd-gray-light-v7 g-pa-20">
+                <div class="row align-items-center">
+                    <div class="col-md-4 text-center text-md-left">
+                        <small class="d-block g-font-size-default">&copy;
+                            <?=date('Y')?> <a href="http://www.britago.com.br" target="_blank">Britago</a>. Todos os direitos reservados.
+                        </small>
+                    </div>
+                    <div class="col-md-4 offset-md-4 text-center text-md-right">
+                        <small class="d-block g-font-size-default">
+                            Desenvolvido por <a target="_blank" href="http://inovensti.com.br">Inovens TI.</a> - Fábrica de Software ©
+                        </small>
+                    </div>
+                </div>
+            </footer>
+            <!-- End Footer -->
+        </div>
+    </div>
+</main>
+<?=$this->partial('partials/scripts.phtml');?>
+<script>
+    $(document).on('ready', function () {
+        // initialization of custom select
+        $('.js-select').selectpicker();
+
+        $.HSCore.components.HSRangeDatepicker.init('.js-range-datepicker');
+
+        // initialization of hamburger
+        $.HSCore.helpers.HSHamburgers.init('.hamburger');
+
+        // initialization of charts
+        $.HSCore.components.HSAreaChart.init('.js-area-chart');
+        $.HSCore.components.HSDonutChart.init('.js-donut-chart');
+        $.HSCore.components.HSBarChart.init('.js-bar-chart');
+
+        $.HSCore.components.HSRangeSlider.init('.js-range-slider');
+
+        // initialization of sidebar navigation component
+        $.HSCore.components.HSSideNav.init('.js-side-nav', {
+            afterOpen: function() {
+                setTimeout(function() {
+                    $.HSCore.components.HSAreaChart.init('.js-area-chart');
+                    $.HSCore.components.HSDonutChart.init('.js-donut-chart');
+                    $.HSCore.components.HSBarChart.init('.js-bar-chart');
+                }, 400);
+            },
+            afterClose: function() {
+                setTimeout(function() {
+                    $.HSCore.components.HSAreaChart.init('.js-area-chart');
+                    $.HSCore.components.HSDonutChart.init('.js-donut-chart');
+                    $.HSCore.components.HSBarChart.init('.js-bar-chart');
+                }, 400);
+            }
+        });
+
+        // initialization of range datepicker
+        $.HSCore.components.HSRangeDatepicker.init('#rangeDatepicker, #rangeDatepicker2, #rangeDatepicker3');
+
+        // initialization of datepicker
+        $.HSCore.components.HSDatepicker.init('#datepicker', {
+            dayNamesMin: [
+                'SU',
+                'MO',
+                'TU',
+                'WE',
+                'TH',
+                'FR',
+                'SA'
+            ]
+        });
+
+        // initialization of HSDropdown component
+        $.HSCore.components.HSDropdown.init($('[data-dropdown-target]'), {dropdownHideOnScroll: false});
+
+        // initialization of custom scrollbar
+        $.HSCore.components.HSScrollBar.init($('.js-custom-scroll'));
+
+        // initialization of popups
+        $.HSCore.components.HSPopup.init('.js-fancybox', {
+            btnTpl: {
+                smallBtn: '<button data-fancybox-close class="btn g-pos-abs g-top-25 g-right-30 g-line-height-1 g-bg-transparent g-font-size-16 g-color-gray-light-v3 g-brd-none p-0" title=""><i class="hs-admin-close"></i></button>'
+            }
+        });
+    });
+</script>
+</body>
+</html>

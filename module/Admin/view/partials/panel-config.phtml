@@ -1,0 +1,182 @@
+<div ng-app="panel" class="row">
+    <div class="col-md-12">
+        <div ng-controller="PanelController as panel" class="col-md-6 margin-bottom-10">
+            <div class="col-md-12 bg-color-darken padding-bottom-10 padding-top-10">
+                <h4 class="no-padding no-margin txt-color-white">
+                    <strong>
+                        <i class="fa fa-cogs"></i>&nbsp;Configurações Gerais
+                    </strong>
+                </h4>
+                <hr/>
+                <div class="row">
+                    <div class="col-md-12 form-group">
+                        <label class="txt-color-white">Configuração</label>
+                        <select ng-model="data.id" ng-change="selectConfig()" class="form-control">
+                            <option ng-value="-1" value="-1">Selecione...</option>
+                            <option ng-repeat="config in configurations" ng-value="config.id">{{ config.title }}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12 form-group">
+                        <label class="txt-color-white">Valor</label>
+                        <input class="form-control" ng-model="data.value" value="">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-success" ng-click="update()" >
+                    Atualizar
+                </button>
+                <button ng-if="data.id != -1" ng-click="clear()" type="button" class="btn btn-danger" >
+                    Cancelar
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    angular.module('panel', [])
+    .controller('PanelController', ['$scope','$http','$timeout', function($scope,$http,$timeout) {
+        $scope.data = {
+            id  :   -1,
+            title   :   '',
+            chave   :   '',
+            value   :   '',
+            editable:   1
+        };
+
+        $scope.configurations = [];
+
+        $scope.clear = function() {
+            $scope.data = {
+                id  :   -1,
+                title   :   '',
+                chave   :   '',
+                value   :   '',
+                editable:   1
+            };
+        };
+
+        $scope.load = function() {
+            $.ajax({
+                url: "/api/configuration",
+                type: "GET",
+                data: {
+                    'filter'    :   [
+                        {
+                            'type' : 'andx',
+                            'conditions' : [
+                                {'field' :'editable', 'type':'eq', 'value' : '1'}
+                            ],
+                            'where'  :  'and'
+                        }
+                    ]
+                },
+                dataType: "json",
+                success: function (response) {
+                    $timeout(function () {
+                        /** MUDAR AQUI **/
+                        /** MUDAR AQUI **/
+                        $scope.configurations = response._embedded.configuration;
+                        /** MUDAR AQUI **/
+                        /** MUDAR AQUI **/
+                    },500);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $.smallBox({
+                        title : "Erro!",
+                        content : "Ops, houve um erro ao consultar as configurações!",
+                        color : "#C46A69", //"#296191" primary,
+                        iconSmall : "fa fa-frown-o bounce animated",
+                        timeout : 4000
+                    });
+                }
+            });
+        };
+
+        $scope.load();
+        
+        $scope.selectConfig = function () {
+            $.ajax({
+                url: "/api/configuration/" + $scope.data.id,
+                type: "GET",
+                dataType: "json",
+                success: function (response) {
+                    $timeout(function () {
+                        $scope.data = {
+                            id      :   response.id,
+                            title   :   response.title,
+                            chave   :   response.chave,
+                            value   :   response.value,
+                            editable:   response.editable
+                        };
+                    },500);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $.smallBox({
+                        title : "Erro!",
+                        content : "Ops, houve um erro ao consultar a configuração!",
+                        color : "#C46A69", //"#296191" primary,
+                        iconSmall : "fa fa-frown-o bounce animated",
+                        timeout : 4000
+                    });
+                }
+            });
+        }
+        
+        $scope.update = function () {
+            if($scope.data.id != -1){
+                bootbox.confirm({
+                    message: "Você deseja realmente atualizar esse registro?",
+                    buttons: {
+                        cancel: {
+                            label: 'Não',
+                            className: 'btn-danger'
+                        },
+                        confirm: {
+                            label: 'Sim',
+                            className: 'btn-success btnConfirm',
+                        }
+                    },
+                    callback: function (result) {
+                        if(!result){
+                            this.modal('hide');
+                        }else{
+                            $http({
+                                url: '/api/configuration/' + $scope.data.id,
+                                method: "PUT",
+                                data: $scope.data
+                            }).then(function (response) {
+                                // success
+                                $.smallBox({
+                                    title : "Sucesso!",
+                                    content : "Registro atualizado com sucesso!",
+                                    color : "#739e73",
+                                    iconSmall : "fa fa-smile-o bounce animated",
+                                    timeout : 4000
+                                });
+
+                                $scope.clear();
+                            },
+                            function (response) {
+                                $.smallBox({
+                                    title : "Erro!",
+                                    content : "Ops, houve algum erro: " + response.statusText,
+                                    color : "#C46A69", //"#296191" primary,
+                                    iconSmall : "fa fa-frown-o bounce animated",
+                                    timeout : 4000
+                                });
+                            });
+                        }
+                    }
+                });
+            }else{
+                $.smallBox({
+                    title : "Erro!",
+                    content : "Ops, você deve selecionar uma configuração válida para atualizar!",
+                    color : "#C46A69", //"#296191" primary,
+                    iconSmall : "fa fa-frown-o bounce animated",
+                    timeout : 4000
+                });
+            }
+        }
+    }]);
+</script>

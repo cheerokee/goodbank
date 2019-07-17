@@ -1,0 +1,884 @@
+<?php
+$form = $this->form;
+$continueds = $this->continueds;
+$name = $this->name;
+?>
+<script>
+    angular.module('panelUserView', [])
+        .controller('UserViewController', ['$scope','$http','$timeout','$filter', function($scope,$http,$timeout,$filter) {
+
+            /*** START DECLARATIONS  ***/
+            $scope.user_id = <?=$this->db_user->getId()?>;
+
+            $scope.user = {};
+            $scope.address = {};
+            $scope.account = {
+                id: null,
+                bank: null,
+                user: $scope.user_id,
+                type_account: null,
+                holder: '',
+                agency: '',
+                type: null,
+                operation: '',
+                account_number: ''
+            };
+            $scope.configuration = {
+                id: '',
+                title: '',
+                chave: ''
+            };
+            $scope.wallet = {
+                user: $scope.user_id
+            };
+
+
+            $scope.countries = [];
+            $scope.states = [];
+            $scope.cities = [];
+            $scope.configurations = [];
+            $scope.wallets = [];
+            $scope.accounts = [];
+            $scope.banks = [];
+
+            $scope.country_selected = null;
+            $scope.state_selected   = null;
+            $scope.city_selected    = null;
+
+            <?php
+            foreach($form as $element){
+                if(in_array($element->getName(),$continueds)){
+                    continue;
+                }
+                ?>
+                $scope.user.<?=$element->getName()?> = '<?=$element->getValue()?>';
+                <?php
+            }
+            ?>
+
+            $scope.tab = 'general';
+
+            $scope.percent_fill = 0;
+            $scope.current_password = '';
+            $scope.new_password = '';
+            $scope.confirm_password = '';
+
+            /*** END DECLARATIONS  ***/
+            /*** START USER  ***/
+
+            $scope.loadUser = function(){
+                $http({
+                    url: "/api/user/" + $scope.user_id,
+                    async: false,
+                    type: "GET",
+                    dataType: "json"
+                }).then(function successCallback(response) {
+
+                    <?php
+                    foreach($form as $element){
+                        if(in_array($element->getName(),$continueds)){
+                            continue;
+                        }
+
+                        switch (get_class($element)){
+                            case 'Zend\Form\Element\Date':
+                                ?>
+                                let date = response.data.<?=$element->getName()?>.date;
+                                date = new Date(date);
+                                $scope.user.<?=$element->getName()?> = date;
+                                <?php
+                                break;
+                            default:
+                            ?>
+                            $scope.user.<?=$element->getName()?> = response.data.<?=$element->getName()?>;
+                            <?php
+                        }
+                    }
+                    ?>
+
+                    $scope.user.id = response.data.id;
+                    $scope.user.image = (response.data.image != null)? response.data.image : '/assets/sem_imagem.jpg';
+
+                    if($scope.user.gender === false){
+                        $scope.user.gender = 0;
+                    }
+
+                    if($scope.user.gender === true){
+                        $scope.user.gender = 1;
+                    }
+
+                    let count_tot = 0;
+                    let count_fill = 0;
+
+                    const continues = [
+                        '_links',
+                        'updatedAt',
+                        'createdAt',
+                        'id',
+                        'type_user',
+                    ];
+
+                    for (field in $scope.user){
+                        if(continues.includes(field))continue;
+                        count_tot++;
+                        if($scope.user[field] == null)continue;
+                        count_fill++
+                    }
+
+                    $scope.percent_fill = Math.round( count_fill / count_tot * 100 );
+
+                    $timeout(function () {
+                        $scope.loadAddress($scope.user.id);
+                        $scope.loadWallet($scope.user.id);
+                        $scope.loadAccount($scope.user.id);
+                    },300);
+                }, function errorCallback(response) {
+                    errorNotify('Erro ao consultar usuário');
+                });
+            };
+
+            $scope.btndel = false;
+
+            cropImage = function (event) {
+                $('#cropModal<?=$name?>').modal();
+                $timeout(function () {
+                    $scope.loadFile(event);
+                },1000);
+            };
+
+            $scope.loadFile = function(event) {
+                var reader = new FileReader();
+
+                reader.onload = function(){
+                    var output = document.getElementById('output<?=$name?>');
+                    output.src = reader.result;
+                    var $image = $('#output<?=$name?>');
+                    console.log($image);
+                    $image.cropper({
+                        zoomOnWheel:false,
+                        aspectRatio: 1 / 1,
+                        crop: function(event) {
+                        }
+                    });
+                    var cropper = $image.data('cropper');
+                };
+
+                reader.readAsDataURL(event.target.files[0]);
+            };
+
+            $('#cropModal<?=$name?>').on('hide.bs.modal', function(e){
+                $('#image_input<?= $name ?>').val(null);
+            });
+
+            $scope.crop = function () {
+                var output = $("#output<?=$name?>");
+                output.cropper('getCroppedCanvas').toBlob(function (blob) {
+                    var formData = new FormData();
+                    formData.append('croppedImage', blob);
+                    $.ajax('<?=$this->url('image/defaults',array(
+                        'controller' => 'image',
+                        'action' => 'recortar'));?>',{
+                        method: "POST",
+                        dataType: 'json',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (o) {
+                            var object = o;
+                            var image = object.image;
+                            var image_name = object.image_name;
+
+                            $scope.user.image = image;
+
+                            $http({
+                                url: '/api/user/' + $scope.user.id,
+                                method: "PATCH",
+                                data: {
+                                    image : image
+                                }
+                            }).then(function(response) {
+                                    // success
+                                    successNotify('Foto Atualizada com Sucesso');
+
+                                    $scope.load();
+                                },
+                                function(response) {
+                                    successNotify('Houve um erro ao tentar atualizar as informações de usuário!');
+                                });
+
+                            $("#image<?=$name?>").val(image_name);
+
+                            $("#cropModal<?=$name?>").modal('hide');
+                            $timeout(function () {
+                                $scope.btndel = true;
+                            },300);
+                        },
+                        error: function () {
+                            $.smallBox({
+                                title : "Erro!",
+                                content : "Ops, houve algum erro: " + response.statusText,
+                                color : "#C46A69", //"#296191" primary,
+                                iconSmall : "fa fa-frown-o bounce animated",
+                                timeout : 4000
+                            });
+                        }
+                    },'Json');
+                });
+            };
+
+            $scope.update = function () {
+                $.ajax({
+                    url: '/api/user/' + $scope.user.id,
+                    type: "PATCH",
+                    async: true,
+                    contentType : 'application/json',
+                    data: JSON.stringify($scope.user),
+                    success: function (o) {
+                        successNotify('Usuário atualizado com sucesso!');
+                        $scope.load();
+                    },
+                    error: function (o) {
+                        errorNotify('Houve um erro ao atualizar o usuário!');
+                    },
+                    dataType: "json"
+                });
+            };
+
+            $scope.updatePassword = function() {
+                if($scope.new_password != $scope.confirm_password){
+                    errorNotify('A nova senha e a sua confirmação devem ser iguais!');
+                    return;
+                }
+
+                var current = Crypto.MD5($scope.current_password);
+
+                $.ajax({
+                    url: "/api/user",
+                    type: "GET",
+                    data: {
+                        'filter'    :   [
+                            {
+                                'type' : 'andx',
+                                'conditions' : [
+                                    {'field' :'email', 'type':'eq', 'value' : $scope.user.email},
+                                    {'field' :'password', 'type':'eq', 'value' : current},
+                                ],
+                                'where'  :  'and'
+                            }
+                        ]
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        if(response._embedded.user.length > 0){
+                            $.ajax({
+                                url: '/api/user/' + $scope.user.id,
+                                type: "PATCH",
+                                async: true,
+                                contentType : 'application/json',
+                                data: JSON.stringify({password : $scope.new_password }),
+                                success: function (o) {
+                                    successNotify('Senha atualizada com sucesso');
+                                    $scope.current_password = '';
+                                    $scope.new_password = '';
+                                    $scope.confirm_password = '';
+                                },
+                                error: function (o) {
+                                    errorNotify('Houve um erro ao atualizar a senha do usuário!');
+                                },
+                                dataType: "json"
+                            });
+
+                        }else{
+                            errorNotify('A senha atual está incorreta!');
+                        }
+
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        errorNotify('Houve erro ao alterar a senha');
+                        return;
+                    }
+                });
+            };
+
+            /*** END USER  ***/
+            /*** START ADDRESS  ***/
+
+            $scope.loadAddress = function(user_id){
+                $.ajax({
+                    url: "/api/address",
+                    type: "GET",
+                    data: {
+                        'filter'    :   [
+                            {
+                                'type' : 'andx',
+                                'conditions' : [
+                                    {'field' :'user', 'type':'eq', 'value' : user_id}
+                                ],
+                                'where'  :  'and'
+                            }
+                        ]
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        if(response.total_items > 0){
+                            let address = response._embedded.address[0];
+                            $scope.address.id = address.id;
+                            $scope.address.address = address.address;
+                            $scope.address.number = address.number;
+                            $scope.address.neighborhood = address.neighborhood;
+                            $scope.address.zip_code = address.zip_code;
+                            $scope.address.complement = address.complement;
+
+                            if( typeof address._embedded.country !== 'undefined' && address._embedded.country !== null ){
+                                $scope.country_selected = address._embedded.country.id;
+                            }
+
+                            if( typeof address._embedded.state !== 'undefined' && address._embedded.state !== null ) {
+                                $scope.state_selected = address._embedded.state.id;
+                            }
+
+                            if( typeof address._embedded.city !== 'undefined' && address._embedded.city !== null ) {
+                                $scope.city_selected = address._embedded.city.id;
+                            }
+
+                            $scope.loadCountries();
+                        }else{
+                            $scope.address.user = user_id;
+                            $scope.saveAddress();
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        errorNotify('Erro ao consultar endereço');
+                    }
+                });
+            };
+
+            $scope.loadCountries = function(){
+                $.ajax({
+                    url: "/api/country",
+                    type: "GET",
+                    dataType: "json",
+                    success: function (response) {
+                        $scope.countries = response._embedded.country;
+                        $timeout(function () {
+                            if($scope.country_selected !== null)
+                            {
+                                $scope.address.country = $scope.country_selected;
+                                $scope.loadStates($scope.country_selected);
+                            }
+                        },500);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        errorNotify('Erro ao consultar países');
+                    }
+                });
+            };
+
+            $scope.loadStates = function(country_id){
+                if(country_id){
+                    $.ajax({
+                        url: "/api/state",
+                        type: "GET",
+                        data: {
+                            'filter'    :   [
+                                {
+                                    'type' : 'andx',
+                                    'conditions' : [
+                                        {'field' :'country', 'type':'eq', 'value' : country_id}
+                                    ],
+                                    'where'  :  'and'
+                                }
+                            ]
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                            $scope.states = response._embedded.state;
+
+                            $timeout(function () {
+                                if($scope.state_selected !== null)
+                                {
+                                    $scope.address.state = $scope.state_selected;
+                                    $scope.loadCities($scope.state_selected);
+                                }
+                            },500);
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            errorNotify('Erro ao consultar estados');
+                        }
+                    });
+                }else{
+                    $.ajax({
+                        url: "/api/state",
+                        type: "GET",
+                        data: {
+                            'filter'    :   [
+                                {
+                                    'type' : 'andx',
+                                    'conditions' : [
+                                        {'field' :'country', 'type':'eq', 'value' : $scope.address.country}
+                                    ],
+                                    'where'  :  'and'
+                                }
+                            ]
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                            $scope.states = response._embedded.state;
+                            $scope.cities = [];
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            errorNotify('Erro ao consultar estados');
+                        }
+                    });
+                }
+            };
+
+            $scope.loadCities = function(state_id){
+                if(state_id){
+                    $.ajax({
+                        url: "/api/city",
+                        type: "GET",
+                        data: {
+                            'filter'    :   [
+                                {
+                                    'type' : 'andx',
+                                    'conditions' : [
+                                        {'field' :'state', 'type':'eq', 'value' : state_id}
+                                    ],
+                                    'where'  :  'and'
+                                }
+                            ]
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                            $scope.cities = response._embedded.city;
+                            $timeout(function () {
+                                if($scope.city_selected !== null)
+                                {
+                                    $scope.address.city = $scope.city_selected;
+                                }
+                            },500);
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            errorNotify('Erro ao consultar cidades');
+                        }
+                    });
+                }else{
+                    $.ajax({
+                        url: "/api/city",
+                        type: "GET",
+                        data: {
+                            'filter'    :   [
+                                {
+                                    'type' : 'andx',
+                                    'conditions' : [
+                                        {'field' :'state', 'type':'eq', 'value' : $scope.address.state}
+                                    ],
+                                    'where'  :  'and'
+                                }
+                            ]
+                        },
+                        dataType: "json",
+                        success: function (response) {
+                            $scope.cities = response._embedded.city;
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            errorNotify('Erro ao consultar as cidades');
+                        }
+                    });
+                }
+            };
+
+            $scope.saveAddress = function() {
+                $.ajax({
+                    url: '/api/address',
+                    type: "POST",
+                    async: true,
+                    contentType : 'application/json',
+                    data: JSON.stringify($scope.address),
+                    success: function (o) {
+                        $scope.loadAddress($scope.user.id);
+                    },
+                    error: function (o) {
+                        errorNotify('Houve um erro ao criar o endereço!');
+                    },
+                    dataType: "json"
+                });
+            };
+
+            $scope.updateAddress = function() {
+                $.ajax({
+                    url: '/api/address/' + $scope.address.id,
+                    type: "PATCH",
+                    async: true,
+                    contentType : 'application/json',
+                    data: JSON.stringify($scope.address),
+                    success: function (o) {
+                        successNotify('Endereço atualizado com sucesso!');
+                    },
+                    error: function (o) {
+                        errorNotify('Houve um erro ao atualizar o endereço!');
+                    },
+                    dataType: "json"
+                });
+            };
+
+            /*** END ADDRESS  ***/
+            /*** START CONFIGURATION  ***/
+
+            $scope.loadConfigs = function(){
+                $.ajax({
+                    url: "/api/configuration",
+                    type: "GET",
+                    data: {
+                        'filter'    :   [
+                            {
+                                'type' : 'andx',
+                                'conditions' : [
+                                    {'field' :'editable', 'type':'eq', 'value' : 1}
+                                ],
+                                'where'  :  'and'
+                            }
+                        ]
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        $scope.configurations = response._embedded.configuration;
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        errorNotify('Erro ao carregar as configurações');
+                    }
+                });
+            };
+
+            $scope.loadConfiguration = function(){
+                $http({
+                    url: "/api/configuration/" + $scope.configuration.id,
+                    async: false,
+                    type: "GET",
+                    dataType: "json"
+                }).then(function successCallback(response) {
+                    $scope.configuration.id = response.data.id;
+                    $scope.configuration.title = response.data.title;
+                    $scope.configuration.chave = response.data.chave;
+                    $scope.configuration.value = response.data.value;
+                }, function errorCallback(response) {
+                    errorNotify('Erro ao consultar a configuração');
+                });
+            };
+
+            $scope.updateConfig = function () {
+                $.ajax({
+                    url: '/api/configuration/' + $scope.configuration.id,
+                    type: "PATCH",
+                    async: true,
+                    contentType : 'application/json',
+                    data: JSON.stringify($scope.configuration),
+                    success: function (response) {
+                        successNotify('Configuração atualizada com sucesso');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        errorNotify('Houve erro na atualização da configuração');
+                    }
+                });
+            }
+
+            /*** END CONFIGURATION  ***/
+            /*** START ACCOUNT  ***/
+
+            $scope.loadBanks = function(){
+                $.ajax({
+                    url: "/api/bank",
+                    type: "GET",
+                    dataType: "json",
+                    success: function (response) {
+                        $scope.banks = response._embedded.bank;
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        errorNotify("Erro ao consultar as carteiras bitcoin");
+                    }
+                });
+            };
+
+            $scope.loadAccount = function(user_id){
+                $.ajax({
+                    url: "/api/account",
+                    type: "GET",
+                    data: {
+                        "filter"    :   [
+                            {
+                                'type' : 'andx',
+                                'conditions' : [
+                                    {'field' :'user', 'type':'eq', 'value' : user_id}
+                                ],
+                                'where'  :  'and'
+                            }
+                        ]
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        $scope.accounts = [];
+                        if(response.total_items > 0){
+                            $timeout(function () {
+                                $scope.accounts = response._embedded.account;
+                            },300);
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        errorNotify("Erro ao consultar as contas bancárias");
+                    }
+                });
+            };
+
+            $scope.editAccount = function(account_id) {
+                $.ajax({
+                    url: "/api/account/" + account_id,
+                    type: "GET",
+                    dataType: "json",
+                    success: function (response) {
+                        $timeout(function () {
+                            console.log(response._embedded.user.id);
+                            $scope.account.id = response.id;
+                            $scope.account.agency = response.agency;
+                            $scope.account.account_number = response.account_number;
+                            $scope.account.type = (response.type)?1:0;
+                            $scope.account.operation = response.operation;
+                            $scope.account.type_account = (response.type_account)?1:0;
+                            $scope.account.cnpj = response.cnpj;
+                            $scope.account.holder = response.holder;
+                            $scope.account.user = response._embedded.user.id;
+                            $scope.account.bank = response._embedded.bank.id;
+                            console.log($scope.account.type,$scope.account.type_account);
+                        },300);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        errorNotify("Erro ao consultar a conta bancária selecionada");
+                    }
+                });
+            };
+
+            $scope.updateAccount = function() {
+                if($scope.account.id){
+                    $.ajax({
+                        url: '/api/account/' + $scope.account.id,
+                        type: "PATCH",
+                        async: true,
+                        contentType : 'application/json',
+                        data: JSON.stringify($scope.account),
+                        success: function (o) {
+                            $scope.account = {user: $scope.user_id};
+                            $scope.loadAccount($scope.user_id);
+                            successNotify("Conta bancária atualizada com sucesso!");
+                        },
+                        error: function (o) {
+                            errorNotify("Houve um erro ao editar a carteira!");
+                        },
+                        dataType: "json"
+                    });
+                }else{
+                    $.ajax({
+                        url: '/api/account',
+                        type: "POST",
+                        async: true,
+                        contentType : 'application/json',
+                        data: JSON.stringify($scope.account),
+                        success: function (o) {
+                            $scope.clearAccount();
+                            $scope.loadAccount($scope.user_id);
+                            successNotify("Conta bancária cadastrada com sucesso!");
+                        },
+                        error: function (o) {
+                            errorNotify("Houve um erro ao criar a carteira!");
+                        },
+                        dataType: "json"
+                    });
+                }
+            };
+
+            $scope.delAccount = function(account_id) {
+                bootbox.confirm({
+                    message: "Você deseja realmente excluir esse registro?",
+                    buttons: {
+                        cancel: {
+                            label: "Não",
+                            className: "btn-danger"
+                        },
+                        confirm: {
+                            label: "Sim",
+                            className: "btn-success btnConfirm",
+                        }
+                    },
+                    callback: function (result) {
+                        if (!result) {
+                            this.modal("hide");
+                        } else {
+                            $http({
+                                url: '/api/account/' + account_id,
+                                method: "DELETE"
+                            }).then(function(response) {
+                                    successNotify('Registro deletado com sucesso');
+                                    $scope.loadAccount($scope.user_id);
+                                },
+                                function(response) {
+                                    errorNotify('Houve erro ao deletar o registro');
+                                });
+                        }
+                    }
+                });
+            };
+
+            $scope.clearAccount = function() {
+                $scope.account = {
+                    id: null,
+                    bank: null,
+                    user: $scope.user_id,
+                    type_account: null,
+                    holder: '',
+                    agency: '',
+                    type: null,
+                    operation: '',
+                    account_number: ''
+                };
+            };
+
+            /*** END ACCOUNT  ***/
+            /*** START WALLET  ***/
+
+            $scope.loadWallet = function(user_id){
+                $.ajax({
+                    url: "/api/wallet",
+                    type: "GET",
+                    data: {
+                        "filter"    :   [
+                            {
+                                'type' : 'andx',
+                                'conditions' : [
+                                    {'field' :'user', 'type':'eq', 'value' : user_id}
+                                ],
+                                'where'  :  'and'
+                            }
+                        ]
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        $scope.wallets = [];
+                        if(response.total_items > 0){
+                            $timeout(function () {
+                                $scope.wallets = response._embedded.wallet;
+                            },300);
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        errorNotify("Erro ao consultar as carteiras bitcoin");
+                    }
+                });
+            };
+
+            $scope.editWallet = function(wallet_id) {
+                $.ajax({
+                    url: "/api/wallet/" + wallet_id,
+                    type: "GET",
+                    dataType: "json",
+                    success: function (response) {
+                        $timeout(function () {
+                            $scope.wallet.id = response.id;
+                            $scope.wallet.account = response.account;
+                        },300);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        errorNotify("Erro ao consultar a carteira selecionada");
+                    }
+                });
+            };
+
+            $scope.updateWallet = function() {
+                if($scope.wallet.id){
+                    $.ajax({
+                        url: '/api/wallet/' + $scope.wallet.id,
+                        type: "PATCH",
+                        async: true,
+                        contentType : 'application/json',
+                        data: JSON.stringify($scope.wallet),
+                        success: function (o) {
+                            $scope.wallet = {user: $scope.user_id};
+                            $scope.loadWallet($scope.user_id);
+                            successNotify("Carteira atualizada com sucesso!")
+                        },
+                        error: function (o) {
+                            errorNotify("Houve um erro ao editar a carteira!");
+                        },
+                        dataType: "json"
+                    });
+                }else{
+                    $.ajax({
+                        url: '/api/wallet',
+                        type: "POST",
+                        async: true,
+                        contentType : 'application/json',
+                        data: JSON.stringify($scope.wallet),
+                        success: function (o) {
+                            $scope.wallet = {user: $scope.user_id};
+                            $scope.loadWallet($scope.user_id);
+                        },
+                        error: function (o) {
+                            errorNotify("Houve um erro ao criar a carteira!");
+                        },
+                        dataType: "json"
+                    });
+                }
+            };
+
+            $scope.delWallet = function(wallet_id) {
+                bootbox.confirm({
+                    message: "Você deseja realmente excluir esse registro?",
+                    buttons: {
+                        cancel: {
+                            label: "Não",
+                            className: "btn-danger"
+                        },
+                        confirm: {
+                            label: "Sim",
+                            className: "btn-success btnConfirm",
+                        }
+                    },
+                    callback: function (result) {
+                        if (!result) {
+                            this.modal("hide");
+                        } else {
+                            $http({
+                                url: '/api/wallet/' + wallet_id,
+                                method: "DELETE"
+                            }).then(function(response) {
+                                successNotify('Registro deletado com sucesso');
+                                $scope.loadWallet($scope.user_id);
+                            },
+                            function(response) {
+                                errorNotify('Houve erro ao deletar a carteira');
+                            });
+                        }
+                    }
+                });
+            };
+
+            /*** END WALLET  ***/
+
+            $scope.load = function(){
+                $scope.loadUser();
+                $scope.loadConfigs();
+                $scope.loadBanks();
+            };
+
+            $scope.load();
+
+            /** CROP IMAGE START **/
+
+
+            $scope.changeTab = function (tab) {
+                $scope.tab = tab;
+            };
+
+            $('#cropModal<?=$name?>').on('hide.bs.modal', function(e){
+                $("#image_input<?= $name ?>").val('');
+            });
+        }]);
+</script>

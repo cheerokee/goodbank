@@ -1,0 +1,66 @@
+<div class="g-hidden-sm-down g-bg-gray-light-v8 g-pa-20">
+    <ul class="u-list-inline g-color-gray-dark-v6">
+        <li class="list-inline-item g-mr-10">
+            <a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle" href="/admin-home">
+                Dashboard
+            </a>
+            <i class="hs-admin-angle-right g-font-size-12 g-color-gray-light-v6 g-valign-middle g-ml-10"></i>
+        </li>
+        <li class="list-inline-item">
+            <span class="g-valign-middle">
+                Painel de Investimento
+            </span>
+        </li>
+    </ul>
+</div>
+<div ng-app="panelInvestmentView" ng-controller="InvestimentViewController" class="col g-ml-45 g-ml-0--lg g-pb-65--md">
+    <div class="g-pa-20">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="g-pos-rel h-100 g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-30--md">
+                    <header>
+                        <h2>
+                            <i class=""></i>&nbsp;Painel de Investimento
+                        </h2>
+                        <p>Faça seus investimentos</p>
+                    </header>
+                    <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-mt-25--md g-mb-30--md">
+                    <div class="row g-mx-minus-10 g-mb-60">
+                        <div ng-repeat="plan in plans" class="col-md-4 g-px-10 g-mb-20 g-mb-0--md">
+                            <article class="g-bg-white g-overflow-hidden g-brd-around g-brd-gray-light-v7 g-rounded-4">
+                                <header class="text-center g-bg-gray-light-v8 g-pa-20">
+                                    <h4 class="h6 text-uppercase g-font-weight-400 g-font-size-16 g-color-black mb-0">
+                                        {{ plan.name }}
+                                    </h4>
+                                </header>
+                                <section class="g-mb-40 g-mt-40">
+                                    <div class="js-donut-chart g-pos-rel mx-auto"
+                                         style="width: 128px; height: 128px;"
+                                         data-series='[50, 50]'
+                                         data-border-width="4"
+                                         data-start-angle="0"
+                                         data-fill-colors='["#1e110c","#dede30"]'>
+                                        <i class="hs-admin-clipboard g-absolute-centered g-font-size-40 g-color-gray-light-v3"></i>
+                                    </div>
+                                </section>
+                                <div class="g-px-20 g-py-30">
+                                    <strong class="d-block text-center g-color-secondary g-font-weight-400 g-font-size-30 g-line-height-0_8 g-mb-25">
+                                        <sup class="g-font-size-18">R$</sup>{{ plan.price  | currency:'':2:'pt-BR'}}
+                                    </strong>
+                                    <button ng-click="aporteModalNew(plan)"
+                                            data-toggle="modal" data-target="#investimentModal"
+                                            class="btn btn-md btn-xl--md btn-block u-btn-secondary g-font-size-default--md"
+                                            type="button">
+                                        Aportar
+                                    </button>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?=$this->partial('partials/modal-investiment');?>
+</div>
+<script src="/assets/js/angular/panel-investiment.js" />
