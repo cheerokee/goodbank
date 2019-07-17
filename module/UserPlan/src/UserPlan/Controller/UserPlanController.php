@@ -519,6 +519,7 @@ class UserPlanController extends CrudController{
     }
 
     public function applyBalanceAction() {
+        $this->layout()->setTemplate('layout/admin_auth.phtml');
         /**
          * @var ZF\ContentNegotiation\Request $request
          */
