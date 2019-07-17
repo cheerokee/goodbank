@@ -151,7 +151,18 @@ $rotas = array(
                     'action' => 'rescue'
                 )
             )
-        )
+        ),
+        'apply-balance' => array(
+            'type' => 'Segment',
+            'options' => array(
+                'route'=>'/admin/apply-balance',
+                'defaults' => array(
+                    '__NAMESPACE__' => 'UserPlan\Controller',
+                    'controller' => 'UserPlan',
+                    'action' => 'apply-balance'
+                )
+            )
+        ),
     )
 );
 

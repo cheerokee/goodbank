@@ -3,6 +3,7 @@
 namespace UserPlan\Controller;
 
 use Base\Controller\CrudController;
+use Cycle\Entity\Cycle;
 use Solicitation\Entity\Solicitation;
 use Transaction\Entity\Transaction;
 use UserPlan\Service\UserPlan;
@@ -515,6 +516,92 @@ class UserPlanController extends CrudController{
 
             return $this->redirect()->toRoute('cash-out-panel',array('id' => $db_solicitation->getId()));
         }
+    }
+
+    public function applyBalanceAction() {
+        /**
+         * @var ZF\ContentNegotiation\Request $request
+         */
+        $em = $this->getEm();
+        //$request = $this->getRequest();
+
+        /**
+         * @var Cycle $db_cycle
+         * @var \UserPlan\Entity\UserPlan[] $db_user_plans
+         * @var Transaction $db_transaction
+         */
+
+        $db_category_transaction = $em->getRepository('CategoryTransaction\Entity\CategoryTransaction')->findOneByCode('rendimento');
+
+        /** Buscar todos os aportes ativos **/
+        $db_user_plans = $em->getRepository('UserPlan\Entity\UserPlan')->findByStatus(1);
+
+        if(!empty($db_user_plans)){
+            foreach ($db_user_plans as $db_user_plan)
+            {
+                /** Buscar um ciclo ativo, se não existir, criar **/
+                $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneByStatus(1);
+                if(!$db_cycle){
+                    $last_cycle = $em->getRepository('Cycle\Entity\Cycle')
+                        ->findOneBy(array(),array('year' => 'DESC','month' => 'DESC'));
+
+                    if(!$last_cycle){
+                        $db_cycle = new Cycle();
+                        $db_cycle->setStatus(1);
+                        $db_cycle->setMonth(date('m')*1);
+                        $db_cycle->getYear(date('Y')*1);
+
+                        $em->persist($db_cycle);
+                        $em->flush();
+                    }else{
+                        if($last_cycle->getMonth() == 12){
+                            $next_month = 1;
+                            $next_year = $last_cycle->getYear()+1;
+                        }else{
+                            $next_month = $last_cycle->getMonth() + 1;
+                            $next_year = $last_cycle->getYear();
+                        }
+
+                        $db_cycle = new Cycle();
+                        $db_cycle->setStatus(1);
+                        $db_cycle->setMonth($next_month);
+                        $db_cycle->setYear($next_year);
+
+                        $em->persist($db_cycle);
+                        $em->flush();
+                    }
+                }
+
+                $db_transaction = $em->getRepository('Transaction\Entity\Transaction')->findOneBy(array(
+                    'user_plan' =>  $db_user_plan,
+                    'cycle'     =>  $db_cycle,
+                    'category_transaction' => $db_category_transaction
+                ));
+
+                if(!$db_transaction){
+                    $db_transaction = new Transaction();
+
+                    $db_transaction->setUserPlan($db_user_plan);
+                    $db_transaction->setCycle($db_cycle);
+                    $db_transaction->setCategoryTransaction($db_category_transaction);
+                    $db_transaction->setType(0);
+                }
+
+                $db_transaction->setValue(1);
+                $db_transaction->setDate((new \DateTime('now')));
+
+                $em->persist($db_transaction);
+                $em->flush();
+
+                echo $db_cycle;
+                echo $db_transaction;
+                die;
+            }
+        }
+
+        header("HTTP/1.1 200 OK");
+        echo 'ok';
+        die;
     }
 
     public function smartCopy($source, $dest, $options=array('folderPermission'=>0777,'filePermission'=>0777))
