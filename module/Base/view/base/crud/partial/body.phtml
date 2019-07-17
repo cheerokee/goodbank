@@ -1,0 +1,31 @@
+<tbody >
+    <?php
+    if(!$this->_listView) {
+        $this->_listView = $this->ViewModel()->getCurrent()->getVariable('_listView');
+    }
+
+    if(count($this->data) > 0){
+        foreach($this->data as $k => $entity) {
+            echo $this->partial('partial/row', array(
+                'controller' => $controller,
+                'key' => $k,
+                'entity' => $entity,
+                'param' => $this->param,
+                'em' => $this->em,
+                'fk' => $this->fk,
+                'fk_id' => $this->fk_id,
+                'order' => $this->order,
+                'page' => $this->page
+            ));
+        }
+    }else{
+        ?>
+        <tr>
+            <td colspan="<?=count($this->_listView['fields'])+1?>">
+                Nenhum resultado encontrado
+            </td>
+        </tr>
+        <?php
+    }
+    ?>
+</tbody>

@@ -1,0 +1,873 @@
+<?php
+/**
+ * @var \Register\Entity\User $db_user
+ */
+$db_user = $this->db_user;
+$name = 'User';
+$form = $this->form;
+$continueds = array(
+    'role',
+    'id',
+    'friendlyUrl',
+    'company',
+    'type_user',
+    'active',
+    'submit'
+);
+?>
+<div ng-app="panel<?=$name?>View" ng-controller="UserViewController" class="g-pa-20">
+    <div class="row">
+        <div class="col-md-3 g-mb-30 g-mb-0--md">
+            <div class="h-100 g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md">
+                <!-- User Information -->
+                <section class="text-center g-mb-30 g-mb-50--md">
+                    <div id="content_image_input<?= $name ?>" class="d-inline-block g-pos-rel g-mb-20">
+                        <a class="u-badge-v2--lg u-badge--bottom-right g-width-32 g-height-32 g-bg-secondary g-bg-primary--hover g-transition-0_3 g-mb-20 g-mr-20"
+                           onclick="$('#image_input<?= $name ?>').trigger('click');"
+                           href="">
+                            <i class="hs-admin-pencil g-absolute-centered g-font-size-16 g-color-white"></i>
+                        </a>
+                        <img class="img-fluid rounded-circle" src="{{ user.image }}" alt="Image description">
+
+                        <div id="content_image_input<?= $name ?>">
+                            <input class="form-control"
+                                   style="display: none"
+                                   type="file"
+                                   id="image_input<?= $name ?>"
+                                   accept="image/*"
+                                   onchange="cropImage(event)" >
+                        </div>
+                    </div>
+                    <h3 class="g-font-weight-300 g-font-size-20 g-color-black mb-0">
+                        {{ user.name }}
+                    </h3>
+                </section>
+                <!-- User Information -->
+
+                <!-- Profile Completion -->
+                <section class="g-mb-30 g-mb-50--md">
+                    <h4 class="media h6 g-font-weight-400 g-mb-15">
+                        <span class="d-flex align-self-center g-color-gray-dark-v6">Perfil Completo</span>
+                        <span class="media-body align-self-center text-right g-color-gray-dark-v6">{{ percent_fill }}%</span>
+                    </h4>
+
+                    <div class="progress g-height-4 g-rounded-2">
+                        <div class="progress-bar g-bg-lightblue-v3 g-rounded-3"
+                             role="progressbar"
+                             style="width: {{ percent_fill }}%"
+                             aria-valuenow="{{ percent_fill }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100"></div>
+                    </div>
+                </section>
+                <section>
+                    <ul class="list-unstyled mb-0">
+                        <li class="g-brd-top g-brd-gray-light-v7 mb-0">
+                            <a class="d-flex align-items-center u-link-v5 g-parent g-py-15 tab-user-view-menu"
+                               ng-class="{'active' : tab == 'general'}"
+                                ng-click="changeTab('general')">
+                                <span class="g-font-size-18 g-color-gray-light-v6 g-color-primary--parent-hover g-color-primary--parent-active g-mr-15">
+                                    <i class="hs-admin-user"></i>
+                                </span>
+                                <span class="g-color-gray-dark-v6 g-color-primary--parent-hover g-color-primary--parent-active">
+                                    Informações de Perfil
+                                </span>
+                            </a>
+                            <a class="d-flex align-items-center u-link-v5 g-parent g-py-15 tab-user-view-menu"
+                               ng-class="{'active' : tab == 'address'}"
+                               ng-click="changeTab('address')">
+                                <span class="g-font-size-18 g-color-gray-light-v6 g-color-primary--parent-hover g-color-primary--parent-active g-mr-15">
+                                    <i class="hs-admin-location-pin"></i>
+                                </span>
+                                <span class="g-color-gray-dark-v6 g-color-primary--parent-hover g-color-primary--parent-active">
+                                    Endereço
+                                </span>
+                            </a>
+                            <a class="d-flex align-items-center u-link-v5 g-parent g-py-15 tab-user-view-menu"
+                               ng-class="{'active' : tab == 'wallet'}"
+                               ng-click="changeTab('wallet')">
+                                <span class="g-font-size-18 g-color-gray-light-v6 g-color-primary--parent-hover g-color-primary--parent-active g-mr-15">
+                                    <i class="hs-admin-wallet"></i>
+                                </span>
+                                <span class="g-color-gray-dark-v6 g-color-primary--parent-hover g-color-primary--parent-active">
+                                    Carteira Bitcoin
+                                </span>
+                            </a>
+                            <a class="d-flex align-items-center u-link-v5 g-parent g-py-15 tab-user-view-menu"
+                               ng-class="{'active' : tab == 'account'}"
+                               ng-click="changeTab('account')">
+                                <span class="g-font-size-18 g-color-gray-light-v6 g-color-primary--parent-hover g-color-primary--parent-active g-mr-15">
+                                    <i class="fa fa-bank"></i>
+                                </span>
+                                <span class="g-color-gray-dark-v6 g-color-primary--parent-hover g-color-primary--parent-active">
+                                    Conta Bancária
+                                </span>
+                            </a>
+                            <?php
+                            if($db_user->hasThisRole('administrador') || $db_user->hasThisRole('funcionario')){
+                                ?>
+                                <a class="d-flex align-items-center u-link-v5 g-parent g-py-15 tab-user-view-menu"
+                                   ng-class="{'active' : tab == 'admin-config'}"
+                                   ng-click="changeTab('admin-config')">
+                                    <span class="g-font-size-18 g-color-gray-light-v6 g-color-primary--parent-hover g-color-primary--parent-active g-mr-15">
+                                        <i class="hs-admin-settings"></i>
+                                    </span>
+                                        <span class="g-color-gray-dark-v6 g-color-primary--parent-hover g-color-primary--parent-active">
+                                        Configurações Administrativas
+                                    </span>
+                                </a>
+                                <?php
+                            }
+                            ?>
+
+                            <a class="d-flex align-items-center u-link-v5 g-parent g-py-15 tab-user-view-menu"
+                               ng-class="{'active' : tab == 'change-password'}"
+                               ng-click="changeTab('change-password')">
+                                <span class="g-font-size-18 g-color-gray-light-v6 g-color-primary--parent-hover g-color-primary--parent-active g-mr-15">
+                                    <i class="hs-admin-lock"></i>
+                                </span>
+                                <span class="g-color-gray-dark-v6 g-color-primary--parent-hover g-color-primary--parent-active">
+                                    Trocar Senha
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="h-100 g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md">
+                <div ng-if="tab == 'general'">
+                    <form id="form_general" ng-submit="update()" class="js-validate">
+                        <header>
+                            <h2 class="text-uppercase g-font-size-12 g-font-size-default--md g-color-black mb-0">
+                                <i class="hs-admin-user"></i>&nbsp;Informações Gerais
+                            </h2>
+                        </header>
+                        <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-my-30--md" />
+                        <?php
+                        $hidden = array(
+                            'hidden' => 1,
+                            'submit' => 1
+                        );
+
+                        foreach($form as $element){
+                            if(in_array($element->getName(),$continueds)){
+                                continue;
+                            }
+                            /**
+                             * @var \Zend\Form\Element $element
+                             */
+                            $type = $element->getAttributes()['type'];
+                            if($hidden[$type]){
+                                continue;
+                            }
+                            ?>
+                            <div class="row g-mb-20">
+                                <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+                                    <label class="mb-0" for="#firstName">
+                                        <?=$element->getLabel()?>
+                                    </label>
+                                </div>
+
+                                <div class="col-md-9 align-self-center">
+                                    <div class="form-group g-pos-rel mb-0">
+                                        <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                            <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                                        </span>
+                                        <?php
+
+                                        switch (get_class($element)){
+                                            case 'Zend\Form\Element\Select':
+                                                ?>
+                                                <select name="<?=$element->getName()?>"
+                                                        ng-model="user.<?=$element->getName()?>"
+                                                        class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                                        type="text"
+                                                        <?=($element->getAttribute('required'))?'required="required"':''?>>
+                                                    <option value="">Selecione...</option>
+                                                    <?php
+                                                    foreach($element->getValueOptions() as $k => $option){
+                                                        ?>
+                                                        <option ng-value="<?=$k?>" value="<?=$k?>">
+                                                            <?=$option?>
+                                                        </option>
+                                                        <?php
+                                                    }
+                                                    ?>
+                                                </select>
+                                                <?php
+                                                break;
+                                            case 'Zend\Form\Element\Textarea':
+                                                ?>
+                                                <textarea name="<?=$element->getName()?>"
+                                                          ng-model="user.<?=$element->getName()?>"
+                                                          class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                                           type="text"
+                                                            <?=($element->getAttribute('required'))?'required="required"':''?>
+                                                           data-msg="This field is mandatory"
+                                                           data-error-class="u-has-error-v3"
+                                                           data-success-class="has-success"
+                                                           aria-required="true"></textarea>
+                                                <?php
+                                                break;
+                                            case 'Zend\Form\Element\Date':
+                                                ?>
+                                                <input name="<?=$element->getName()?>"
+                                                       ng-model="user.<?=$element->getName()?>"
+                                                       class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                                       type="date"
+                                                        <?=($element->getAttribute('required'))?'required="required"':''?>
+                                                       data-msg="This field is mandatory"
+                                                       data-error-class="u-has-error-v3"
+                                                       data-success-class="has-success"
+                                                       aria-required="true">
+                                                <?php
+                                                break;
+                                            default:
+                                            ?>
+                                            <input name="<?=$element->getName()?>"
+                                                   ng-model="user.<?=$element->getName()?>"
+                                                   class="<?=$element->getAttribute('class')?> form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                                   type="text"
+                                                    <?=($element->getAttribute('required'))?'required="required"':''?>
+                                                   data-msg="This field is mandatory"
+                                                   data-error-class="u-has-error-v3"
+                                                   data-success-class="has-success"
+                                                   aria-required="true">
+                                            <?php
+                                        }
+                                        ?>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <?php
+                        }
+
+                        ?>
+                    </form>
+                </div>
+                <div ng-if="tab == 'address'">
+                    <form id="form_address" ng-submit="updateAddress()"
+                          class="js-validate">
+                        <header>
+                            <h2 class="text-uppercase g-font-size-12 g-font-size-default--md g-color-black mb-0">
+                                <i class="hs-admin-location-pin"></i>&nbsp;Informações de Endereço
+                            </h2>
+                        </header>
+
+                        <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-my-30--md">
+
+                        <div class="row g-mb-20">
+                            <div class="col-md-2">
+                                <label class="mb-0" for="#address">
+                                    Logradouro: *
+                                </label>
+                            </div>
+
+                            <div class="col-md-10 align-self-center">
+                                <div class="form-group g-pos-rel mb-0">
+                                    <input ng-model="address.address"
+                                           class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                           type="text"
+                                           id="address"
+                                           required="required">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-mb-20">
+                            <div class="col-md-5">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="mb-0" for="#number">
+                                            Nº: *
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-9 align-self-center">
+                                        <div class="form-group g-pos-rel mb-0">
+                                            <input ng-model="address.number"
+                                                   class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                                   type="text"
+                                                   id="number"
+                                                   required="required">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="mb-0" for="#neighborhood">
+                                            Bairro:
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-9 align-self-center">
+                                        <div class="form-group g-pos-rel mb-0">
+                                            <input ng-model="address.neighborhood"
+                                                   class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                                   type="text"
+                                                   id="neighborhood">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-mb-20">
+                            <div class="col-md-5">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="mb-0" for="#zip_code">
+                                            CEP: *
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-9 align-self-center">
+                                        <div class="form-group g-pos-rel mb-0">
+                                            <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                                <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                                            </span>
+                                            <input ng-model="address.zip_code"
+                                                   class="cep form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                                   type="text"
+                                                   onkeypress="mascara(this,mCEP)"
+                                                   required="required">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="mb-0" for="#complement">
+                                            Complemento:
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-9 align-self-center">
+                                        <div class="form-group g-pos-rel mb-0">
+                                            <input ng-model="address.complement"
+                                                   class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                                   type="text"
+                                                   id="complement">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-mb-20">
+                            <div class="col-md-5">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="mb-0" for="#country">
+                                            País: *
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-9 align-self-center">
+                                        <div class="form-group g-pos-rel mb-0">
+                                            <select ng-model="address.country"
+                                                    class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                                    id="country"
+                                                    ng-change="loadStates(address.country.id)"
+                                                    required="required">
+                                                <option value="">Selecione...</option>
+                                                <option ng-repeat="country in countries" ng-value="country.id" value="{{ country.id }}">
+                                                    {{ country.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="mb-0" for="#state">
+                                            Estado: *
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-9 align-self-center">
+                                        <div class="form-group g-pos-rel mb-0">
+                                            <select ng-model="address.state"
+                                                    class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                                    id="state"
+                                                    ng-change="loadCities(address.state.id)"
+                                                    required="required">
+                                                <option value="">Selecione o país primeiro...</option>
+                                                <option ng-repeat="state in states" ng-value="state.id" value="{{ state.id }}">
+                                                    {{ state.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-mb-20">
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="mb-0" for="#city">
+                                            Cidade: *
+                                        </label>
+                                    </div>
+
+                                    <div class="col-md-9 align-self-center">
+                                        <div class="form-group g-pos-rel mb-0">
+                                            <select ng-model="address.city"
+                                                    class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                                    id="city"
+                                                    required="required">
+                                                <option value="">Selecione o estado primeiro...</option>
+                                                <option ng-repeat="city in cities" ng-value="city.id" value="{{ city.id }}">
+                                                    {{ city.name }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div ng-if="tab == 'wallet'">
+                    <header>
+                        <h2 class="text-uppercase g-font-size-12 g-font-size-default--md g-color-black mb-0">
+                            <i class="hs-admin-user"></i>&nbsp;Carteiras Bitcoin
+                        </h2>
+                    </header>
+                    <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-my-30--md" />
+                    <div class="row g-mb-20">
+                        <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+                            <label class="mb-0" for="#firstName">
+                                Cód. da Carteira Bitcoin
+                            </label>
+                        </div>
+
+                        <div class="col-md-9 align-self-center">
+
+                            <div class="g-pos-rel">
+                                <form id="form_{{ tab }}" ng-submit="updateWallet()" class="js-validate">
+                                    <button title="Adicionar Carteira"
+                                            class="btn u-input-btn--v1 g-width-40 g-rounded-right-4"
+                                            type="submit"
+                                            ng-class="{ 'g-bg-primary' : !wallet.id,'g-bg-blue' : wallet.id  }">
+                                        <i ng-if="!wallet.id" class="hs-admin-plus g-absolute-centered g-font-size-16 g-color-white"></i>
+                                        <i ng-if="wallet.id" class="hs-admin-pencil-alt g-absolute-centered g-font-size-16 g-color-white"></i>
+                                    </button>
+                                    <input ng-model="wallet.account"
+                                           class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                                           type="text"
+                                           placeholder="Ex. 1Hx9mJqaaCgRxK9KzHNwhLkxiEHisncb9A"
+                                           required>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-mb-20">
+                        <div class="col-md-12">
+                            <hr />
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Carteiras Bitcoin</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="wallet in wallets">
+                                        <td>{{ wallet.account }}</td>
+                                        <td>
+                                            <button type="button" ng-click="editWallet(wallet.id)" class="btn btn-info">
+                                                <i class="hs-admin-pencil-alt"></i> Editar
+                                            </button>
+                                            <button type="button" ng-click="delWallet(wallet.id)" class="btn btn-danger">
+                                                <i class="hs-admin-close"></i> Excluir
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div ng-if="tab == 'account'">
+                    <header>
+                        <h2 class="text-uppercase g-font-size-12 g-font-size-default--md g-color-black mb-0">
+                            <i class="fa fa-bank"></i>&nbsp;Contas Bancárias
+                        </h2>
+                    </header>
+                    <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-my-30--md" />
+                    <form id="form_{{ tab }}" name="form_{{ tab }}" ng-submit="updateAccount()" >
+                        <div class="row g-mb-20">
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-5 align-self-center g-mb-5 g-mb-0--md">
+                                        <label class="mb-0">
+                                            Pessoa: *
+                                        </label>
+                                    </div>
+                                    <div class="col-md-7 align-self-center">
+                                        <select ng-model="account.type_account"
+                                                name="type_account"
+                                                class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                                                required>
+                                            <option value="">Selecione...</option>
+                                            <option ng-value="0" value="0">Física</option>
+                                            <option ng-value="1" value="1">Jurídica</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-if="account.type_account === 1" class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+                                        <label class="mb-0">
+                                            CNPJ:
+                                        </label>
+                                    </div>
+                                    <div class="col-md-9 align-self-center">
+                                        <input ng-model="account.cnpj" name="cnpj"
+                                               class="form-control cnpj form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                                               type="text"
+                                               onkeypress="mascara(this,mCNPJ)"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-mb-20">
+                            <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+                                <label class="mb-0">
+                                    Banco: *
+                                </label>
+                            </div>
+                            <div class="col-md-9 align-self-center">
+                                <select ng-model="account.bank"
+                                        name="bank"
+                                        class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                                        required>
+                                    <option value="">Selecione...</option>
+                                    <option ng-repeat="bank in banks" ng-value="bank.id" value="{{ bank.id }}">
+                                        {{ bank.name }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-mb-20">
+                            <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+                                <label class="mb-0">
+                                    Titular: *
+                                </label>
+                            </div>
+                            <div class="col-md-9 align-self-center">
+                                <input ng-model="account.holder"
+                                       name="holder"
+                                       class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                                       type="text"
+                                       placeholder="Ex. José Aparecido Costa, Empresa A"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="row g-mb-20">
+                            <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+                                <label class="mb-0">
+                                    Agência: *
+                                </label>
+                            </div>
+                            <div class="col-md-9 align-self-center">
+                                <input ng-model="account.agency"
+                                       name="agency"
+                                       class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                                       type="text"
+                                       placeholder="Ex. 4488"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="row g-mb-20">
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-5 align-self-center g-mb-5 g-mb-0--md">
+                                        <label class="mb-0">
+                                            Tipo de Conta: *
+                                        </label>
+                                    </div>
+                                    <div class="col-md-7 align-self-center">
+                                        <select ng-model="account.type"
+                                                name="type"
+                                                class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                                                required>
+                                            <option value="">Selecione...</option>
+                                            <option ng-value="0" value="0">Corrente</option>
+                                            <option ng-value="1" value="1">Poupança</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+                                        <label class="mb-0">
+                                            Operação: (Opcional)
+                                        </label>
+                                    </div>
+                                    <div class="col-md-9 align-self-center">
+                                        <input ng-model="account.operation"
+                                               name="operation"
+                                               class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                                               type="text"
+                                               placeholder="Ex. 013" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-mb-20">
+                            <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+                                <label class="mb-0">
+                                    Nº da Conta: *
+                                </label>
+                            </div>
+                            <div class="col-md-9 align-self-center">
+                                <input ng-model="account.account_number"
+                                       name="account_number"
+                                       class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                                       type="text"
+                                       placeholder="Ex. 00001234"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="row g-mb-20">
+                            <div class="col-md-12">
+                                <button type="submit" ng-class="{ 'btn-primary' : account.id == null,'btn-info' : account.id }" class="btn">
+                                    <i ng-class="{ 'hs-admin-plus' : account.id == null,'hs-admin-save' : account.id }"></i>&nbsp;
+                                    {{ (account.id) ? 'Atualizar Conta' : 'Adicionar Conta' }}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="row g-mb-20">
+                        <div class="col-md-12">
+                            <hr />
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>Banco</th>
+                                    <th>Titular</th>
+                                    <th>CNPJ</th>
+                                    <th>Tipo</th>
+                                    <th>Agência</th>
+                                    <th>Nº da Conta</th>
+                                    <th>Operação</th>
+                                    <th>Ação</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="account in accounts">
+                                    <td>{{ account._embedded.bank.name }}</td>
+                                    <td>{{ account.holder }}</td>
+                                    <td>{{ account.cnpj }}</td>
+                                    <td>{{ ( account.type ) ? 'Poupança' : 'Corrente' }}</td>
+                                    <td>{{ account.agency }}</td>
+                                    <td>{{ account.account_number }}</td>
+                                    <td>{{ account.operation }}</td>
+                                    <td>
+                                        <button type="button" ng-click="editAccount(account.id)" class="btn btn-info">
+                                            <i class="hs-admin-pencil-alt"></i> Editar
+                                        </button>
+                                        <button type="button" ng-click="delAccount(account.id)" class="btn btn-danger">
+                                            <i class="hs-admin-close"></i> Excluir
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div ng-if="tab == 'admin-config'">
+                    <form id="form_admin-config"
+                          ng-submit="updateConfig()"
+                          class="js-validate">
+                        <header>
+                            <h2 class="text-uppercase g-font-size-12 g-font-size-default--md g-color-black mb-0">
+                                <i class="hs-admin-settings"></i>&nbsp;Configurações Administrativas
+                            </h2>
+                        </header>
+
+                        <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-my-30--md">
+
+
+                        <div class="row g-mb-20">
+                            <div class="col-md-3">
+                                <label class="mb-0" for="#currentPassword">
+                                    Configuração
+                                </label>
+                            </div>
+
+                            <div class="col-md-9 align-self-center">
+                                <div class="form-group g-pos-rel mb-0">
+                                        <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                            <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                                        </span>
+                                    <select ng-model="$parent.configuration.id"
+                                            required="required"
+                                            ng-change="loadConfiguration()"
+                                            class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12">
+                                        <option value="">Selecione...</option>
+                                        <option ng-repeat="configuration in configurations"
+                                                ng-value="configuration.id"
+                                                value="{{ configuration.id }}">
+                                            {{ configuration.title }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-mb-20">
+                            <div class="col-md-3">
+                                <label class="mb-0" for="#currentPassword">
+                                    Valor
+                                </label>
+                            </div>
+
+                            <div class="col-md-9 align-self-center">
+                                <div class="form-group g-pos-rel mb-0">
+                                        <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                            <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                                        </span>
+                                    <input type="text"
+                                           ng-model="configuration.value"
+                                           class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                           value="">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div ng-show="tab == 'change-password'">
+                    <form id="form_change-password" ng-submit="updatePassword()"
+                          class="js-validate">
+                        <header>
+                            <h2 class="text-uppercase g-font-size-12 g-font-size-default--md g-color-black mb-0">
+                                <i class="hs-admin-lock"></i>&nbsp;Mudar a senha
+                            </h2>
+                        </header>
+
+                        <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-my-30--md">
+
+                        <div class="row g-mb-20">
+                            <div class="col-md-3">
+                                <label class="mb-0" for="#currentPassword">Senha atual</label>
+                            </div>
+
+                            <div class="col-md-9 align-self-center">
+                                <div>
+                                    <div class="form-group g-pos-rel mb-0">
+                                        <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                            <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                                        </span>
+                                        <input ng-model="current_password"
+                                               id="current_password"
+                                               class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                               type="password"
+                                               required="required">
+                                    </div>
+
+                                    <a class="form-text g-color-secondary"
+                                       href="<?=$this->url('lostpassword')?>">
+                                        <small class="g-font-size-default g-mt-8">
+                                            Esqueceu sua senha?
+                                        </small>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-mb-20">
+                            <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+                                <label class="mb-0" for="#newPassword">
+                                    Nova senha
+                                </label>
+                            </div>
+
+                            <div class="col-md-9 align-self-center">
+                                <div class="form-group g-pos-rel mb-0">
+                                    <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                        <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                                    </span>
+                                    <input ng-model="new_password"
+                                           class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                           type="password"
+                                           required="required">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-mb-20">
+                            <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+                                <label class="mb-0" for="#confirmNewPassword">
+                                    Confirme a nova senha
+                                </label>
+                            </div>
+
+                            <div class="col-md-9 align-self-center">
+                                <div class="form-group g-pos-rel mb-0">
+                                    <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                        <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                                    </span>
+                                    <input ng-model="confirm_password"
+                                           class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                           type="password"
+                                           required="required">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-my-30--md">
+                <div ng-hide="(tab == 'wallet')">
+                    <button form="form_{{ tab }}" class="btn btn-md btn-xl--md u-btn-secondary g-width-160--md g-font-size-12 g-font-size-default--md g-mb-10" type="submit">
+                        <i class="hs-admin-save"></i>&nbsp;Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="cropModal<?=$name?>" tabindex="-1" role="dialog" aria-labelledby="cropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Recorte a Imagem</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-md-12">
+                        <div id="content-crop-box<?=$name?>">
+                            <img class="img-fluid" id="output<?=$name?>"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" ng-click="crop()">Recortar</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<?=$this->partial('partials/user-view-angular.phtml',array(
+    'db_user' => $this->db_user,
+    'form'  => $form,
+    'continueds'      => $continueds,
+    'name'      => $name
+));?>

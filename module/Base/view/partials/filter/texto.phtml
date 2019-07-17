@@ -1,0 +1,34 @@
+<?php
+$coluna = $this->chave;
+$controller = $this->controller;
+$em = $this->em;
+$functions = new \Base\Controller\BaseFunctions();
+
+$vl = null;
+if(isset($_POST[$controller . '_' . $chave])) {
+    $vl = $_POST[$controller . '_' . $chave];
+}
+
+if(isset($_SESSION['filter-form'][$controller . '_' . $chave])) {
+    $vl     = $_SESSION['filter-form'][$controller . '_' . $chave];
+}
+?>
+<div class="form-group g-mb-30">
+    <label class="g-mb-10" for="<?= $controller ?>_<?=$coluna?>">
+        <?= $filter['label'] ?>
+    </label>
+    <div class="g-pos-rel">
+        <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+            <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+        </span>
+        <input id="<?= $controller ?>_<?=$coluna?>"
+               name="<?= $controller ?>_<?=$coluna?>"
+               class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10"
+               type="text"
+               placeholder=""
+               value="<?= $_POST[$controller . '_' . $chave] ?>">
+        <input type="hidden" name="<?= $controller ?>_<?=$coluna?>_strategy"
+               id="<?= $controller?>_<?=$coluna?>_strategy"
+               value="<?= $filter['strategy'] ?>">
+    </div>
+</div>

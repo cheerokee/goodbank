@@ -1,0 +1,66 @@
+<?php
+$coluna = $this->chave;
+$controller = $this->controller;
+$em = $this->em;
+$functions = new \Base\Controller\BaseFunctions();
+$element = $this->element;
+
+$vl = null;
+
+if(isset($_POST[$controller . '_' . $chave])) {
+    $vl = $_POST[$controller . '_' . $chave];
+}
+
+if(isset($_SESSION['filter-form'][$controller . '_' . $chave])) {
+    $vl     = $_SESSION['filter-form'][$controller . '_' . $chave];
+}
+
+if($element instanceof Zend\Form\Element\Select) {
+    ?>
+     <div class="g-mb-30">
+        <label class="g-mb-10" for="<?= $controller ?>_<?= $coluna ?>"><?= $filter['label'] ?></label>
+
+        <div class="form-group u-select--v3 g-pos-rel g-brd-gray-light-v7 g-rounded-25 mb-0">
+            <select name="<?= $controller ?>_<?= $coluna ?>"
+                    id="<?= $controller ?>_<?= $coluna ?>"
+                    class="js-select u-select--v3-select u-sibling w-100"
+                    title="<?= $filter['label'] ?>"
+                    style="display: none;">
+
+                <?php
+                $options = $element->getValueOptions();
+
+                if(!empty($options))
+                {
+                    foreach($options as $k => $option)
+                    {
+                        if(is_numeric($vl)){
+                            $vl = $vl*1;
+                        }
+                        ?>
+                        <option <?=($vl === $k)?'selected':''?> value="<?=$k?>"><?=$option?></option>
+                        <?php
+                    }
+                }
+                ?>
+
+            </select>
+
+            <div class="d-flex align-items-center g-absolute-centered--y g-right-0 g-color-gray-light-v6 g-color-lightblue-v9--sibling-opened g-mr-15">
+                <i class="hs-admin-angle-down"></i>
+            </div>
+        </div>
+    </div>
+    <?php
+}else{
+    ?>
+    <div class="g-mb-30">
+        <label class="g-mb-10"><?= $filter['label'] ?></label>
+
+        <div class="form-group u-select--v3 g-pos-rel g-brd-gray-light-v7 g-rounded-25 mb-0">
+            <p><small>Esse campo não pertence a classe 'Zend\Form\Element\Select', coloca como tipo custom</small></p>
+        </div>
+    </div>
+    <?php
+}
+?>

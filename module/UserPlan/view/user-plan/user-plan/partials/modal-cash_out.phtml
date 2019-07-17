@@ -1,0 +1,138 @@
+<div class="modal fade" id="modal_cash_out"
+     aria-labelledby="modal_cash_out_title"
+     tabindex="-1"
+     role="dialog"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">
+                    Solicitar Saque
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4 class="text-center">
+                            Você pode solicitar o saque dos rendimentos
+                        </h4>
+                        <div ng-show="!(renew || cash_out)">
+                            <p class="mt-4 text-center d-flex align-self-center text-uppercase g-font-size-12 g-font-size-default--md g-color-black g-mb-20">
+                                Deslize a barra informando quantidade de saque desejada
+                            </p>
+                            <div class="form-group g-mb-20">
+                                <input class="js-range-slider"
+                                       type="text"
+                                       data-extra-classes="u-slider--v4 u-slider--v4--single"
+                                       data-type="single"
+                                       data-min="0"
+                                       data-max="{{ user_plan.balance }}"
+                                       data-from="{{ user_plan.balance }}"
+                                       data-result-min="#result2min">
+                            </div>
+
+                            <div class="form-group d-flex align-items-center g-mb-30 g-mb-0--md">
+                                <div class="input-group g-width-100 ml-auto">
+                                    <div class="input-group-prepend g-bg-gray-light-v8">
+                                        <div class="input-group-text justify-content-center g-width-40 g-brd-gray-light-v7">
+                                            R$
+                                        </div>
+                                    </div>
+                                    <input id="result2min"
+                                           class="form-control text-center g-brd-gray-light-v7 g-px-5 g-py-8 ml-auto"
+                                           type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="renew || cash_out">
+                            <p class="alert alert-danger">
+                                O valor total do rendimento será sacado automaticamente
+                            </p>
+                            <h4 class="text-center">
+                                Valor de rendimento
+                                R$ {{ user_plan.balance | currency:'':2:'pt-BR' }}
+                            </h4>
+                            <h4 class="text-center">
+                                Valor do aporte
+                                R$ {{ user_plan._embedded.plan.price | currency:'':2:'pt-BR' }}
+                            </h4>
+                            <h3 class="text-center g-bg-green g-color-white">
+                                Total do saque
+                                <strong>R$ {{ user_plan.balance + user_plan._embedded.plan.price | currency:'':2:'pt-BR' }}</strong>
+                            </h3>
+                        </div>
+                        <hr />
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4 class="g-color-red">Ações Críticas</h4>
+                                    <span class="d-flex align-self-center g-color-gray-dark-v6 g-font-weight-400">
+                                        O resgate ou a renovação de contrato será habilitado somente na expiração do contrato
+                                    </span>
+                                </div>
+                            </div>
+                            <label ng-if="!cash_out" class="d-flex align-items-center justify-content-between mt-2 border border-danger p-1">
+                                <span><strong>Renovar o Contrato</strong></span>
+                                <div ng-if="getExpirationDays(user_plan.approved_date) == 0" class="u-check">
+                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
+                                           name="renew"
+                                           ng-model="renew"
+                                           ng-click="renewChange()"
+                                           type="checkbox" value="true">
+                                    <div class="u-check-icon-radio-v8">
+                                        <i class="fa" data-check-icon=""></i>
+                                    </div>
+                                </div>
+                                <div ng-if="getExpirationDays(user_plan.approved_date) > 0" class="u-check">
+                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
+                                           name="renew"
+                                           disabled
+                                           type="checkbox">
+                                    <div class="u-check-icon-radio-v8">
+                                        <i class="fa" data-check-icon=""></i>
+                                    </div>
+                                </div>
+                            </label>
+                            <label ng-if="!renew" class="d-flex align-items-center justify-content-between mt-2 border border-danger p-1">
+                                <span><strong>Solicitar o Resgate</strong></span>
+                                <div ng-if="getExpirationDays(user_plan.approved_date) == 0" class="u-check">
+                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
+                                           name="cash_out"
+                                           ng-model="cash_out"
+                                           ng-click="cachOutChange()"
+                                           type="checkbox" value="true">
+                                    <div class="u-check-icon-radio-v8">
+                                        <i class="fa" data-check-icon=""></i>
+                                    </div>
+                                </div>
+                                <div ng-if="getExpirationDays(user_plan.approved_date) > 0" class="u-check">
+                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
+                                           name="cash_out"
+                                           disabled
+                                           type="checkbox">
+                                    <div class="u-check-icon-radio-v8">
+                                        <i class="fa" data-check-icon=""></i>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Fechar
+                </button>
+                <button type="button"
+                        class="btn btn-primary"
+                        ng-disabled="enableCashOut()"
+                        ng-click="sendCashOut()">
+                    Solicitar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

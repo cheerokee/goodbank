@@ -1,0 +1,177 @@
+<div class="modal fade"
+     id="investimentModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="investimentModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="investimentModalLabel">
+                    Faça o Aporte
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form ng-submit="add()"
+                  id="plan_contract_form"
+                  method="POST"
+                  name="plan_contract_form"
+                  enctype="multipart/form-data">
+                <div class="modal-body">
+
+                    <input form="plan_contract_form"
+                           type="hidden"
+                           name="id"
+                           value="{{ user_plan.id }}"/>
+
+                    <input form="plan_contract_form"
+                           type="hidden"
+                           ng-model="plan.id"
+                           name="plan_id"
+                           value="{{ plan.id }}"/>
+
+                    <input form="plan_contract_form"
+                           type="hidden"
+                           name="user_id"
+                           id="user_id"
+                           value="<?=$this->userIdentity('User')->getId()?>">
+
+                    <input form="plan_contract_form"
+                           type="hidden"
+                           name="wallet"
+                           value="{{ user_plan._embedded.wallet.id }}"/>
+
+                    <input form="plan_contract_form"
+                           type="hidden"
+                           ng-model="user_plan._embedded.payment_method.id"
+                           name="payment_method"
+                           value="{{ user_plan._embedded.payment_method.id }}"/>
+
+                    <input form="plan_contract_form"
+                           type="hidden"
+                           ng-model="user_plan.status"
+                           name="status"
+                           value="{{ user_plan.status }}"/>
+
+                    <div class="row">
+                        <!-- SE TIVER APENAS UMA CARTEIRA ELA SERA AUTOMATICAMENTE SELECIONADA -->
+                        <div ng-if="wallets.length > 1" class="col-md-12 form-group">
+                            <h4 class="h6 g-font-weight-600 g-color-black g-mb-20">
+                                Escolha a Carteira Bit Coin
+                            </h4>
+                            <div class="btn-group justified-content">
+                                <label ng-repeat="wallet in wallets" class="u-check">
+                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                           name="wallet"
+                                           type="radio"
+                                           ng-model="user_plan.wallet"
+                                           value="wallet.id">
+                                    <span class="btn btn-md btn-block u-btn-outline-lightgray g-color-white--checked g-bg-primary--checked rounded-0">
+                                        {{ wallet.account }}
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        <div ng-if="wallets.length == 0" class="col-md-12 form-group">
+                            <p class="alert alert-danger">
+                                Atenção, você não possui carteira Bitcoin cadastrada no sistema.<br />
+                                Clique no seu nome no canto superior direito, e acesse o "Meu Perfil",
+                                depois vai em "Carteira Bitcoin" e cadastre sua carteira.<br />
+                                Ela deve pertencer a plataforma <a target="_blank" href="https://www.blockchain.com/">Blockchain</a>.
+                            </p>
+                        </div>
+                        <!-- SE TIVER APENAS UMA FORMA DE PAGAMENTO ELA SERA AUTOMATICAMENTE SELECIONADA -->
+                        <div ng-if="payment_methods.length > 1" class="col-md-12 form-group">
+                            <h4 class="h6 g-font-weight-600 g-color-black g-mb-20">
+                                Forma de Pagamento
+                            </h4>
+                            <div class="btn-group justified-content">
+                                <label ng-repeat="payment_method in payment_methods" class="u-check">
+                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                           name="payment_method"
+                                           type="radio"
+                                           form="plan_contract_form"
+                                           ng-model="user_plan.payment_method"
+                                           value="payment_method.id">
+                                    <span class="btn btn-md btn-block u-btn-outline-lightgray g-color-white--checked g-bg-primary--checked rounded-0">
+                                        {{ payment_method.name }}
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <h3 class="mb-4 text-center">Siga as instruções abaixo!</h3>
+                            <p><strong>1</strong> - Clique no botão de "Efetuar Pagamento".</p>
+                            <p><strong>2</strong> - Na plataforma do Blockchain, tire uma print ou uma foto da tela de comprovante de pagamento.</p>
+                            <p><strong>3</strong> - Selecione a imagem.</p>
+                            <p><strong>4</strong> - Leia os termos e clique na caixa de confirmação</p>
+                            <p><strong>5</strong> - Clique no botão "Aportar"</p>
+                            <p class="card g-rounded-50 p-4 text-center mt-3">
+                                <strong>
+                                    A solicitação juntamente com o comprovante será enviado para o administrador.<br />
+                                    Você receberá um e-mail com a aprovação do aporte que entrará em vigor no próximo ciclo possível.
+                                </strong>
+                            </p>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <center>
+                                <a class="btn btn-xl g-brd-around g-rounded-50 u-btn-gradient-v1 g-font-size-30"
+                                   target="_blank"
+                                   href="{{ plan.bitcoin_payment_url }}">
+                                    Efetuar Pagamento
+                                </a>
+                            </center>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label>
+                                <strong>Seu Comprovante</strong>
+                            </label>
+                            <input type="file"
+                                   class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10"
+                                   name="receipt"
+                                   ng-model="user_plan.receipt"
+                                   placeholder="Selecione o print ou a foto do comprovante"
+                                   id="receipt"
+                                   angular.element(this).scope().fileNameChanged()
+                                   required/>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label class="form-check-inline u-check g-pl-25">
+                                <input class="g-pos-abs g-left-0"
+                                       type="checkbox"
+                                       name="accept_term"
+                                       form="plan_contract_form"
+                                       value="on"
+                                       required>
+                                <div class="u-check-icon-checkbox-v6 g-absolute-centered--y g-left-0 bg-white">
+                                    <i class="fa" data-check-icon=""></i>
+                                </div>
+                                Li e concordo com os &nbsp;<a href="#">termos</a>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-4 offset-md-8">
+                                <button ng-show="aport_btn" name="aport_contract_form" type="submit" class="btn btn-primary pull-right">
+                                    <i class="hs-admin-check"></i>&nbsp;Aportar
+                                </button>
+                                <button ng-show="load_btn"
+                                        type="button" disabled class="btn btn-primary pull-right">
+                                    <i class="hs-admin-reload"></i>&nbsp;Aguarde...
+                                </button>
+                                <button type="button" class="btn btn-secondary pull-right mr-2" data-dismiss="modal">
+                                    <i class="hs-admin-close"></i>&nbsp;Fechar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

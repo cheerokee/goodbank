@@ -1,0 +1,17 @@
+.ui-autocomplete{
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+    background-color: #fff;
+    width: fit-content !important;
+    border: 1px solid #e1eaea !important;
+    border-radius: 20px;
+}
+
+.ui-autocomplete li{
+    cursor: pointer;
+}
+
+.tab-user-view-menu{
+    cursor: pointer;
+}

@@ -1,0 +1,23 @@
+<?php
+$element = $this->element;
+$db_entity = $this->getEm()->getRepository($this->entity_name)->findOneById($this->entity_id);
+
+/**
+ * @var Base\Controller\BaseFunctions $functions
+ */
+$functions = new \Base\Controller\BaseFunctions();
+if($db_entity){
+    $getMethod = 'get' . $functions->toCamelCase($element->getName());
+    $date = $db_entity->$getMethod();
+}
+?>
+<div class="g-pos-rel">
+    <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+        <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+    </span>
+    <input class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10"
+           type="datetime-local"
+           name="<?=$element->getName()?>"
+           value="<?=($date)?$date->format('Y-m-d').'T'.$date->format('H:i:s'):'';?>"
+           placeholder="">
+</div>

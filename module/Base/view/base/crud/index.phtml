@@ -1,0 +1,185 @@
+<?php
+
+$functions = new \Base\Controller\BaseFunctions();
+$controller = $functions->camel2dashed($this->_listView['controller']);
+
+$link['new'] = $this->url($this->_listView['route'], array(
+    'controller' => $controller,
+    'action' => 'new'
+));
+
+$chave = $this->_listView['controller'];
+
+$entity = $this->entity;
+$em = $this->getEm();
+
+
+$fk     = $this->fk;
+$fk_id  = $this->fk_id;
+
+$url_new = null;
+if($fk != null && $fk_id != null)
+{
+    $url_new = $this->url($controller.'-join-new',array('fk' => $fk,'fk_id' => $fk_id));
+}else{
+    $url_new = $this->url($this->_listView['route'],array('action'=>'new'));
+}
+
+?>
+<div class="g-hidden-sm-down g-bg-gray-light-v8 g-pa-20">
+    <ul class="u-list-inline g-color-gray-dark-v6">
+
+        <li class="list-inline-item g-mr-10">
+            <a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle"
+               href="<?=$this->url('admin');?>">
+                Dashboard
+            </a>
+            <i class="hs-admin-angle-right g-font-size-12 g-color-gray-light-v6 g-valign-middle g-ml-10"></i>
+        </li>
+        <li class="list-inline-item">
+            <span class="g-valign-middle">
+                <?=$this->_listView['title']?>
+            </span>
+        </li>
+    </ul>
+</div>
+<div class="g-pa-20">
+    <h1 class="g-font-weight-300 g-font-size-28 g-color-black g-mb-30">
+        <i class="<?=$this->_listView['icon']?>"></i> <?=$this->_listView['title']?>
+    </h1>
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <?php $this->getFlashMessenger();?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 offset-md-6">
+            <?=$this->partial('filter-base',array(
+                'em' => $em,
+                'controller' => $controller,
+                'listView' => $this->_listView,
+                'entity' => $this->entity,
+                'form'  => $this->form,
+            ));
+            ?>
+        </div>
+    </div>
+    <hr class="d-flex g-brd-gray-light-v7 ">
+    <?php
+
+    if($fk != null && $fk_id != null && $this->fk_entity){
+        ?>
+        <div class="row">
+            <div class="col-md-8">
+                <h4>
+                    <a href="<?=$this->url($this->fk_route,array('controller' => $fk,'action' => 'edit','id' => $fk_id))?>">
+                        Cod.: <?=$this->fk_entity->getId();?> <?=$this->fk_entity;?>
+                    </a>
+                </h4>
+
+            </div>
+            <div class="col-md-4">
+                <button onclick="history.go(-1)" class="btn btn-danger pull-right">
+                    <i class="fa fa-arrow-circle-o-left"></i>&nbsp;Retornar
+                </button>
+            </div>
+            <div class="col-md-12">
+                <hr />
+            </div>
+        </div>
+        <?php
+    }
+
+    ?>
+    <div class="media-md align-items-center g-mb-30">
+        <div class="d-flex g-mb-15 g-mb-0--md">
+            <h2 class="g-font-weight-400 g-font-size-20 g-color-black mb-0">
+                <i class="hs-admin-list"></i> <?=$this->_listView['title']?> > <small>Listagem de Registros</small>
+            </h2>
+        </div>
+
+        <div class="media d-md-flex align-items-center ml-auto">
+            <div class=" g-ml-15 g-ml-55--md">
+                <div class="d-flex justify-content-end input-group g-pos-rel g-width-320--md">
+
+
+                    <?php
+                    if(isset($this->_listView['actions']['defaults']['new'])){
+                        $btn_new = $this->_listView['actions']['defaults']['new'];
+                        if($btn_new['enable']){
+                            ?>
+                            <a href="<?=$url_new ?>?<?=$param?>" class="<?=$btn_new['class']?> pull-right js-fancybox btn btn-xl g-brd-around g-rounded-50 u-btn-gradient-v1 g-width-160--md g-font-size-default" name="filter-form">
+                                <i class="hs-admin-plus"></i>&nbsp;Novo
+                            </a>
+                            <?php
+                        }
+                    }else{
+                        ?>
+                        <a href="<?=$url_new ?>?<?=$param?>" class="<?=$btn_new['class']?> pull-right btn btn-xl g-brd-around g-rounded-50 u-btn-gradient-v1 g-width-160--md g-font-size-default" >
+                            <i class="hs-admin-plus"></i>&nbsp;Novo
+                        </a>
+                        <?php
+                    }
+                    ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="g-mb-40">
+        <div class="table-responsive">
+            <?php
+            $method_filter = 'filter'.ucwords($controller);
+            try{
+                echo $this->$method_filter();
+            }catch (Exception $e){}
+
+            $order = isset($this->_listView['order']) && $this->_listView['order'];
+            if($order){
+                echo "<p class='alert alert-warning'>Você pode ordernar os registros arrastando-os para cima e para baixo!</p>";
+            }
+            ?>
+
+            <table class="js-datatable table u-table--v3 u-editable-table--v1 g-color-black <?=($order)?'sorted_table':''?>"
+                   data-dt-info="#datatableInfo<?=$controller?>"
+                   data-dt-search="#datatableSearch<?=$controller?>"
+                   data-dt-entries="#datatableEntries<?=$controller?>"
+                   data-dt-is-show-paging="true"
+                   data-dt-pagination="datatablePagination<?=$controller?>"
+                   data-dt-page-length="5"
+                   data-dt-is-responsive="false"
+                   data-dt-pagination-classes="list-inline text-right mb-0"
+                   data-dt-pagination-items-classes="list-inline-item g-hidden-sm-down"
+                   data-dt-pagination-links-classes="u-pagination-v1__item u-pagination-v1-2 g-bg-secondary--active g-color-white--active g-brd-gray-light-v7 g-brd-secondary--hover g-brd-secondary--active g-rounded-4 g-py-8 g-px-15"
+                   data-dt-pagination-next-classes="list-inline-item"
+                   data-dt-pagination-next-link-classes="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                   data-dt-pagination-next-link-markup='<span class="g-line-height-1 g-valign-middle" aria-hidden="true"><i class="hs-admin-angle-right"></i></span><span class="sr-only">Next</span>'
+                   data-dt-pagination-prev-classes="list-inline-item"
+                   data-dt-pagination-prev-link-classes="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                   data-dt-pagination-prev-link-markup='<span class="g-line-height-1 g-valign-middle" aria-hidden="true"><i class="hs-admin-angle-left"></i></span><span class="sr-only">Prev</span>'>
+                <?=$this->partial('partial/header');?>
+                <?=$this->partial('partial/body',array(
+                    'controller' => $controller,
+                    'data' => $data,
+                    'param' => $param,
+                    'em' => $em,
+                    'fk' => $fk,
+                    'fk_id' => $fk_id,
+                    'order' => $order,
+                    'page'  =>  $this->page
+                ));?>
+            </table>
+        </div>
+    </div>
+    <div class="media align-items-center g-mb-45">
+        <?php
+        if(!(isset($this->_listView['order']) && $this->_listView['order']))
+        {
+            echo $this->paginationControl($this->data,'Sliding','partials/paginator');
+        }
+        ?>
+    </div>
+</div>
+
+
+
+

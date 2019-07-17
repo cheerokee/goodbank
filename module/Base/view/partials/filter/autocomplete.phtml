@@ -1,0 +1,161 @@
+<?php
+$chave = $this->chave;
+$controller = $this->controller;
+$em = $this->em;
+$functions = new \Base\Controller\BaseFunctions();
+
+$vl = null;
+if(isset($_POST[$controller . '_' . $chave])) {
+    $vl     = $_POST[$controller . '_' . $chave];
+    $vl_id  = $_POST[$controller . '_' . $chave . '_id'];
+}
+
+if(isset($_SESSION['filter-form'][$controller . '_' . $chave])) {
+    $vl     = $_SESSION['filter-form'][$controller . '_' . $chave];
+    $vl_id  = $_SESSION['filter-form'][$controller . '_' . $chave . '_id'];
+}
+
+?>
+<div class="form-group g-mb-30">
+    <label class="g-mb-10" for="<?= $controller ?>_<?=$chave?>">
+        <?= $filter['label'] ?>
+    </label>
+    <div class="g-pos-rel">
+        <span class="btn u-input-btn--v1 g-width-40 g-bg-primary g-rounded-right-20" type="submit">
+            <i class="hs-admin-search g-absolute-centered g-font-size-16 g-color-white"></i>
+        </span>
+        <input id="<?= $controller ?>_<?=$chave?>"
+               name="<?= $controller ?>_<?=$chave?>"
+               class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10"
+               type="text"
+               placeholder=""
+               value="<?= $vl ?>">
+        <input type="hidden" name="<?= $controller?>_<?=$chave?>_id" id="<?= $controller ?>_<?=$chave?>_id" value="<?= $vl_id?>">
+    </div>
+</div>
+<?php
+
+$db_login = $em->getRepository('Register\Entity\User')->findOneById($this->UserIdentity('User'));
+
+switch($controller){
+    case 'solicitation':
+        switch ($chave){
+            case 'user_plan':
+                $db_entities = $em->getRepository('UserPlan\Entity\UserPlan')->findAll();
+                break;
+        }
+
+        break;
+    case 'transaction':
+        switch ($chave){
+            case 'user_plan':
+                $db_entities = $em->getRepository('UserPlan\Entity\UserPlan')->findAll();
+                break;
+            case 'cycle':
+                $db_entities = $em->getRepository('Cycle\Entity\Cycle')->findAll();
+                break;
+        }
+
+        break;
+    case 'user-plan':
+        switch ($chave){
+            case 'user':
+                $db_entities = $em->getRepository('Register\Entity\User')->findAll();
+                break;
+            case 'bank':
+                $db_entities = $em->getRepository('Bank\Entity\Bank')->findAll();
+                break;
+            case 'wallet':
+                $db_entities = $em->getRepository('Wallet\Entity\Wallet')->findAll();
+                break;
+        }
+
+        break;
+    case ('wallet' || 'account'): // Listar qualquer pessoa
+        switch ($chave){
+            case 'user':
+                $db_entities = $em->getRepository('Register\Entity\User')->findAll();
+                break;
+            case 'bank':
+                $db_entities = $em->getRepository('Bank\Entity\Bank')->findAll();
+                break;
+        }
+
+        break;
+    case 'company': // Listar funcionários que tenha o id do login
+        $db_entities = $em->getRepository($this->entity)->findAll();
+        break;
+//    case 'employee': // Listar funcionários da mesma empresa
+//        $db_entities = $em->getRepository($this->entity)->findByCompany($db_login->getId());
+//        break;
+    case 'user': // Listar funcionários da mesma empresa
+        $db_entities = $em->getRepository($this->entity)->findAll();
+        break;
+    default:
+        echo 'CONFIGURE O FILTRO AUTOCOMPLETE PARA ESSE CONTROLLER';
+        break;
+}
+
+$names = array();
+if(!empty($db_entities)){
+    foreach ($db_entities as $db_entity) {
+
+        if($db_entity){
+            switch ( $controller )
+            {
+                case 'wallet':
+                    if($chave == 'user'){
+                        $name = $db_entity->getName();
+                        $names[] = array('label' => $functions->formatarTexto($name), 'value' => $db_entity->getId());
+                    }
+
+                    break;
+                default:
+                    $names[] = array('label' => $functions->formatarTexto($db_entity->getName()), 'value' => $db_entity->getId());
+                    break;
+            }
+        }
+    }
+}
+$names = json_encode($names);
+?>
+
+<script>
+    $(document).ready(function () {
+        <?php
+        if(isset($names) && $names != '')
+        {
+        ?>
+        let Json = '<?=$names?>';
+        var users = JSON.parse(Json);
+
+        $("#<?= $controller.'_'.$chave?>").autocomplete({
+            source: users,
+            messages: {
+                noResults: '',
+                results: function() {}
+            },
+            open: function (event, ui) {
+                $('#<?= $controller ."_".$chave."_id"?>').val('');
+            },
+            select: function (event, ui) {
+                $('#<?= $controller."_".$chave?>').val(ui.item.label);
+                $('#<?= $controller ."_".$chave."_id"?>').val(ui.item.value);
+                return false;
+            }
+        }).blur(function () {
+            if ($('#<?= $controller."_".$chave?>').val() == '') {
+                $('#<?= $controller."_".$chave?>').val('');
+                $('#<?= $controller ."_".$chave."_id"?>').val('');
+            }
+
+            if ($('#<?= $controller ."_".$chave."_id"?>').val() == '') {
+                $('#<?= $controller."_".$chave?>').val('');
+            }
+        });
+        <?php
+        }
+        ?>
+    });
+</script>
+

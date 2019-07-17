@@ -1,0 +1,7 @@
+<?php
+$user = $this->userIdentity('User');
+if(!($user instanceof \Register\Entity\User)){
+    header('Location: /auth');
+    die;
+}
+?>

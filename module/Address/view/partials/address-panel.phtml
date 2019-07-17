@@ -1,0 +1,638 @@
+<?php
+/**
+ * @var \Base\Controller\BaseFunctions $function
+ */
+$function = new \Base\Controller\BaseFunctions();
+
+$title  =   "Endereço";
+$key    =   $function->strToFriendlyUrl($title);
+
+$em = $this->em;
+$db_countries = $em->getRepository('Address\Entity\Country')->findAll();
+
+?>
+<script src="/js/admin/angular.min.js"></script>
+<div id="ribbon">
+    <span class="ribbon-button-alignment">
+        <span id="refresh" class="btn btn-ribbon" data-action="resetWidgets" data-title="refresh"  rel="tooltip" data-placement="bottom" data-original-title="<i class='text-warning fa fa-warning'></i> Warning! This will reset all your widget settings." data-html="true">
+            <i class="fa fa-refresh"></i>
+        </span>
+    </span>
+    <ol class="breadcrumb">
+        <li>
+            <a href="<?=$this->url('admin');?>">Dashboard</a>
+        </li>
+        <li class="active">
+            Painel de Endereços
+        </li>
+    </ol>
+</div>
+<div ng-app="panel-address" id="content">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h1 class="page-title txt-color-blueDark">
+                <i class="fa-fw fa fa-lock"></i> Painel de Endereços <span>> Gerencie os Endereços</span>
+            </h1>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <?php
+            switch ($this->reference){
+                case "job":
+                    $db_job = $em->getRepository('Job\Entity\Job')->findOneById($this->reference_id);
+                    ?>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Emprego</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th><?=$db_job->getId()?></th>
+                                <th><?=$db_job?></th>
+                                <th>
+                                    <a href="<?=$this->url('job/default',array('controller' => 'job','action' => 'edit', 'id' => $db_job->getId() ))?>"
+                                       class="btn btn-primary">
+                                        Acessar
+                                    </a>
+                                </th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h3 class="page-title txt-color-blueDark">
+                        Emprego: <?=$db_job?>
+                    </h3>
+                    <?php
+                    break;
+                case "curriculum":
+                    $db_curriculum = $em->getRepository('Job\Entity\Curriculum')->findOneById($this->reference_id);
+                    ?>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Currículo</th>
+                            <th>Ação</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th><?=$db_curriculum->getId()?></th>
+                            <th><?=$db_curriculum?></th>
+                            <th>
+                                <a href="<?=$this->url('curriculum/default',array('controller' => 'curriculum','action' => 'edit', 'id' => $db_curriculum->getId() ))?>"
+                                   class="btn btn-primary">
+                                    Acessar
+                                </a>
+                            </th>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <h3 class="page-title txt-color-blueDark">
+                        Emprego: <?=$db_job?>
+                    </h3>
+                    <?php
+                    break;
+            }
+            ?>
+
+        </div>
+    </div>
+    <section ng-controller="AddressController as address" id="widget-grid" class="">
+        <div class="row">
+            <article class="col-sm-12">
+                <div class="jarviswidget" id="wid-id-0" data-widget-editbutton="false">
+                    <header>
+                        <div class="col-md-6">
+                            <span class="widget-icon">
+                                <i class="glyphicon glyphicon-map-marker txt-color-darken"></i>
+                            </span>
+                            <h2>Endereços</h2>
+                        </div>
+                    </header>
+                    <div class="no-padding">
+                        <div class="widget-body">
+                            <div class="col-md-12 margin-top-10">
+                                <button class="btn btn-success pull-right" ng-click="add()">
+                                    <i class="fa fa-plus"></i>&nbsp;Novo
+                                </button>
+                                <a class="btn btn-primary"
+                                   id="showform"
+                                   data-toggle="collapse"
+                                   href="#collapseAddress"
+                                   role="button"
+                                   aria-expanded="false"
+                                   aria-controls="collapseAddress">
+                                    Exibir / Esconder Formulário
+                                </a>
+
+                                <hr />
+                                <div class="row collapse" id="collapseAddress">
+                                    <div class="col-md-2 form-group">
+                                        <label>CEP *</label>
+                                        <input id="zip_code" type="text" class="form-control cep" ng-model="data.zip_code">
+                                    </div>
+                                    <div class="col-md-4 form-group">
+                                        <label>Rua *</label>
+                                        <input id="street" type="text" class="form-control" ng-model="data.street">
+                                    </div>
+                                    <div class="col-md-2 form-group">
+                                        <label>Número *</label>
+                                        <input id="number" type="text" class="form-control" ng-model="data.number">
+                                    </div>
+                                    <div class="col-md-4 form-group">
+                                        <label>Bairro *</label>
+                                        <input id="neighborhood" type="text" class="form-control" ng-model="data.neighborhood">
+                                    </div>
+                                    <div class="col-md-4 form-group">
+                                        <label>Complemento</label>
+                                        <input id="complement" type="text" class="form-control" ng-model="data.complement">
+                                    </div>
+                                    <div class="col-md-3 form-group">
+                                        <label>País: *</label>
+                                        <select id="country" class="form-control" name="country" ng-model="data.country" ng-change="getStates()" required>
+                                            <option value="">Selecione...</option>
+                                            <?php
+                                            if(!empty($db_countries)){
+                                                foreach($db_countries as $db_country){
+                                                    ?>
+                                                    <option <?=($country == $db_country->getId())?'selected':'';?> ng-value="<?=$db_country->getId()?>" value="<?=$db_country->getId()?>">
+                                                        <?=$db_country->getName()?>
+                                                    </option>
+                                                    <?php
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 form-group">
+                                        <label>Estado: *</label>
+                                        <select id="state" class="form-control" name="state" ng-model="data.state" ng-change="getCities()" required>
+                                            <option value="">Selecione o país primeiro...</option>
+                                            <option ng-repeat="state in states" ng-value="state.id" >{{ state.name }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 form-group">
+                                        <label>Cidade: *</label>
+                                        <select id="city" class="form-control" name="city" ng-model="data.city" required>
+                                            <option value="">Selecione o estado primeiro...</option>
+                                            <option ng-repeat="city in cities" ng-value="city.id" >{{ city.name }}</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <button ng-show="btnadd" ng-click="save()" class="btn btn-success">
+                                            Salvar
+                                        </button>
+                                        <button ng-show="btnedit" ng-click="update()" class="btn btn-info">
+                                            Atualizar
+                                        </button>
+                                        <button class="btn btn-danger" ng-click="clear()">
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                </div>
+                                <hr />
+                            </div>
+                            <div class="col-md-12 margin-top-10">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Código</th>
+                                            <th>CEP</th>
+                                            <th>Rua</th>
+                                            <th>Número</th>
+                                            <th>Bairro</th>
+                                            <th>Complemento</th>
+                                            <th>Cidade</th>
+                                            <th>Estado</th>
+                                            <th>País</th>
+                                            <th>Ação</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="address  in  addresses">
+                                            <th>{{ address.id }}</th>
+                                            <th>{{ address.zip_code }}</th>
+                                            <th>{{ address.street }}</th>
+                                            <th>{{ address.number }}</th>
+                                            <th>{{ address.neighborhood }}</th>
+                                            <th>{{ address.complement }}</th>
+                                            <th>{{ address._embedded.city.name }}</th>
+                                            <th>{{ address._embedded.state.name }}</th>
+                                            <th>{{ address._embedded.country.name }}</th>
+                                            <th>
+                                                <button class="btn btn-info" ng-click="edit(address.id)">
+                                                    <i class="fa fa-edit"></i>&nbsp;Editar
+                                                </button>
+                                                <button class="btn btn-danger" ng-click="del(address.id)">
+                                                    <i class="fa fa-edit"></i>&nbsp;Excluir
+                                                </button>
+                                            </th>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+</div>
+<script>
+    $(document).ready(function(){
+        $(".cep").mask("99999-999");
+    });
+
+    angular.module('panel-address', [])
+        .controller('AddressController', ['$scope','$http','$timeout', function($scope,$http,$timeout) {
+            var reference = "<?=$this->reference?>";
+            var reference_id = "<?=$this->reference_id?>";
+            $scope.data             =   {
+                "id"            :   null,
+                "zip_code"      :   "",
+                "street"        :   "",
+                "number"        :   0,
+                "neighborhood"  :   "",
+                "city"          :   null,
+                "state"         :   null,
+                "country"       :   null,
+                "complement"    :   null,
+                "reference_id"  :   "<?=$this->reference_id?>",
+                "reference"     :   "<?=$this->reference?>"
+            };
+
+            $scope.addresses        =   [];
+            $scope.id               =   null;
+
+            $scope.btnadd           =   true;
+            $scope.btnedit          =   false;
+            $scope.has_error        =   false;
+
+            $scope.states = [];
+            $scope.cities = [];
+
+            $scope.load = function() {
+                $.ajax({
+                    url: "/api/address",
+                    type: "GET",
+                    data: {
+                        'filter'    :   [
+                            {
+                                'type' : 'andx',
+                                'conditions' : [
+                                    {'field' :'reference', 'type':'eq', 'value' : '<?=$this->reference?>'},
+                                    {'field' :'reference_id', 'type':'eq', 'value' : '<?=$this->reference_id?>'},
+                                ],
+                                'where'  :  'and'
+                            }
+                        ]
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        $timeout(function () {
+                            $scope.addresses = response._embedded.address;
+                        },1000);
+
+                        console.log($scope.addresses);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        $.smallBox({
+                            title : "Erro!",
+                            content : "Ops, houve um erro ao consultar os recursos!",
+                            color : "#C46A69", //"#296191" primary,
+                            iconSmall : "fa fa-frown-o bounce animated",
+                            timeout : 4000
+                        });
+                    }
+                });
+
+            };
+
+            $scope.load();
+
+            $scope.validation = function() {
+                var errors = 0;
+                let $v = 'zip_code';
+                if($scope.data.zip_code == ''){
+                    let c = $("#" + $v).parent().attr('class');
+                    $("#" + $v).parent().attr('class',c + ' has-error').focus();
+                    errors++;
+                }else{
+                    let c = $("#" + $v).parent().attr('class');
+                    $("#" + $v).parent().attr('class',c.replace("has-error",""));
+                }
+
+                $v = 'street';
+                if($scope.data.street == ''){
+                    let c = $("#" + $v).parent().attr('class');
+                    $("#" + $v).parent().attr('class',c + ' has-error').focus();
+                    errors++;
+                }else{
+                    let c = $("#" + $v).parent().attr('class');
+                    $("#" + $v).parent().attr('class',c.replace("has-error",""));
+                }
+
+                $v = 'number';
+                if($scope.data.number == ''){
+                    let c = $("#" + $v).parent().attr('class');
+                    $("#" + $v).parent().attr('class',c + ' has-error').focus();
+                    errors++;
+                }else{
+                    let c = $("#" + $v).parent().attr('class');
+                    $("#" + $v).parent().attr('class',c.replace("has-error",""));
+                }
+
+                $v = 'neighborhood';
+                if($scope.data.neighborhood == ''){
+                    let c = $("#" + $v).parent().attr('class');
+                    $("#" + $v).parent().attr('class',c + ' has-error').focus();
+                    errors++;
+                }else{
+                    let c = $("#" + $v).parent().attr('class');
+                    $("#" + $v).parent().attr('class',c.replace("has-error",""));
+                }
+
+                $v = 'country';
+                if($scope.data.country == ''){
+                    alert("Você deve selecionar algum país");
+                    errors++;
+                }
+
+                $v = 'state';
+                if($scope.data.state == ''){
+                    alert("Você deve selecionar algum estado");
+                    errors++;
+                }
+
+                $v = 'city';
+                if($scope.data.city == ''){
+                    alert("Você deve selecionar alguma cidade");
+                    errors++;
+                }
+
+                return errors;
+            };
+
+            $scope.add = function () {
+
+                $scope.clear();
+                $("#showform").trigger('click');
+            };
+
+            $scope.save = function () {
+                var errors = 0;
+                errors = $scope.validation();
+                if(errors <= 0)
+                {
+                    if($scope.data.id == null){
+                        if($scope.addresses.length == 0) {
+                            $timeout(function () {
+                                $http({
+                                    url: '/api/address',
+                                    method: "POST",
+                                    data: $scope.data
+                                }).then(function (response) {
+                                        // success
+                                        $.smallBox({
+                                            title: "Sucesso!",
+                                            content: "Registro criado com sucesso!",
+                                            color: "#739e73",
+                                            iconSmall: "fa fa-smile-o bounce animated",
+                                            timeout: 4000
+                                        });
+
+                                        $scope.load();
+                                        $scope.clear();
+                                    },
+                                    function (response) {
+                                        $.smallBox({
+                                            title: "Erro!",
+                                            content: "Ops, houve algum erro: " + response.statusText,
+                                            color: "#C46A69", //"#296191" primary,
+                                            iconSmall: "fa fa-frown-o bounce animated",
+                                            timeout: 4000
+                                        });
+                                    });
+                            }, 500);
+                        }else{
+                            alert("Você só pode cadastrar no máximo 1 endereço!");
+                            return false;
+                        }
+                    }else{
+                        $timeout(function(){
+                            $http({
+                                url: '/api/address/' + $scope.data.id,
+                                method: "PUT",
+                                data: $scope.data
+                            }).then(function (response) {
+                                    // success
+                                    $.smallBox({
+                                        title : "Sucesso!",
+                                        content : "Registro atualizado com sucesso!",
+                                        color : "#739e73",
+                                        iconSmall : "fa fa-smile-o bounce animated",
+                                        timeout : 4000
+                                    });
+
+                                    $scope.load();
+                                    $scope.clear();
+                                },
+                                function (response) {
+                                    $.smallBox({
+                                        title : "Erro!",
+                                        content : "Ops, houve algum erro: " + response.statusText,
+                                        color : "#C46A69", //"#296191" primary,
+                                        iconSmall : "fa fa-frown-o bounce animated",
+                                        timeout : 4000
+                                    });
+                                });
+                        },500);
+                    }
+
+                }
+
+            };
+
+            $scope.edit = function(id) {
+                $scope.clear();
+                console.log($("#showform").attr('aria-expanded'));
+                if($("#showform").attr('aria-expanded') == 'false'){
+                    $("#showform").trigger('click');
+                }
+
+                $.ajax({
+                    url: "/api/address/" + id,
+                    type: "GET",
+                    //data: {
+                    //    'filter'    :   [
+                    //        {
+                    //            'type' : 'andx',
+                    //            'conditions' : [
+                    //                {'field' :'reference', 'type':'eq', 'value' : '<?//=$this->reference?>//'},
+                    //                {'field' :'reference_id', 'type':'eq', 'value' : '<?//=$this->reference_id?>//'},
+                    //            ],
+                    //            'where'  :  'and'
+                    //        }
+                    //    ]
+                    //},
+                    dataType: "json",
+                    success: function (response) {
+                        $scope.data.country = response._embedded.country.id;
+                        $scope.getStates(response._embedded.country.id);
+
+                        $timeout(function () {
+                            $scope.data.state = response._embedded.state.id;
+                            $scope.getCities(response._embedded.state.id);
+                            $timeout(function () {
+                                $scope.data.city = response._embedded.city.id;
+                                $scope.data.id = response.id;
+                                $scope.data.zip_code = response.zip_code;
+                                $scope.data.street = response.street;
+                                $scope.data.number = response.number;
+                                $scope.data.neighborhood = response.neighborhood;
+                                $scope.data.complement = response.complement;
+                                $scope.data.reference_id = response.reference_id;
+                                $scope.data.reference = response.reference;
+                            },500);
+                        },500);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        $.smallBox({
+                            title : "Erro!",
+                            content : "Ops, houve um erro ao consultar os recursos!",
+                            color : "#C46A69", //"#296191" primary,
+                            iconSmall : "fa fa-frown-o bounce animated",
+                            timeout : 4000
+                        });
+                    }
+                });
+
+            };
+
+            $scope.del = function (id) {
+                bootbox.confirm({
+                    message: "Deseja excluir esse item?",
+                    buttons: {
+                        cancel: {
+                            label: 'Não',
+                            className: 'btn-danger'
+                        },
+                        confirm: {
+                            label: 'Sim',
+                            className: 'btn-success btnConfirm',
+                        }
+                    },
+                    callback: function (result) {
+                        if(!result){
+                            this.modal('hide');
+                        }else{
+                            $http({
+                                url: '/api/address/' + id,
+                                method: "DELETE"
+                            }).then(function(response) {
+                                $.smallBox({
+                                    title : "Sucesso!",
+                                    content : "Registro deletado com sucesso!",
+                                    color : "#739e73",
+                                    iconSmall : "fa fa-smile-o bounce animated",
+                                    timeout : 4000
+                                });
+
+                                $scope.load();
+                            },
+                            function(response) {
+                                // failed
+                                if(response.status == 422)
+                                {
+                                    $.smallBox({
+                                        title : "Erro!",
+                                        content : "Houve erro na exclusão do cadastro, erro: "+response.statusText,
+                                        color : "#C46A69", //"#296191" primary,
+                                        iconSmall : "fa fa-frown-o bounce animated",
+                                        timeout : 4000
+                                    });
+                                }
+                            });
+                        }
+                    }
+                });
+            };
+
+            $scope.clear = function() {
+                $scope.data     =   {};
+                $scope.data.reference   =   reference;
+                $scope.data.reference_id   =   reference_id;
+                $scope.id       =   null;
+            };
+
+            $scope.getStates = function() {
+                $.ajax({
+                    url: "/api/state",
+                    type: "GET",
+                    data: {
+                        'filter'    :   [
+                            {
+                                'type' : 'andx',
+                                'conditions' : [
+                                    {'field' :'country', 'type':'eq', 'value' : $scope.data.country}
+                                ],
+                                'where'  :  'and'
+                            }
+                        ]
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        $timeout(function () {
+                            $scope.states = response._embedded.state;
+                        },1000);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        $.smallBox({
+                            title : "Erro!",
+                            content : "Ops, houve um erro ao consultar os recursos!",
+                            color : "#C46A69", //"#296191" primary,
+                            iconSmall : "fa fa-frown-o bounce animated",
+                            timeout : 4000
+                        });
+                    }
+                });
+            };
+
+            $scope.getCities = function() {
+                $.ajax({
+                    url: "/api/city",
+                    type: "GET",
+                    data: {
+                        'filter'    :   [
+                            {
+                                'type' : 'andx',
+                                'conditions' : [
+                                    {'field' :'state', 'type':'eq', 'value' : $scope.data.state}
+                                ],
+                                'where'  :  'and'
+                            }
+                        ]
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        $timeout(function () {
+                            $scope.cities = response._embedded.city;
+                        },1000);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        $.smallBox({
+                            title : "Erro!",
+                            content : "Ops, houve um erro ao consultar os recursos!",
+                            color : "#C46A69", //"#296191" primary,
+                            iconSmall : "fa fa-frown-o bounce animated",
+                            timeout : 4000
+                        });
+                    }
+                });
+            };
+        }]);
+</script>

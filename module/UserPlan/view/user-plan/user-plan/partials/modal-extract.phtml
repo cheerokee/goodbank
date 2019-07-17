@@ -1,0 +1,53 @@
+<div class="modal fade" id="modal_extract"
+     aria-labelledby="modal_extract_title"
+     tabindex="-1"
+     role="dialog"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">
+                    Últimas Transações
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Ciclo</th>
+                            <th>Categoria</th>
+                            <th>Data</th>
+                            <th>Tipo</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-class="{ 'g-color-red' : transaction.type,'g-color-green' : !transaction.type }"
+                            ng-repeat="transaction in transactions">
+                            <th>{{ getMonth(transaction._embedded.cycle.month) }}/{{ transaction._embedded.cycle.year }}</th>
+                            <th>{{ transaction._embedded.category_transaction.name }}</th>
+                            <th>{{ formatDate(transaction.date) }}</th>
+                            <th>{{ (transaction.type)?'Débito' : 'Crédito' }}</th>
+                            <th>R$ {{ transaction.value | currency:'':2:'pt-BR' }}</th>
+                        </tr>
+                        <tr ng-if="transactions.length >= 2">
+                            <td colspan="5">
+                                <p class="text-center">
+                                    <a href="/admin/transaction?" target="_blank">Visualizar todas as transações</a>
+                                </p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

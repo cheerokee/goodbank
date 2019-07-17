@@ -1,0 +1,9 @@
+.height-100{
+    min-height: 100%;
+}
+
+.flash-alert{
+    margin: 0px;
+    list-style: none;
+    padding: 5px;
+}

@@ -1,0 +1,63 @@
+<?php
+$coluna = $this->chave;
+$controller = $this->controller;
+$em = $this->em;
+$functions = new \Base\Controller\BaseFunctions();
+
+$vl_de = null;
+if(isset($_POST[$controller . '_' . $chave . '_de'])) {
+    $vl_de = $_POST[$controller . '_' . $chave . '_de'];
+}
+
+if(isset($_SESSION['filter-form'][$controller . '_' . $chave . '_de'])) {
+    $vl_de = $_SESSION['filter-form'][$controller . '_' . $chave . '_de'];
+}
+
+$vl_ate = null;
+if(isset($_POST[$controller . '_' . $chave . '_ate'])) {
+    $vl_ate = $_POST[$controller . '_' . $chave . '_ate'];
+}
+
+if(isset($_SESSION['filter-form'][$controller . '_' . $chave . '_ate'])) {
+    $vl_ate = $_SESSION['filter-form'][$controller . '_' . $chave . '_ate'];
+}
+?>
+<div class="row">
+    <div class="col-md-12">
+        <label class="g-mb-10" for="inputGroup-3_1">
+            Período
+        </label>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group g-mb-30">
+            <label class="g-mb-10" for="inputGroup-3_1">
+                De:
+            </label>
+            <div class="g-pos-rel">
+                <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                    <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                </span>
+                <input id="<?= $controller ?>_<?=$coluna?>_de"
+                       name="<?= $controller ?>_<?=$coluna?>_de"
+                       class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10"
+                       type="datetime-local" value="<?=$vl_de?>">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group g-mb-30">
+            <label class="g-mb-10" for="inputGroup-3_1">
+                Até:
+            </label>
+            <div class="g-pos-rel">
+                <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                    <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                </span>
+                <input id="<?= $controller ?>_<?=$coluna?>_ate"
+                       name="<?= $controller ?>_<?=$coluna?>_ate"
+                       class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10"
+                       type="datetime-local" value="<?=$vl_ate?>">
+            </div>
+        </div>
+    </div>
+</div>
