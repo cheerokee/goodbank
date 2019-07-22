@@ -104,6 +104,15 @@
                                 </div>
                             </div>
                         </div>
+                        <div ng-if="user_plans.length == 0">
+                            <h2 class="alert alert-danger text-center pt-4">
+                                <i class="hs-admin-face-sad g-font-size-60"></i><br />Você não possui nenhum aporte, não perca oportunidade, faça seu primeiro investimento!<br />
+                                <a class="btn btn-xl g-brd-around g-rounded-50 u-btn-gradient-v1 g-font-size-30 mt-5 mb-4"
+                                   href="<?=$this->url('panel-investiment')?>">
+                                    <i class="hs-admin-money"></i>&nbsp;Investir
+                                </a>
+                            </h2>
+                        </div>
                         <?=$this->partial('partials/modal-extract');?>
                         <?=$this->partial('partials/modal-cash_out');?>
                         <?=$this->partial('partials/modal-select-account');?>
