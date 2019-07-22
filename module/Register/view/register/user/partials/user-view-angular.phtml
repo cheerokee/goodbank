@@ -21,7 +21,8 @@ $name = $this->name;
                 agency: '',
                 type: null,
                 operation: '',
-                account_number: ''
+                account_number: '',
+                main: 0
             };
             $scope.configuration = {
                 id: '',
@@ -228,19 +229,53 @@ $name = $this->name;
 
             $scope.update = function () {
                 $.ajax({
-                    url: '/api/user/' + $scope.user.id,
-                    type: "PATCH",
-                    async: true,
-                    contentType : 'application/json',
-                    data: JSON.stringify($scope.user),
-                    success: function (o) {
-                        successNotify('Usuário atualizado com sucesso!');
-                        $scope.load();
+                    url: "/api/user",
+                    type: "GET",
+                    data: {
+                        "filter"    :   [
+                            {
+                                'type' : 'andx',
+                                'conditions' : [
+                                    {'field' :'document', 'type':'eq', 'value' : $scope.user.document}
+                                ],
+                                'where'  :  'and'
+                            }
+                        ]
                     },
-                    error: function (o) {
-                        errorNotify('Houve um erro ao atualizar o usuário!');
+                    dataType: "json",
+                    success: function (response) {
+                        let users = response._embedded.user;
+                        for(index in users){
+                            let user = users[index];
+
+                            if($scope.user.id != user.id){
+                                $timeout(function () {
+                                    $scope.user.document = "";
+                                },300);
+                                errorNotify("Já existe um usuário com esse CPF no sistema!");
+                                return false;
+                            }
+                        }
+
+                        $.ajax({
+                            url: '/api/user/' + $scope.user.id,
+                            type: "PATCH",
+                            async: true,
+                            contentType : 'application/json',
+                            data: JSON.stringify($scope.user),
+                            success: function (o) {
+                                successNotify('Usuário atualizado com sucesso!');
+                                $scope.load();
+                            },
+                            error: function (o) {
+                                errorNotify('Houve um erro ao atualizar o usuário!');
+                            },
+                            dataType: "json"
+                        });
                     },
-                    dataType: "json"
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        errorNotify("Erro ao consultar as carteiras bitcoin");
+                    }
                 });
             };
 
@@ -581,7 +616,7 @@ $name = $this->name;
                         errorNotify('Houve erro na atualização da configuração');
                     }
                 });
-            }
+            };
 
             /*** END CONFIGURATION  ***/
             /*** START ACCOUNT  ***/
@@ -595,7 +630,7 @@ $name = $this->name;
                         $scope.banks = response._embedded.bank;
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        errorNotify("Erro ao consultar as carteiras bitcoin");
+                        errorNotify("Erro ao consultar os bancos");
                     }
                 });
             };
@@ -646,9 +681,9 @@ $name = $this->name;
                             $scope.account.type_account = (response.type_account)?1:0;
                             $scope.account.cnpj = response.cnpj;
                             $scope.account.holder = response.holder;
+                            $scope.account.main = (response.main === false)?0:1;
                             $scope.account.user = response._embedded.user.id;
                             $scope.account.bank = response._embedded.bank.id;
-                            console.log($scope.account.type,$scope.account.type_account);
                         },300);
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
@@ -671,7 +706,7 @@ $name = $this->name;
                             successNotify("Conta bancária atualizada com sucesso!");
                         },
                         error: function (o) {
-                            errorNotify("Houve um erro ao editar a carteira!");
+                            errorNotify("Houve um erro ao editar a conta bancária!");
                         },
                         dataType: "json"
                     });
@@ -688,7 +723,7 @@ $name = $this->name;
                             successNotify("Conta bancária cadastrada com sucesso!");
                         },
                         error: function (o) {
-                            errorNotify("Houve um erro ao criar a carteira!");
+                            errorNotify("Houve um erro ao criar a conta bancária!");
                         },
                         dataType: "json"
                     });

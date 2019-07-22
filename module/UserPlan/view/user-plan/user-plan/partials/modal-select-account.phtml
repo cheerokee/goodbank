@@ -1,0 +1,66 @@
+<div class="modal fade" id="modal_select_account"
+     aria-labelledby="modal_select_account_title"
+     tabindex="-1"
+     role="dialog"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">
+                    Selecione a conta bancária para receber
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div ng-if="accounts.length > 0" class="col-md-12 table-responsive">
+                        <p class="alert alert-danger">
+                            Você pode adicionar ou editar a conta bancária clicando no seu perfil localizado no canto superior direito
+                        </p>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Pessoa</th>
+                                    <th>Banco</th>
+                                    <th>Titular</th>
+                                    <th>Agência</th>
+                                    <th>Tipo de Conta</th>
+                                    <th>Nº da Conta</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="account in accounts">
+                                    <td>{{ (account.type_account)?"Jurídica":"Física" }}</td>
+                                    <td>{{ account._embedded.bank.name }}</td>
+                                    <td>{{ account.holder }}</td>
+                                    <td>{{ account.agency }}</td>
+                                    <td>{{ (account.type) ? "Poupança" : "Corrente" }}</td>
+                                    <td>{{ account.account_number }}</td>
+                                    <td>
+                                        <button ng-click="selectAccount(account)" class="btn btn-primary">
+                                            <i class="hs-admin-check"></i>&nbsp;Selecionar
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div ng-if="accounts.length == 0" class="col-md-12 table-responsive">
+                        <h5>
+                            Você precisa criar uma conta bancária para solicitar saque no sistema
+                        </h5>
+                        <?=$this->partial('form-account');?>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

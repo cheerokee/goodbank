@@ -19,7 +19,9 @@ class Solicitation extends FormBase{
             ->setValueOptions(array(
                 '0' => $this->translate("Saque"),
                 '1' => $this->translate("Renovação"),
-                '2' => $this->translate("Resgate")
+                '2' => $this->translate("Resgate"),
+                '3' => $this->translate("Primeira Comissão"),
+                '4' => $this->translate("Comissão")
             ))
             ->setAttribute('value','0')
             ->setAttribute('required','required')
@@ -62,6 +64,31 @@ class Solicitation extends FormBase{
                     'params' => array()
                 ),
                 'label' => 'Aporte: *',
+                'column-size' => 'sm-4',
+                'label_attributes' => array('class' => 'col-sm-2 input-sm')
+            ),
+            'attributes' => array(
+                'class' => 'form-control',
+                'component' => 'autocomplete'
+            )
+        ));
+
+        $this->add(array(
+            'name' => 'user',
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',
+            'options' => array(
+                'disable_inarray_validator' => true,
+                'object_manager' => $objectManager,
+                'target_class' => 'Register\Entity\User',
+                'property' => 'name',
+                'display_empty_item' => true,
+                'empty_item_label' => 'Selecione...',
+                'is_method' => true,
+                'find_method' => array(
+                    'name' => 'findAll',
+                    'params' => array()
+                ),
+                'label' => 'Usuário: *',
                 'column-size' => 'sm-4',
                 'label_attributes' => array('class' => 'col-sm-2 input-sm')
             ),

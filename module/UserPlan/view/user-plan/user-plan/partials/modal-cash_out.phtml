@@ -29,8 +29,8 @@
                                        data-extra-classes="u-slider--v4 u-slider--v4--single"
                                        data-type="single"
                                        data-min="0"
-                                       data-max="{{ user_plan.balance }}"
-                                       data-from="{{ user_plan.balance }}"
+                                       data-max="{{ user_plan.balance.toFixed(2) }}"
+                                       data-from="{{ user_plan.balance.toFixed(2) }}"
                                        data-result-min="#result2min">
                             </div>
 
@@ -64,7 +64,7 @@
                                 <strong>R$ {{ user_plan.balance + user_plan._embedded.plan.price | currency:'':2:'pt-BR' }}</strong>
                             </h3>
                         </div>
-                        <hr />
+                        <hr class="m-2" />
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-md-12">
@@ -73,52 +73,75 @@
                                         O resgate ou a renovação de contrato será habilitado somente na expiração do contrato
                                     </span>
                                 </div>
+                                <div class="col-md-6">
+                                    <label ng-if="!cash_out" class="d-flex align-items-center justify-content-between mt-2 border border-danger p-1">
+                                        <span><strong>Renovar o Contrato</strong></span>
+                                        <div ng-if="getExpirationDays(user_plan.approved_date) == 0" class="u-check">
+                                            <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
+                                                   name="renew"
+                                                   ng-model="renew"
+                                                   ng-click="renewChange()"
+                                                   type="checkbox" value="true">
+                                            <div class="u-check-icon-radio-v8">
+                                                <i class="fa" data-check-icon=""></i>
+                                            </div>
+                                        </div>
+                                        <div ng-if="getExpirationDays(user_plan.approved_date) > 0" class="u-check">
+                                            <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
+                                                   name="renew"
+                                                   disabled
+                                                   type="checkbox">
+                                            <div class="u-check-icon-radio-v8">
+                                                <i class="fa" data-check-icon=""></i>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="col-md-6">
+                                    <label ng-if="!renew" class="d-flex align-items-center justify-content-between mt-2 border border-danger p-1">
+                                        <span><strong>Solicitar o Resgate</strong></span>
+                                        <div ng-if="getExpirationDays(user_plan.approved_date) == 0" class="u-check">
+                                            <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
+                                                   name="cash_out"
+                                                   ng-model="cash_out"
+                                                   ng-click="cachOutChange()"
+                                                   type="checkbox" value="true">
+                                            <div class="u-check-icon-radio-v8">
+                                                <i class="fa" data-check-icon=""></i>
+                                            </div>
+                                        </div>
+                                        <div ng-if="getExpirationDays(user_plan.approved_date) > 0" class="u-check">
+                                            <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
+                                                   name="cash_out"
+                                                   disabled
+                                                   type="checkbox">
+                                            <div class="u-check-icon-radio-v8">
+                                                <i class="fa" data-check-icon=""></i>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
-                            <label ng-if="!cash_out" class="d-flex align-items-center justify-content-between mt-2 border border-danger p-1">
-                                <span><strong>Renovar o Contrato</strong></span>
-                                <div ng-if="getExpirationDays(user_plan.approved_date) == 0" class="u-check">
-                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
-                                           name="renew"
-                                           ng-model="renew"
-                                           ng-click="renewChange()"
-                                           type="checkbox" value="true">
-                                    <div class="u-check-icon-radio-v8">
-                                        <i class="fa" data-check-icon=""></i>
-                                    </div>
-                                </div>
-                                <div ng-if="getExpirationDays(user_plan.approved_date) > 0" class="u-check">
-                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
-                                           name="renew"
-                                           disabled
-                                           type="checkbox">
-                                    <div class="u-check-icon-radio-v8">
-                                        <i class="fa" data-check-icon=""></i>
-                                    </div>
-                                </div>
-                            </label>
-                            <label ng-if="!renew" class="d-flex align-items-center justify-content-between mt-2 border border-danger p-1">
-                                <span><strong>Solicitar o Resgate</strong></span>
-                                <div ng-if="getExpirationDays(user_plan.approved_date) == 0" class="u-check">
-                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
-                                           name="cash_out"
-                                           ng-model="cash_out"
-                                           ng-click="cachOutChange()"
-                                           type="checkbox" value="true">
-                                    <div class="u-check-icon-radio-v8">
-                                        <i class="fa" data-check-icon=""></i>
-                                    </div>
-                                </div>
-                                <div ng-if="getExpirationDays(user_plan.approved_date) > 0" class="u-check">
-                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-right-0"
-                                           name="cash_out"
-                                           disabled
-                                           type="checkbox">
-                                    <div class="u-check-icon-radio-v8">
-                                        <i class="fa" data-check-icon=""></i>
-                                    </div>
-                                </div>
-                            </label>
                         </div>
+                    </div>
+                </div>
+                <span ng-if="enableCashOut()" class="text-danger">
+                    Saque disponível somente nos dias:
+                    <center>
+                        <ul style="list-style: none;padding: 0;margin: 20px 0px 0px 0px;">
+                            <li style="display: inline" class="alert alert-danger" ng-repeat="day in canDays">
+                                {{ day }}
+                            </li>
+                        </ul>
+                    </center>
+                </span>
+                <div class="row">
+                    <div class="col-md-12">
+                        <hr class="m-2" />
+                        <h5>Conta Selecionada</h5>
+                        <p>
+                            {{ account._embedded.bank.name }} - Ag.: {{ account.agency }} Conta:{{ account.account_number }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -128,9 +151,16 @@
                 </button>
                 <button type="button"
                         class="btn btn-primary"
+                        ng-show="enableSolicitation"
                         ng-disabled="enableCashOut()"
                         ng-click="sendCashOut()">
                     Solicitar
+                </button>
+                <button type="button"
+                        class="btn btn-primary"
+                        disabled
+                        ng-show="!enableSolicitation">
+                    <i class="fa fa-refresh"></i> Aguarde
                 </button>
             </div>
         </div>

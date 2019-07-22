@@ -50,6 +50,10 @@ class TransactionController extends CrudController{
                     'label' => $this->translate('Id'),
                     'list' => true,
                 ),
+                'user'=>array(
+                    'label' => $this->translate('Usuário'),
+                    'list' => true,
+                ),
                 'userPlan'=>array(
                     'label' => $this->translate('Plano do Usuário'),
                     'list' => true,
@@ -76,6 +80,11 @@ class TransactionController extends CrudController{
                 ),
             ),
             'filters' => array(
+                'user' => array(
+                    'label'     => 'Usuário',
+                    'type'      => 'autocomplete',
+                    'column'    => 'col-md-12'
+                ),
                 'user_plan' => array(
                     'label'     => 'Plano de Usuário',
                     'type'      => 'autocomplete',

@@ -13,24 +13,25 @@
         </li>
     </ul>
 </div>
-<div ng-app="panelInvestmentView" ng-controller="InvestimentViewController" class="col g-ml-45 g-ml-0--lg g-pb-65--md">
+<div ng-app="panelInvestmentView" ng-controller="InvestimentViewController" class="col g-ml-0--lg g-pb-65--md">
     <div class="g-pa-20">
         <div class="row">
             <div class="col-md-12">
                 <div class="g-pos-rel h-100 g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-30--md">
                     <header>
                         <h2>
-                            <i class=""></i>&nbsp;Painel de Investimento
+                            <i class="hs-admin-layout-media-center-alt"></i>&nbsp;Painel de Investimento
                         </h2>
                         <p>Faça seus investimentos</p>
                     </header>
                     <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-mt-25--md g-mb-30--md">
                     <div class="row g-mx-minus-10 g-mb-60">
-                        <div ng-repeat="plan in plans" class="col-md-4 g-px-10 g-mb-20 g-mb-0--md">
+                        <div ng-repeat="plan in plans"
+                             class="col-md-4 g-px-10 g-mb-20 g-mb-20--md mb-3">
                             <article class="g-bg-white g-overflow-hidden g-brd-around g-brd-gray-light-v7 g-rounded-4">
-                                <header class="text-center g-bg-gray-light-v8 g-pa-20">
+                                <header class="text-center g-pa-20 bg-green-light">
                                     <h4 class="h6 text-uppercase g-font-weight-400 g-font-size-16 g-color-black mb-0">
-                                        {{ plan.name }}
+                                        <strong>{{ plan.name }}</strong>
                                     </h4>
                                 </header>
                                 <section class="g-mb-40 g-mt-40">
@@ -40,16 +41,20 @@
                                          data-border-width="4"
                                          data-start-angle="0"
                                          data-fill-colors='["#1e110c","#dede30"]'>
-                                        <i class="hs-admin-clipboard g-absolute-centered g-font-size-40 g-color-gray-light-v3"></i>
+                                        <img style="zoom: 0.5"
+                                             class="img-fluid g-absolute-centered"
+                                             src="/assets/img/logo-icon.png" />
                                     </div>
                                 </section>
                                 <div class="g-px-20 g-py-30">
-                                    <strong class="d-block text-center g-color-secondary g-font-weight-400 g-font-size-30 g-line-height-0_8 g-mb-25">
-                                        <sup class="g-font-size-18">R$</sup>{{ plan.price  | currency:'':2:'pt-BR'}}
+                                    <strong class="color-green-light d-block text-center g-font-weight-400 g-font-size-30 g-line-height-0_8 g-mb-25">
+                                        <strong>
+                                            <sup class="g-font-size-18">R$</sup>{{ plan.price  | currency:'':2:'pt-BR'}}
+                                        </strong>
                                     </strong>
                                     <button ng-click="aporteModalNew(plan)"
                                             data-toggle="modal" data-target="#investimentModal"
-                                            class="btn btn-md btn-xl--md btn-block u-btn-secondary g-font-size-default--md"
+                                            class="btn btn-md btn-xl--md btn-block u-btn-black g-font-size-default--md"
                                             type="button">
                                         Aportar
                                     </button>

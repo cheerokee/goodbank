@@ -18,6 +18,10 @@ class SolicitationRepository extends EntityRepository
             $where .= " AND x.user_plan = " . $data['solicitation_user_plan_id'];
         }
 
+        if(isset($data['solicitation_user_id']) && $data['solicitation_user_id'] != ''){
+            $where .= " AND x.user = " . $data['solicitation_user_id'];
+        }
+
         if(isset($data['solicitation_type']) && $data['solicitation_type'] != ''){
             $where .= " AND x.type = " . $data['solicitation_type'];
         }

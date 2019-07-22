@@ -1,0 +1,172 @@
+<form id="form_{{ tab }}" name="form_{{ tab }}" ng-submit="updateAccount()" >
+    <div class="row g-mb-20">
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-5 align-self-center g-mb-5 g-mb-0--md">
+                    <label class="mb-0">
+                        Pessoa: *
+                    </label>
+                </div>
+                <div class="col-md-7 align-self-center">
+                    <select ng-model="account.type_account"
+                            name="type_account"
+                            class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                            required>
+                        <option value="">Selecione...</option>
+                        <option ng-value="0" value="0">Física</option>
+                        <option ng-value="1" value="1">Jurídica</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div ng-if="account.type_account === 1" class="col-md-6">
+            <div class="row">
+                <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+                    <label class="mb-0">
+                        CNPJ:
+                    </label>
+                </div>
+                <div class="col-md-9 align-self-center">
+                    <input ng-model="account.cnpj" name="cnpj"
+                           class="form-control cnpj form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                           type="text"
+                           onkeypress="mascara(this,mCNPJ)"
+                           required>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-mb-20">
+        <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+            <label class="mb-0">
+                Banco: *
+            </label>
+        </div>
+        <div class="col-md-9 align-self-center">
+            <select ng-model="account.bank"
+                    name="bank"
+                    class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                    required>
+                <option value="">Selecione...</option>
+                <option ng-repeat="bank in banks" ng-value="bank.id" value="{{ bank.id }}">
+                    {{ bank.name }}
+                </option>
+            </select>
+        </div>
+    </div>
+    <div class="row g-mb-20">
+        <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+            <label class="mb-0">
+                Titular: *
+            </label>
+        </div>
+        <div class="col-md-9 align-self-center">
+            <input ng-model="account.holder"
+                   name="holder"
+                   class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                   type="text"
+                   placeholder="Ex. José Aparecido Costa, Empresa A"
+                   required>
+        </div>
+    </div>
+    <div class="row g-mb-20">
+        <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+            <label class="mb-0">
+                Agência: *
+            </label>
+        </div>
+        <div class="col-md-9 align-self-center">
+            <input ng-model="account.agency"
+                   name="agency"
+                   class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                   type="text"
+                   placeholder="Ex. 4488"
+                   required>
+        </div>
+    </div>
+    <div class="row g-mb-20">
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-5 align-self-center g-mb-5 g-mb-0--md">
+                    <label class="mb-0">
+                        Tipo de Conta: *
+                    </label>
+                </div>
+                <div class="col-md-7 align-self-center">
+                    <select ng-model="account.type"
+                            name="type"
+                            class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                            required>
+                        <option value="">Selecione...</option>
+                        <option ng-value="0" value="0">Corrente</option>
+                        <option ng-value="1" value="1">Poupança</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+                    <label class="mb-0">
+                        Operação: (Opcional)
+                    </label>
+                </div>
+                <div class="col-md-9 align-self-center">
+                    <input ng-model="account.operation"
+                           name="operation"
+                           class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                           type="text"
+                           placeholder="Ex. 013" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-mb-20">
+        <div class="col-md-7">
+            <div class="row">
+                <div class="col-md-4 align-self-center g-mb-5 g-mb-0--md">
+                    <label class="mb-0">
+                        Nº da Conta: *
+                    </label>
+                </div>
+                <div class="col-md-8 align-self-center">
+                    <input ng-model="account.account_number"
+                           name="account_number"
+                           class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                           type="text"
+                           placeholder="Ex. 00001234"
+                           required>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="row">
+                <div class="col-md-4 align-self-center g-mb-5 g-mb-0--md">
+                    <label class="mb-0">
+                        Principal?: *
+                    </label>
+                </div>
+                <div class="col-md-8 align-self-center">
+                    <select ng-model="account.main"
+                            name="main"
+                            class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
+                            required>
+                        <option value="">Selecione...</option>
+                        <option ng-value="0" value="0">Não</option>
+                        <option ng-value="1" value="1">Sim</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-mb-20">
+        <div class="col-md-12">
+            <button type="submit"
+                    ng-class="{ 'btn-primary' : account.id == null,'btn-info' : account.id }"
+                    class="btn">
+                <i ng-class="{ 'hs-admin-plus' : account.id == null,'hs-admin-save' : account.id }"></i>&nbsp;
+                {{ (account.id) ? 'Atualizar Conta' : 'Adicionar Conta' }}
+            </button>
+        </div>
+    </div>
+</form>

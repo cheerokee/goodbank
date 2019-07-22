@@ -15,6 +15,32 @@ class Transaction extends FormBase{
         $this->add($id);
 
         $this->add(array(
+            'name' => 'user',
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',
+            'options' => array(
+                'disable_inarray_validator' => true,
+                'object_manager' => $objectManager,
+                'target_class' => 'Register\Entity\User',
+                'property' => 'name',
+                'display_empty_item' => true,
+                'empty_item_label' => 'Selecione...',
+                'is_method' => true,
+                'find_method' => array(
+                    'name' => 'findAll',
+                    'params' => array()
+                ),
+                'label' => 'Usuário: *',
+                'column-size' => 'sm-4',
+                'label_attributes' => array('class' => 'col-sm-2 input-sm')
+            ),
+            'attributes' => array(
+                'class' => 'form-control',
+                'required' => 'required',
+                'component' => 'autocomplete'
+            )
+        ));
+
+        $this->add(array(
             'name' => 'user_plan',
             'type' => 'DoctrineModule\Form\Element\ObjectSelect',
             'options' => array(

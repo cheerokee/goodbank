@@ -363,27 +363,39 @@ class UserPlan
 
     public function getExpirationDateStr()
     {
-        $date = $this->approved_date->format('Y-m-d H:i:s');
-        $date_expiration = date('d/m/Y H:i:s', strtotime("+1 year",strtotime($date)));
+        if($this->approved_date){
+            $date = $this->approved_date->format('Y-m-d H:i:s');
+            $date_expiration = date('d/m/Y H:i:s', strtotime("+1 year",strtotime($date)));
 
-        return ($this->approved_date != null)?$date_expiration:'Não Aprovado';
+            return $date_expiration;
+        }else{
+            return 'Não Aprovado';
+        }
     }
 
     public function getExpirationDate()
     {
-        $date = $this->approved_date->format('Y-m-d H:i:s');
-        $date_expiration = date('Y-m-d H:i:s', strtotime("+1 year",strtotime($date)));
+        if($this->approved_date){
+            $date = $this->approved_date->format('Y-m-d H:i:s');
+            $date_expiration = date('Y-m-d H:i:s', strtotime("+1 year",strtotime($date)));
 
-        return ($this->approved_date != null)?(new \DateTime($date_expiration)):'Não Aprovado';
+            return (new \DateTime($date_expiration));
+        }else{
+            return 'Não Aprovado';
+        }
     }
 
     public function getDaysRemainingStr()
     {
         $data_inicial = new \DateTime('now');
         $data_final = $this->getExpirationDate();
-        $diferenca = $data_inicial->diff( $data_final );
+        if($data_final){
+            $diferenca = $data_inicial->diff( $data_final );
 
-        return $diferenca->days;
+            return $diferenca->days;
+        }else{
+            return 0;
+        }
     }
 
     /**

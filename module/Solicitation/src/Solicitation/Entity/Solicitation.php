@@ -25,6 +25,8 @@ class Solicitation
      * 0 - Saque
      * 1 - Renovação
      * 2 - Resgate
+     * 3 - Primeira Comissão
+     * 4 - Comissão
      * @ORM\Column(name="type", type="integer", nullable=false)
      */
     private $type;
@@ -47,6 +49,18 @@ class Solicitation
      * })
      */
     private $user_plan;
+
+    /**
+     * @var \Register\Entity\User
+     *
+     * @ORM\ManyToOne(targetEntity="Register\Entity\User")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="user_id", referencedColumnName="id",
+     *      nullable=false,
+     *      onDelete="CASCADE")
+     * })
+     */
+    private $user;
 
     /**
      * @var string
@@ -151,6 +165,12 @@ class Solicitation
             case 2:
                 $str = 'Resgate';
                 break;
+            case 3:
+                $str = 'Primeira Comissão';
+                break;
+            case 4:
+                $str = 'Comissão';
+                break;
         }
 
         return $str;
@@ -183,6 +203,22 @@ class Solicitation
     public function setValue($value)
     {
         $this->value = $value;
+    }
+
+    /**
+     * @return \Register\Entity\User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param \Register\Entity\User $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
     }
 
     /**

@@ -1,0 +1,143 @@
+<?php
+$color = $this->color;
+?>
+<tr>
+    <td align="center" bgcolor="<?=$color?>">
+        <table role="presentation"
+               border="0"
+               cellspacing="0"
+               cellpadding="0"
+               bgcolor="<?=$color?>" style="width: 100%">
+            <tbody>
+            <tr>
+                <td align="center"
+                    bgcolor="<?=$color?>"
+                    height="50"
+                    style="height:50px; font-size: 0;">
+                    &nbsp;
+                </td>
+            </tr>
+            <tr>
+                <td align="center" bgcolor="<?=$color?>">
+                    <table role="presentation"
+                           width="240"
+                           border="0"
+                           cellspacing="0"
+                           cellpadding="0">
+                        <tbody>
+                        <tr>
+                            <?php
+                            $url = $this->getConfiguration('TWITTER');
+                            if($url != ''){
+                                ?>
+                                <!-- TWITTER -->
+                                <td align="center"
+                                    height="70"
+                                    width="70">
+                                    <a target="_blank" href="<?=$url?>">
+                                        <img src="https://www.htmlemailcheck.com/assets/img/email/email-icon-twitter.png"
+                                             height="70"
+                                             width="70"
+                                             alt="Twitter"
+                                             style="display:block; border:0; width:70px; height:70px;">
+                                    </a>
+                                </td>
+                                <?php
+                            }
+
+                            $url = $this->getConfiguration('FACEBOOK');
+                            if($url != ''){
+                                ?>
+                                <!-- FACEBOOK -->
+                                <td align="center" height="70" width="70">
+                                    <a target="_blank"
+                                       href="<?=$url?>">
+                                        <img src="https://www.htmlemailcheck.com/assets/img/email/email-icon-facebook.png"
+                                             height="70"
+                                             width="70"
+                                             alt="Facebook"
+                                             style="display:block; border:0; width:70px; height:70px;">
+                                    </a>
+                                </td>
+                                <?php
+                            }
+
+                            $url = $this->getConfiguration('YOUTUBE');
+                            if($url != ''){
+                                ?>
+                                <!-- YOUTUBE -->
+                                <td align="center" height="70" width="70">
+                                    <a href="<?=$url?>" target="_blank">
+                                        <img src="http://www.robsonmoulin.com.br/wp-content/uploads/2018/06/obtendo-ultimo-video-youtube-website-200x200.jpg"
+                                             height="70"
+                                             width="70"
+                                             alt="YouTube"
+                                             style="display:block; border:0; width:70px; height:70px;">
+                                    </a>
+                                </td>
+                                <?php
+                            }
+
+                            $url = $this->getConfiguration('INSTAGRAM');
+                            if($url != ''){
+                                ?>
+                                <!-- INSTAGRAM -->
+                                <td align="center" height="70" width="70">
+                                    <a href="<?=$url?>" target="_blank">
+                                        <img src="https://midiasturbinadas.com.br/blog/wp-content/uploads/2018/05/aumentar-seguidores-no-instagram.png"
+                                             height="70"
+                                             width="70"
+                                             alt="Instagram"
+                                             style="display:block; border:0; width:70px; height:70px;">
+                                    </a>
+                                </td>
+                                <?php
+                            }
+
+                            $url = $this->getConfiguration('LINKEDIN');
+                            if($url != ''){
+                                ?>
+                                <!-- LINKEDIN -->
+                                <td align="center" height="70" width="70">
+                                    <a href="<?=$url?>" target="_blank">
+                                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgyg1W1NammkIQ9uoJcv-5T89_EyNtfCRxchlBTjFnchz24vxv"
+                                             height="70"
+                                             width="70"
+                                             alt="Linkedin"
+                                             style="display:block; border:0; width:70px; height:70px;">
+                                    </a>
+                                </td>
+                                <?php
+                            }
+                            ?>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td align="center"
+                    bgcolor="<?=$color?>"
+                    height="50" style="height:50px; font-size: 0;">
+                    &nbsp;
+                </td>
+            </tr>
+            <tr>
+                <td align="center"
+                    bgcolor="<?=$color?>"
+                    style="font-family: Helvetica, Arial, sans-serif; font-size: 11px; color:#ffffff; line-height:20px;">
+                    <?=$this->getConfiguration('NOMEEMPRESA');?> © 2019 Todos os direitos reservados
+                </td>
+            </tr>
+            <tr>
+                <td align="center"
+                    bgcolor="<?=$color?>"
+                    height="50"
+                    style="height:50px; font-size: 0;">
+                    &nbsp;
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </td>
+</tr>

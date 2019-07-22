@@ -6,6 +6,7 @@ angular.module("panelInvestmentView", [])
     $scope.load_btn = false;
     $scope.renew = false;
     $scope.cash_out = false;
+    $scope.enableSolicitation = true;
 
     $scope.plan  = {};
     $scope.user_plan  = {
@@ -20,12 +21,18 @@ angular.module("panelInvestmentView", [])
     };
     $scope.user = {};
     $scope.payment_method = {};
+    $scope.account = {};
 
     $scope.plans = [];
     $scope.wallets = [];
     $scope.payment_methods = [];
     $scope.user_plans = [];
     $scope.transactions = [];
+    $scope.accounts = [];
+    $scope.banks = [];
+
+    /** Dias disponíveis para solicitar saque **/
+    $scope.canDays = [29,30,31,1,21];
 
     $scope.loadUser = function() {
         $http({
@@ -157,7 +164,6 @@ angular.module("panelInvestmentView", [])
     $scope.loadUserPlans();
 
     $scope.loadTransactions = function(user_plan_id) {
-
         $.ajax({
             url: "/api/transaction",
             type: "GET",
@@ -166,7 +172,8 @@ angular.module("panelInvestmentView", [])
                     {
                         'type' : 'andx',
                         'conditions' : [
-                            {'field' :'user_plan', 'type':'eq', 'value' : user_plan_id}
+                            {'field' :'user_plan', 'type':'eq', 'value' : user_plan_id},
+                            {'field' :'user', 'type':'eq', 'value' : $scope.user_id }
                         ],
                         'where'  :  'and'
                     }
@@ -202,13 +209,103 @@ angular.module("panelInvestmentView", [])
                 $.HSCore.components.HSRangeSlider.init('.js-range-slider');
             },600);
         },300);
+
+        $scope.loadAccounts();
+        $scope.account = {};
+        $("#modal_select_account").modal();
+
+        //$("#modal_cash_out").modal();
+    };
+
+    $scope.loadAccounts = function() {
+        $.ajax({
+            url: "/api/account",
+            type: "GET",
+            data: {
+                'filter'    :   [
+                    {
+                        'type' : 'andx',
+                        'conditions' : [
+                            {'field' :'user', 'type':'eq', 'value' : $scope.user_id}
+                        ],
+                        'where'  :  'and'
+                    }
+                ]
+            },
+            dataType: "json",
+            success: function (response) {
+                $timeout(function () {
+                    $scope.accounts = response._embedded.account;
+                },300);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                errorNotify('Erro ao carregar as configurações');
+            }
+        });
+    };
+
+    $scope.loadBanks = function(){
+        $.ajax({
+            url: "/api/bank",
+            type: "GET",
+            dataType: "json",
+            success: function (response) {
+                $scope.banks = response._embedded.bank;
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                errorNotify("Erro ao consultar as carteiras bitcoin");
+            }
+        });
+    };
+    $scope.loadBanks();
+
+    $scope.selectAccount = function (account) {
+        $scope.account = account;
+        $("#modal_select_account").modal('hide');
+        $("#modal_cash_out").modal();
+    };
+
+    $scope.updateAccount = function() {
+        $scope.account.user = $scope.user_id;
+        if($scope.account.id){
+            $.ajax({
+                url: '/api/account/' + $scope.account.id,
+                type: "PATCH",
+                async: true,
+                contentType : 'application/json',
+                data: JSON.stringify($scope.account),
+                success: function (o) {
+                    $scope.account = {user: $scope.user_id};
+                    $scope.loadAccounts($scope.user_id);
+                    successNotify("Conta bancária atualizada com sucesso!");
+                },
+                error: function (o) {
+                    errorNotify("Houve um erro ao editar a carteira!");
+                },
+                dataType: "json"
+            });
+        }else{
+            $.ajax({
+                url: '/api/account',
+                type: "POST",
+                async: true,
+                contentType : 'application/json',
+                data: JSON.stringify($scope.account),
+                success: function (o) {
+                    $scope.loadAccounts();
+                    successNotify("Conta bancária cadastrada com sucesso!");
+                },
+                error: function (o) {
+                    errorNotify("Houve um erro ao criar a carteira!");
+                },
+                dataType: "json"
+            });
+        }
     };
 
     $scope.aporteModalNew = function (plan) {
         $scope.plan = plan;
         $scope.user_plan._embedded.plan = $scope.plan;
-
-
     };
 
     $scope.add = function() {
@@ -252,14 +349,15 @@ angular.module("panelInvestmentView", [])
                     successNotify("Vamos analisar a sua solicitação, em breve entraremos em contato!");
 
                     $("#investimentModal").modal('hide');
-                    $scope.load();
-                    $scope.aport_btn = true;
-                    $scope.load_btn = false;
+                    $timeout(function(){
+                        location.href = "/admin/my-investiment";
+                    },5000);
                 }else{
                     errorNotify(message);
-                    $scope.aport_btn = true;
-                    $scope.load_btn = false;
                 }
+
+                $scope.aport_btn = true;
+                $scope.load_btn = false;
             },
             error: function (result) {
                 errorNotify("Aconteceu algum erro ao enviar a solicitação de contrato, por favor, entre em contato com o administrador!");
@@ -283,8 +381,10 @@ angular.module("panelInvestmentView", [])
         if(date){
             let start_date = new Date(date.date);
             let current_date = new Date();
-            let future_date = new Date();
-            future_date.setDate(start_date.getDate() + 365);
+            let future_date = start_date;
+
+            future_date.setFullYear(start_date.getFullYear() + 1);
+
             let number_days = calculaDias(current_date, future_date);
             return (number_days > 0)?number_days:0;
         }else{
@@ -297,16 +397,14 @@ angular.module("panelInvestmentView", [])
         if(date){
             let start_date = new Date(date.date);
             let current_date = new Date();
-            let future_date = new Date();
-            future_date.setDate(start_date.getDate() + 365);
+            let future_date = start_date;
 
-            let total = calculaDias(start_date, future_date);
-            total = (total > 0)?total:0;
+            future_date.setFullYear(start_date.getFullYear() + 1);
+            let total = 365;
 
             let restante = calculaDias(current_date, future_date);
             restante = (restante > 0)?restante:0;
-
-            let percent = restante * 100 / total;
+            let percent = restante * 100 / 365;
 
             return percent.toFixed(2);
         }else{
@@ -409,6 +507,17 @@ angular.module("panelInvestmentView", [])
         return month_str
     };
 
+    $scope.cycleFuture = function(cycle) {
+        if( typeof cycle !== 'undefined' && cycle !== null ){
+            let date = new Date();
+            let sumDateNow = date.getFullYear() + (date.getMonth() + 1 / 100);
+            let sumFirstCycle = cycle.year + (cycle.month / 100);
+            return (sumFirstCycle > sumDateNow)?true:false;
+        }else{
+            return false;
+        }
+    };
+
     $scope.renewChange = function () {
         if($scope.renew){
             $scope.renew = false;
@@ -429,9 +538,8 @@ angular.module("panelInvestmentView", [])
 
     $scope.enableCashOut = function() {
         let date = new Date();
-        let canDays = [29,30,31,1];
 
-        if(!in_array(date.getDate(),canDays)){
+        if(!in_array(date.getDate(),$scope.canDays)){
             return true;
         }
 
@@ -442,7 +550,8 @@ angular.module("panelInvestmentView", [])
         let data = {
             'renew' : $scope.renew,
             'cash_out'  :   $scope.cash_out,
-            'user_plan_id' : $scope.user_plan.id
+            'user_plan_id' : $scope.user_plan.id,
+            'account': $scope.account.id
         };
 
         let msg = '';
@@ -479,14 +588,23 @@ angular.module("panelInvestmentView", [])
                     this.modal("hide");
                     $("#modal_cash_out").modal("hide");
                 }else{
+                    $timeout(function () {
+                        $scope.enableSolicitation = false;
+                    },300);
                     $.ajax({
                         url: "/admin/send-cash-out",
                         type: "POST",
                         dataType: "json",
                         data: data,
                         success: function (response) {
-                            console.log(response);
-                            return false;
+                            if(response.result){
+                                successNotify(response.message);
+                            }else{
+                                errorNotify(response.message);
+                            }
+                            $timeout(function () {
+                                $scope.enableSolicitation = true;
+                            },300);
                             $("#modal_cash_out").modal("hide");
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
@@ -498,17 +616,19 @@ angular.module("panelInvestmentView", [])
         });
     };
 
-    function calculaDias(date1, date2){
-        //formato do brasil 'pt-br'
-        moment.locale('pt-br');
-        //setando data1
-        var data1 = moment(date1,'DD/MM/YYYY');
-        //setando data2
-        var data2 = moment(date2,'DD/MM/YYYY');
-        //tirando a diferenca da data2 - data1 em dias
-        var diff  = data2.diff(data1, 'days');
+    function calculaDias(date1, date2) {
 
-        return diff;
+        // The number of milliseconds in one day
+        var ONE_DAY = 1000 * 60 * 60 * 24;
+
+        // Convert both dates to milliseconds
+        var date1_ms = date1.getTime();
+        var date2_ms = date2.getTime();
+
+        // Calculate the difference in milliseconds
+        var difference_ms = Math.abs(date1_ms - date2_ms);
+        // Convert back to days and return
+        return Math.round(difference_ms/ONE_DAY);
     }
 
     function in_array(needle, haystack){

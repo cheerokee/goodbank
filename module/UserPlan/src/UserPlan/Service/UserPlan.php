@@ -3,6 +3,7 @@ namespace UserPlan\Service;
 
 use Base\Mail\Mail;
 use Base\Service\AbstractService;
+use Solicitation\Entity\Solicitation;
 use Transaction\Entity\Transaction;
 use Zend\Mail\Transport\Smtp as SmtpTransport;
 use Doctrine\ORM\EntityManager;
@@ -35,7 +36,8 @@ class UserPlan extends AbstractService{
          */
 
         $db_transactions = $this->em->getRepository('Transaction\Entity\Transaction')->findBy(array(
-            'user_plan' => $db_user_plan
+            'user_plan' => $db_user_plan,
+            'user'      => $db_user_plan->getUser()
         ));
 
         if(!empty($db_transactions))
@@ -51,6 +53,43 @@ class UserPlan extends AbstractService{
         }
 
         return $value;
+    }
+
+    public function sendWithdrawal($entity,$rota) {
+        /**
+         * @var Solicitation $entity
+         */
+        $db_user_plan = $entity->getUserPlan();
+        $db_user = $db_user_plan->getUser();
+
+        $value = 0;
+
+        if($entity->getType()){
+            $value = ($entity->getValue() * 1) + $entity->getUserPlan()->getPlan()->getPrice();
+        }else{
+            $value = $entity->getValue();
+        }
+
+        $data = array(
+            'to'  =>  array(
+                $this->getConfigurationMail()['mail']['connection_config']['from'] =>
+                $this->getConfigurationMail()['mail']['connection_config']['name_from']
+            ),
+            'from'    =>  array(
+                $db_user->getEmail() => $db_user->getName()
+            ),
+            'name'  => $db_user->getName(),
+            'value' => "R$" . number_format($value, 2, ',', '.'),
+            'id'    => $entity->getId(),
+            'email' => $db_user->getEmail(),
+            'type'  => $entity->getTypeStr(),
+            'rota'  => $rota,
+        );
+
+        $subject = 'Solicitação de ' . $entity->getTypeStr();
+        $return = $this->sendMail($data,$subject,'solicitation');
+
+        return $return;
     }
 
     public function notificaComprovante($entity,$rota){
@@ -78,30 +117,28 @@ class UserPlan extends AbstractService{
 
     }
 
-    public function notificaRenovacao($entity,$rota,$renew = false){
-        $operacao = ($renew)?'Renovação':'Ativação';
-        /**
-         * @var \EA\Entity\EAContract $entity
-         */
+    public function notificaExpiration($entity,$rota){
         $data = array(
-            'nome'  => $entity->getUser()->getNome(),
+            'from'  =>  array(
+                $this->getConfigurationMail()['mail']['connection_config']['from'] =>
+                $this->getConfigurationMail()['mail']['connection_config']['name_from']
+            ),
+            'to'    =>  array(
+                $entity->getUser()->getEmail() => $entity->getUser()->getName()
+            ),
+            'name'  => $entity->getUser()->getName(),
+            'value' => "R$" . number_format($entity->getPlan()->getPrice(), 2, ',', '.'),
+            'name_plan' => $entity->getPlan()->getName(),
             'data'  => new \DateTime('now'),
             'id'    => $entity->getId(),
             'email' => $entity->getUser()->getEmail(),
             'rota'  => $rota,
-            'service_name' => $entity->getEa()->getName(),
-            'service_type' => $entity->getEa()->getTypeStr(),
-            'operacao' =>  $operacao,
-            'conta' =>  $entity->getEaXmAccount()->getNumber()
         );
 
-        if($renew){
-            $subject = 'Renovacao Expert Advisor / Espelhamento: Renovacao realizada com sucesso';
-        }else{
-            $subject = 'Ativacao Expert Advisor / Espelhamento: Solicitacao de Ativacao';
-        }
+        $subject = 'Aporte Expirado';
+        $return = $this->sendMail($data,$subject,'notify-expiration');
 
-        return $this->sendMail($entity->getUser(),$data,$subject,'notify-renovacao');
+        return $return;
     }
 
     public function sendMail($data,$subject, $template){

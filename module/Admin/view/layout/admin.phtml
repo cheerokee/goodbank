@@ -35,7 +35,7 @@
 <header id="js-header" class="u-header u-header--sticky-top">
     <div class="u-header__section u-header__section--admin-dark g-min-height-65">
         <nav class="navbar no-gutters g-pa-0">
-            <div class="col-auto d-flex flex-nowrap u-header-logo-toggler g-py-12">
+            <div class="col-auto d-flex flex-nowrap u-header-logo-toggler g-py-12 g-bg-black-light">
                 <a href="<?=$this->url('admin')?>" class="navbar-brand d-flex align-self-center g-hidden-xs-down g-line-height-1 py-0 g-mt-5">
                     <img class="img-fluid" src="/assets/logo.png" />
                 </a>
@@ -48,10 +48,7 @@
             </div>
 
             <div class="col-auto d-flex g-py-12 g-pl-40--lg ml-auto">
-                <a id="searchInvoker" class="g-hidden-sm-up text-uppercase u-header-icon-v1 g-pos-rel g-width-40 g-height-40 rounded-circle g-font-size-20" href="#" aria-controls="searchMenu" aria-haspopup="true" aria-expanded="false" data-is-mobile-only="true" data-dropdown-event="click"
-                   data-dropdown-target="#searchMenu" data-dropdown-type="css-animation" data-dropdown-duration="300" data-dropdown-animation-in="fadeIn" data-dropdown-animation-out="fadeOut">
-                    <i class="hs-admin-search g-absolute-centered"></i>
-                </a>
+
 
                 <!-- Top User -->
                 <div class="col-auto d-flex g-pt-5 g-pt-0--sm g-pl-10 g-pl-20--sm">
@@ -81,26 +78,7 @@
                             </span>
                         </a>
                         <!-- Top User Menu -->
-                        <ul id="profileMenu" class="g-pos-abs g-left-0 g-width-100x--lg g-nowrap g-font-size-14 g-py-20 g-mt-17 rounded" aria-labelledby="profileMenuInvoker">
-                            <li class="g-hidden-sm-up g-mb-10">
-                                <a class="media g-py-5 g-px-20" href="#">
-                                    <span class="d-flex align-self-center g-pos-rel g-mr-12">
-                                        <span class="u-badge-v1 g-top-minus-3 g-right-minus-3 g-width-18 g-height-18 g-bg-secondary g-font-size-10 g-color-white rounded-circle p-0">10</span>
-                                        <i class="hs-admin-comment-alt"></i>
-                                    </span>
-                                    <span class="media-body align-self-center">
-                                        Unread Messages
-                                    </span>
-                                </a>
-                            </li>
-                            <li class="g-hidden-sm-up g-mb-10">
-                                <a class="media g-py-5 g-px-20" href="#">
-                                    <span class="d-flex align-self-center g-mr-12">
-                                        <i class="hs-admin-bell"></i>
-                                    </span>
-                                    <span class="media-body align-self-center">Notifications</span>
-                                </a>
-                            </li>
+                        <ul id="profileMenu" class="g-bg-black-light g-pos-abs g-left-0 g-width-100x--lg g-nowrap g-font-size-14 g-py-20 g-mt-17 rounded" aria-labelledby="profileMenuInvoker">
                             <li class="g-mb-10">
                                 <?php
                                 $link = $this->url('user-view',array('id' => $user->getId()));
@@ -136,7 +114,7 @@
 <main class="container-fluid px-0 g-pt-65">
     <div class="row no-gutters g-pos-rel g-overflow-x-hidden">
         <!-- Sidebar Nav -->
-        <div id="sideNav" class="col-auto u-sidebar-navigation-v1 u-sidebar-navigation--dark">
+        <div id="sideNav" class="col-auto u-sidebar-navigation-v1 u-sidebar-navigation--dark g-bg-black-light">
             <ul id="sideNavMenu" class="u-sidebar-navigation-v1-menu u-side-nav--top-level-menu g-min-height-100vh mb-0">
                 <li class="u-sidebar-navigation-v1-menu-item u-side-nav--top-level-menu-item">
                     <a class="media u-side-nav--top-level-menu-link u-side-nav--hide-on-hidden g-px-15 g-py-12 <?=($_SERVER['REDIRECT_URL'] == '/admin-home')?'active':''?>"
@@ -332,7 +310,97 @@
                 smallBtn: '<button data-fancybox-close class="btn g-pos-abs g-top-25 g-right-30 g-line-height-1 g-bg-transparent g-font-size-16 g-color-gray-light-v3 g-brd-none p-0" title=""><i class="hs-admin-close"></i></button>'
             }
         });
+
+
     });
+
+
+    /** DOCUMENTAÇÃO https://www.chartjs.org/  **/
+
+
+    var config = {
+        type: 'line',
+        data: {
+            labels: [
+                'Janeiro',
+                'Fevereiro',
+                'Março',
+                'Abril',
+                'Maio',
+                'Junho',
+                'Julho',
+                'Agosto',
+                'Setembro',
+                'Outubro',
+                'Novembro',
+                'Dezembro'
+            ],
+            datasets: [
+                {
+                    label: 'Rendimento Mensal',
+                    backgroundColor: window.chartColors.red,
+                    borderColor: window.chartColors.red,
+                    data: [
+                        14,
+                        16,
+                        19,
+                        18,
+                        15,
+                        13,
+                        15
+                    ],
+                    fill: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: false,
+                text: 'Chart.js Line Chart'
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: true,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true
+            },
+            scales: {
+                xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Ciclo'
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Percentual'
+                    },
+                    ticks: {
+                        userCallback: function(tick) {
+                            return tick.toString() + '%';
+                        },
+                        // the data minimum used for determining the ticks is Math.min(dataMin, suggestedMin)
+                        suggestedMin: 0,
+
+                        // the data maximum used for determining the ticks is Math.max(dataMax, suggestedMax)
+                        suggestedMax: 20
+                    }
+                }]
+            }
+        }
+    };
+
+    window.onload = function() {
+        var ctx = document.getElementById('canvas').getContext('2d');
+        window.myLine = new Chart(ctx, config);
+    };
+
 </script>
 </body>
 </html>

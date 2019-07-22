@@ -17,7 +17,7 @@
         "zendframework/zendframework": "^2.5",
         "zendframework/zend-session": "2.5.2 as 2.6.1",
         "zendframework/zend-servicemanager": "^2.5",
-        "hounddog/doctrine-data-fixture-module" : "0.0.*",
+        "hounddog/doctrine-data-fixture-module" : "^0.0.4",
         "phpro/zf-doctrine-hydration-module": "^2.0.1",
         "neilime/zf2-twb-bundle": "2.*@stable",
         "zf-commons/zfc-twig": "^1.2",
@@ -31,7 +31,10 @@
         "filp/whoops": "^2.1",
         "sunra/php-simple-html-dom-parser": "1.5.2",
         "swiftmailer/swiftmailer": "^5",
-        "zfcampus/zf-content-negotiation": "^1.4"
+        "zfcampus/zf-content-negotiation": "^1.4",
+        "zendframework/zend-eventmanager": "2.6.4",
+        "zendframework/zend-stdlib": "2.7.7",
+        "zendframework/zend-hydrator": "1.1"
     },
     "require-dev": {
         "zendframework/zend-developer-tools": "^1.1",

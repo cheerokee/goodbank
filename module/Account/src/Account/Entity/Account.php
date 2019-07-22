@@ -89,6 +89,13 @@ class Account
     /**
      * @var string
      *
+     * @ORM\Column(name="main", type="boolean", nullable=false)
+     */
+    private $main;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="cnpj", type="string", length=255, nullable=true)
      */
     private $cnpj;
@@ -307,6 +314,27 @@ class Account
 
     public function getName(){
         return $this->getBank()->getName().' '.$this->getAgency().' '.$this->getAccountNumber();
+    }
+
+    /**
+     * @return string
+     */
+    public function getMain()
+    {
+        return $this->main;
+    }
+
+    public function getMainStr()
+    {
+        return ($this->main) ? "Sim" : "Não";
+    }
+
+    /**
+     * @param string $main
+     */
+    public function setMain($main)
+    {
+        $this->main = $main;
     }
 }
 

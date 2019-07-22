@@ -220,8 +220,6 @@ class UserController extends CrudController
         }
     }
 
-
-
     public function profileAction(){
         $request = $this->getRequest();
         $em = $this->getEm();

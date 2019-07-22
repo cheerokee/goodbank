@@ -14,6 +14,10 @@ class TransactionRepository extends EntityRepository
 
         $where = "1=1";
 
+        if(isset($data['transaction_user_id']) && $data['transaction_user_id'] != ''){
+            $where .= " AND x.user = " . $data['transaction_user_id'];
+        }
+
         if(isset($data['transaction_user_plan_id']) && $data['transaction_user_plan_id'] != ''){
             $where .= " AND x.user_plan = " . $data['transaction_user_plan_id'];
         }
@@ -59,19 +63,13 @@ class TransactionRepository extends EntityRepository
         $alias = 'x';
         $tabela = 'Transaction\Entity\Transaction';
 
-        $alias_ij1 = 'up';
-        $tabela_ij1 = 'UserPlan\Entity\UserPlan';
-
-        $where = "up.user = $user_id";
+        $where = "x.user = $user_id";
 
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select(array(
             $alias
         ))
             ->from($tabela,$alias)
-            ->innerJoin($tabela_ij1,$alias_ij1,JOIN::WITH, $qb->expr()->andx(
-                $qb->expr()->eq('x.user_plan', 'up.id')
-            ))
             ->where($where);
 
         if(!empty($qb->getQuery()->getResult())){

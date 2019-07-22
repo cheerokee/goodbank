@@ -43,6 +43,9 @@ switch($controller){
             case 'user_plan':
                 $db_entities = $em->getRepository('UserPlan\Entity\UserPlan')->findAll();
                 break;
+            case 'user':
+                $db_entities = $em->getRepository('Register\Entity\User')->findAll();
+                break;
         }
 
         break;
@@ -50,6 +53,9 @@ switch($controller){
         switch ($chave){
             case 'user_plan':
                 $db_entities = $em->getRepository('UserPlan\Entity\UserPlan')->findAll();
+                break;
+            case 'user':
+                $db_entities = $em->getRepository('Register\Entity\User')->findAll();
                 break;
             case 'cycle':
                 $db_entities = $em->getRepository('Cycle\Entity\Cycle')->findAll();

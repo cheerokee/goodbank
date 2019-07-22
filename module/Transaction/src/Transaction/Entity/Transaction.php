@@ -21,6 +21,18 @@ class Transaction
     private $id;
 
     /**
+     * @var \Register\Entity\User
+     *
+     * @ORM\ManyToOne(targetEntity="Register\Entity\User")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="user_id", referencedColumnName="id",
+     *      nullable=false,
+     *      onDelete="CASCADE")
+     * })
+     */
+    private $user;
+
+    /**
      * @var \UserPlan\Entity\UserPlan
      *
      * @ORM\ManyToOne(targetEntity="UserPlan\Entity\UserPlan")
@@ -256,6 +268,21 @@ class Transaction
         $this->date = $date;
     }
 
+    /**
+     * @return \Register\Entity\User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param \Register\Entity\User $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
 
     public function __toString()
     {
