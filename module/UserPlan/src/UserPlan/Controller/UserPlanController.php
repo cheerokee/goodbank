@@ -701,104 +701,105 @@ class UserPlanController extends CrudController{
             'user' => 'ASC'
         ));
 
+        /** Buscar um ciclo ativo, se não existir, criar **/
+        $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneByStatus(1);
+
+        /** Já deixar criado um próximo ciclo pendente **/
+        if($db_cycle){
+
+            if($db_cycle->getMonth() == 12){
+                $next_month = 1;
+                $next_year = $db_cycle->getYear()+1;
+            }else{
+                $next_month = $db_cycle->getMonth() + 1;
+                $next_year = $db_cycle->getYear();
+            }
+
+            $db_next_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneBy(array(
+                'month' => $next_month,
+                'year' => $next_year
+            ));
+
+            if(!$db_next_cycle){
+                /** Criando o próximo ciclo **/
+                $db_next_cycle = new Cycle();
+                $db_next_cycle->setStatus(0);
+                $db_next_cycle->setMonth($next_month);
+                $db_next_cycle->setYear($next_year);
+
+                $em->persist($db_next_cycle);
+                $em->flush();
+            }
+        }
+
+        /** Buscar o proximo ciclo inativo e depois transformar em ativo **/
+        if(!$db_cycle && date('d') == 1){
+            $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneBy(array(
+                'status' => 0
+            ),array(
+                'year' => 'DESC',
+                'month' => 'DESC'
+            ));
+
+            if($db_cycle){
+                $db_cycle->setStatus(1);
+                $em->persist($db_cycle);
+                $em->flush();
+            }
+        }
+
+        /** Caso não tenha ciclo ativo e nem inativo **/
+        /** CRIAR OUTRO CICLO SOMENTE SE FOR DIA 1º DE CADA MES **/
+        if(!$db_cycle && date('d') == 1){
+
+            /** BUSCAR O ÚLTIMO CICLO FINALIZADO **/
+            $last_cycle = $em->getRepository('Cycle\Entity\Cycle')
+                ->findOneBy(array(
+                    'status' => 2
+                ),array(
+                    'year' => 'DESC',
+                    'month' => 'DESC'
+                ));
+
+            /** SE NÃO EXISTIR CICLO ALGUM **/
+            if(!$last_cycle){
+                $db_cycle = new Cycle();
+                $db_cycle->setStatus(1);
+                $db_cycle->setMonth(date('m')*1);
+                $db_cycle->getYear(date('Y')*1);
+
+                $em->persist($db_cycle);
+                $em->flush();
+            }else{
+
+                if($last_cycle->getMonth() == 12){
+                    $next_month = 1;
+                    $next_year = $last_cycle->getYear()+1;
+                }else{
+                    $next_month = $last_cycle->getMonth() + 1;
+                    $next_year = $last_cycle->getYear();
+                }
+
+                $db_cycle = new Cycle();
+                $db_cycle->setStatus(1);
+                $db_cycle->setMonth($next_month);
+                $db_cycle->setYear($next_year);
+
+                $em->persist($db_cycle);
+                $em->flush();
+            }
+        }
+
+        if(!$db_cycle){
+            throw new \Exception('Não existe ciclo ativo, e também não é o primeiro dia do mes para criar um ciclo novo.');
+            die;
+        }
+
         if(!empty($db_user_plans)){
             $db_user = null;
             $percent = 0;
             foreach ($db_user_plans as $db_user_plan)
             {
-                /** Buscar um ciclo ativo, se não existir, criar **/
-                $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneByStatus(1);
-
-                /** Já deixar criado um próximo ciclo pendente **/
-                if($db_cycle){
-                    if($db_cycle->getMonth() == 12){
-                        $next_month = 1;
-                        $next_year = $db_cycle->getYear()+1;
-                    }else{
-                        $next_month = $db_cycle->getMonth() + 1;
-                        $next_year = $db_cycle->getYear();
-                    }
-
-                    $db_next_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneBy(array(
-                        'month' => $next_month,
-                        'year' => $next_year
-                    ));
-
-                    if(!$db_next_cycle){
-                        /** Criando o próximo ciclo **/
-                        $db_next_cycle = new Cycle();
-                        $db_next_cycle->setStatus(0);
-                        $db_next_cycle->setMonth($next_month);
-                        $db_next_cycle->setYear($next_year);
-
-                        $em->persist($db_next_cycle);
-                        $em->flush();
-                    }
-                }
-
-                /** Buscar o proximo ciclo inativo e depois transformar em ativo **/
-                if(!$db_cycle && date('d') == 1){
-                    $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneBy(array(
-                        'status' => 0
-                    ),array(
-                        'year' => 'DESC',
-                        'month' => 'DESC'
-                    ));
-
-                    if($db_cycle){
-                        $db_cycle->setStatus(1);
-                        $em->persist($db_cycle);
-                        $em->flush();
-                    }
-                }
-
-                /** Caso não tenha ciclo ativo e nem inativo **/
-                /** CRIAR OUTRO CICLO SOMENTE SE FOR DIA 1º DE CADA MES **/
-                if(!$db_cycle && date('d') == 1){
-
-                    /** BUSCAR O ÚLTIMO CICLO FINALIZADO **/
-                    $last_cycle = $em->getRepository('Cycle\Entity\Cycle')
-                        ->findOneBy(array(
-                            'status' => 2
-                        ),array(
-                            'year' => 'DESC',
-                            'month' => 'DESC'
-                        ));
-
-                    /** SE NÃO EXISTIR CICLO ALGUM **/
-                    if(!$last_cycle){
-                        $db_cycle = new Cycle();
-                        $db_cycle->setStatus(1);
-                        $db_cycle->setMonth(date('m')*1);
-                        $db_cycle->getYear(date('Y')*1);
-
-                        $em->persist($db_cycle);
-                        $em->flush();
-                    }else{
-
-                        if($last_cycle->getMonth() == 12){
-                            $next_month = 1;
-                            $next_year = $last_cycle->getYear()+1;
-                        }else{
-                            $next_month = $last_cycle->getMonth() + 1;
-                            $next_year = $last_cycle->getYear();
-                        }
-
-                        $db_cycle = new Cycle();
-                        $db_cycle->setStatus(1);
-                        $db_cycle->setMonth($next_month);
-                        $db_cycle->setYear($next_year);
-
-                        $em->persist($db_cycle);
-                        $em->flush();
-                    }
-                }
-
-                if(!$db_cycle){
-                    throw new \Exception('Não existe ciclo ativo, e também não é o primeiro dia do mes para criar um ciclo novo.');
-                    die;
-                }
-
                 /** Verificar se o primeiro ciclo do aporte é igual ou maior que o aporte ativo **/
                 $plan_first_month = $db_user_plan->getFirstCycle()->getMonth();
                 $plan_first_year = $db_user_plan->getFirstCycle()->getYear();
