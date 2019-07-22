@@ -1,20 +1,20 @@
 $(document).ready(function(){
     if($('select[name=type_account]').val() == 1){
         $("#inputcnpj").show();
-        $("#inputcnpj").show().attr("required","required");
+        $("input[name=cnpj]").attr("required","required");
     }else{
         $("#inputcnpj").hide();
-        $("#inputcnpj").hide().removeAttr("required");
+        $("input[name=cnpj]").removeAttr("required");
     }
 
     $("select[name=type_account]").change(function(){
         var type = $(this).val();
         if(type == 1){
-            $("#inputcnpj").show();
-            $("#inputcnpj").show().attr("required","required");
+            $("input[name=cnpj]").parent().show();
+            $("input[name=cnpj]").attr("required","required");
         }else{
-            $("#inputcnpj").hide();
-            $("#inputcnpj").hide().removeAttr("required");
+            $("input[name=cnpj]").parent().hide();
+            $("input[name=cnpj]").removeAttr("required");
         }
     });
 
@@ -454,4 +454,18 @@ function ValidarCPF(Objcpf){
        $(".cpf").val('');
     }
 
+}
+
+function copyToClipboard() {
+    /* Get the text field */
+    var copyText = document.getElementById("copyInput");
+
+    /* Select the text field */
+    copyText.select();
+
+    /* Copy the text inside the text field */
+    document.execCommand("copy");
+
+    /* Alert the copied text */
+    successNotify("Copiado, agora envie para algum amigo");
 }

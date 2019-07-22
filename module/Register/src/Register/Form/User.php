@@ -79,10 +79,6 @@ class User  extends FormBase
             ->setValue('0');
         $this->add($type);
 
-        $active = new \Zend\Form\Element\Hidden('active');
-        $active->setValue(1);
-        $this->add($active);
-        
         $this->add(array(
             'name' => 'submit',
             'type'=>'Zend\Form\Element\Submit',

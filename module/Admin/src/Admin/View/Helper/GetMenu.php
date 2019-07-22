@@ -49,7 +49,7 @@ class GetMenu extends AbstractHelper implements ServiceLocatorAwareInterface{
             'my-investiment' => array(
                 'titulo'    =>  'Meus Investimentos',
                 'active'    => true,
-                'icon' => 'hs-admin-layout-media-center-alt',
+                'icon' => 'hs-admin-money',
                 'rota' => '/admin/my-investiment',
             ),
             'users' => array(

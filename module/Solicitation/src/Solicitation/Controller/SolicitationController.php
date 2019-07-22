@@ -68,6 +68,10 @@ class SolicitationController extends CrudController{
                     'label' => $this->translate('Valor'),
                     'list' => true,
                 ),
+                'user'=>array(
+                    'label' => $this->translate('Usuário'),
+                    'list' => true,
+                ),
                 'user_plan'=>array(
                     'label' => $this->translate('Aporte'),
                     'list' => true,
@@ -82,6 +86,11 @@ class SolicitationController extends CrudController{
                 ),
             ),
             'filters' => array(
+                'user' => array(
+                    'label'     => 'Usuário',
+                    'type'      => 'autocomplete',
+                    'column'    => 'col-md-12'
+                ),
                 'user_plan' => array(
                     'label'     => 'Aporte',
                     'type'      => 'autocomplete',

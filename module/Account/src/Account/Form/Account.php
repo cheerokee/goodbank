@@ -106,6 +106,17 @@ class Account extends FormBase{
             ->setAttribute('class','form-control');
         $this->add($field);
 
+        $field = new \Zend\Form\Element\Select("main");
+        $field->setLabel($this->translate("Principal: *"))
+            ->setValueOptions(array(
+                '0' => $this->translate("Não"),
+                '1' => $this->translate("Sim")
+            ))
+            ->setAttribute('value','0')
+            ->setAttribute('required','required')
+            ->setAttribute('class','form-control');
+        $this->add($field);
+
         $field = new \Zend\Form\Element\Select("type_account");
         $field->setLabel($this->translate("Tipo de Pessoa: "))
             ->setValueOptions(array(
@@ -118,7 +129,7 @@ class Account extends FormBase{
         $this->add($field);
 
         $field = new \Zend\Form\Element\Text("operation");
-        $field->setLabel($this->translate("Tipo de Operação: *"))
+        $field->setLabel($this->translate("Tipo de Operação: (Opcional)"))
             ->setAttribute('type','text')
             ->setAttribute('class','form-control')
             ->setAttribute('placeholder','Ex.: 013');

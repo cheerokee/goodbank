@@ -3,6 +3,7 @@ angular.module("cash-out", [])
 
     $scope.action = $("#type_solicitation").val();
     $scope.user_plan_id = $("#user_plan_id").val();
+    $scope.user_id = $("#user_id").val();
 
     $scope.transactions = [];
 
@@ -16,7 +17,8 @@ angular.module("cash-out", [])
                     {
                         'type' : 'andx',
                         'conditions' : [
-                            {'field' :'user_plan', 'type':'eq', 'value' : user_plan_id}
+                            {'field' :'user_plan', 'type':'eq', 'value' : user_plan_id},
+                            {'field' :'user', 'type':'eq', 'value' : $scope.user_id}
                         ],
                         'where'  :  'and'
                     }

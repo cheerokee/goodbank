@@ -55,7 +55,7 @@
                            name="status"
                            value="{{ user_plan.status }}"/>
 
-                    <div class="row">
+                    <div ng-if="wallets.length > 0" class="row">
                         <!-- SE TIVER APENAS UMA CARTEIRA ELA SERA AUTOMATICAMENTE SELECIONADA -->
                         <div ng-if="wallets.length > 1" class="col-md-12 form-group">
                             <h4 class="h6 g-font-weight-600 g-color-black g-mb-20">
@@ -104,10 +104,17 @@
                         <div class="col-md-12 form-group">
                             <h3 class="mb-4 text-center">Siga as instruções abaixo!</h3>
                             <p><strong>1</strong> - Clique no botão de "Efetuar Pagamento".</p>
-                            <p><strong>2</strong> - Na plataforma do Blockchain, tire uma print ou uma foto da tela de comprovante de pagamento.</p>
-                            <p><strong>3</strong> - Selecione a imagem.</p>
-                            <p><strong>4</strong> - Leia os termos e clique na caixa de confirmação</p>
-                            <p><strong>5</strong> - Clique no botão "Aportar"</p>
+                            <p>
+                                <strong>2</strong> - Na plataforma do Blockchain, informe o valor do aporte de <strong>R$ {{ user_plan._embedded.plan.price | currency:'':2:'pt-BR' }}</strong>,
+                                <span class="text-danger"><strong>mesmo que a plataforma informe um valor diferente a ser pago</strong>,</span> veja abaixo o exemplo:
+                            </p>
+                            <p>
+                                <center><img class="img-fluid" src="/assets/pagamento.png" /></center>
+                            </p>
+                            <p><strong>3</strong> - Na plataforma do Blockchain,  tire uma print ou uma foto da tela de comprovante de pagamento.</p>
+                            <p><strong>4</strong> - Selecione a carteira bitcoin</p>
+                            <p><strong>5</strong> - Leia os termos e clique na caixa de confirmação</p>
+                            <p><strong>6</strong> - Clique no botão "Aportar"</p>
                             <p class="card g-rounded-50 p-4 text-center mt-3">
                                 <strong>
                                     A solicitação juntamente com o comprovante será enviado para o administrador.<br />
@@ -123,8 +130,25 @@
                                     Efetuar Pagamento
                                 </a>
                             </center>
+                            <hr />
                         </div>
-                        <div class="col-md-12 form-group">
+                        <div class="col-md-6 form-group ">
+                            <label>
+                                <strong>Selecione sua carteira bitcoin</strong>
+                            </label>
+                            <select class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10"
+                                    name="wallet"
+                                    ng-model="user_plan.wallet"
+                                    required>
+                                <option value="">Selecione...</option>
+                                <option ng-repeat="wallet in wallets"
+                                        ng-value="wallet.id"
+                                        value="{{ wallet.id }}">
+                                    {{ wallet.account }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
                             <label>
                                 <strong>Seu Comprovante</strong>
                             </label>
@@ -148,8 +172,16 @@
                                 <div class="u-check-icon-checkbox-v6 g-absolute-centered--y g-left-0 bg-white">
                                     <i class="fa" data-check-icon=""></i>
                                 </div>
-                                Li e concordo com os &nbsp;<a href="#">termos</a>
+                                Li e concordo com os &nbsp;<a target="_blank" href="/assets/termo.pdf">termos</a>
                             </label>
+                        </div>
+                    </div>
+                    <div ng-if="wallets.length == 0" class="row">
+                        <div class="col-md-12">
+                            <p class="alert alert-danger">
+                                Você precisa ter alguma carteira bitcoin cadastrada, clique em "Meu Perfil"
+                                localizado no canto superior direito e clique na seção "Carteira Bitcoin".
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -157,14 +189,14 @@
                     <div class="col-md-12">
                         <div class="row">
                             <div class="col-md-4 offset-md-8">
-                                <button ng-show="aport_btn" name="aport_contract_form" type="submit" class="btn btn-primary pull-right">
+                                <button ng-if="wallets.length > 0" ng-show="aport_btn" name="aport_contract_form" type="submit" class="btn btn-primary bg-green-light pull-right">
                                     <i class="hs-admin-check"></i>&nbsp;Aportar
                                 </button>
                                 <button ng-show="load_btn"
                                         type="button" disabled class="btn btn-primary pull-right">
                                     <i class="hs-admin-reload"></i>&nbsp;Aguarde...
                                 </button>
-                                <button type="button" class="btn btn-secondary pull-right mr-2" data-dismiss="modal">
+                                <button type="button" class="btn btn-secondary bg-dark pull-right mr-2" data-dismiss="modal">
                                     <i class="hs-admin-close"></i>&nbsp;Fechar
                                 </button>
                             </div>

@@ -149,10 +149,13 @@ class UserPlan extends FormBase{
                 'empty_item_label' => 'Selecione...',
                 'is_method' => true,
                 'find_method' => array(
-                    'name' => 'findAll',
-                    'params' => array()
+                    'name' => 'findBy',
+                    'params' => array(
+                        'criteria' => array(),
+                        'orderBy' => array('year' => 'DESC','month' => 'DESC')
+                    )
                 ),
-                'label' => 'Primeiro Ciclo: *',
+                'label' => 'Primeiro Ciclo: * (Ciclos Inativos)',
                 'column-size' => 'sm-4',
                 'label_attributes' => array('class' => 'col-sm-2 input-sm')
             ),

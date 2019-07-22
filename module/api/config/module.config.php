@@ -2700,6 +2700,12 @@ return [
                 'filters' => [],
                 'name' => 'type_account',
             ],
+            13 => [
+                'required' => true,
+                'validators' => [],
+                'filters' => [],
+                'name' => 'main',
+            ],
         ],
         'api\\V1\\Rest\\Bank\\Validator' => [
             0 => [

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "de8db36f26e76173a4ea309fc4183e1f",
+    "content-hash": "9b9fb5db7db894d5d230c58966143ae5",
     "packages": [
         {
             "name": "api-skeletons/zf-doctrine-module-zend-hydrator",

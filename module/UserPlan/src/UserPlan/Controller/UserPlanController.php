@@ -4,6 +4,8 @@ namespace UserPlan\Controller;
 
 use Base\Controller\CrudController;
 use Cycle\Entity\Cycle;
+use PercentGain\Entity\PercentGain;
+use Register\Entity\User;
 use Solicitation\Entity\Solicitation;
 use Transaction\Entity\Transaction;
 use UserPlan\Service\UserPlan;
@@ -175,7 +177,76 @@ class UserPlanController extends CrudController{
             $data = $post->toArray();
 
             if($data['status'] != $db_entity->getStatus() && $data['status']){
+
+                $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneById($data['first_cycle']);
                 $data['approved_date'] = new \DateTime('now');
+
+                /**
+                 * @var User $db_sponsor
+                 */
+                $db_sponsor = $db_entity->getUser()->getSponsor();
+
+                $db_category_transaction = $em
+                    ->getRepository('CategoryTransaction\Entity\CategoryTransaction')
+                    ->findOneBy(array('code' => 'first_commission'));
+
+                if(!$db_category_transaction){
+                    throw new \Exception('O sistema precisa da categoria de transação de primeiro comissão cadastrada.');
+                }
+
+                if($db_sponsor){
+
+                    $comission = $db_entity->getPlan()->getPrice() * 0.10;
+
+                    $db_transaction = $em->getRepository('Transaction\Entity\Transaction')->findOneBy(array(
+                        'user' =>  $db_sponsor,
+                        'user_plan' => $db_entity,
+                        'category_transaction'  => $db_category_transaction,
+                        'type' => 0
+                    ));
+
+                    if(!$db_transaction){
+                        /**
+                         * @var Transaction $db_transaction
+                         */
+                        $db_transaction = new Transaction();
+                        $db_transaction->setUser($db_sponsor);
+                        $db_transaction->setUserPlan($db_entity);
+                    }
+
+                    $db_transaction->setType(0);
+                    /** O patrocinador vai ganhar 10% do valor do aporte **/
+                    $db_transaction->setValue($comission);
+                    $db_transaction->setCategoryTransaction($db_category_transaction);
+                    $db_transaction->setCycle($db_cycle);
+                    $db_transaction->setDate((new \DateTime('now')));
+
+                    $em->persist($db_transaction);
+                    $em->flush();
+
+                    /**
+                     * @var Solicitation $db_solicitation
+                     */
+                    $db_solicitation = $em
+                        ->getRepository('Solicitation\Entity\Solicitation')
+                        ->findOneBy(array(
+                           'user_plan' => $db_entity,
+                           'user' => $db_sponsor
+                        ));
+
+                    if(!$db_solicitation){
+                        $db_solicitation = new Solicitation();
+                        $db_solicitation->setUser($db_sponsor);
+                        $db_solicitation->setUserPlan($db_entity);
+                    }
+
+                    $db_solicitation->setValue($comission);
+                    $db_solicitation->setType(3);
+                    $db_solicitation->setClosed(0);
+
+                    $em->persist($db_solicitation);
+                    $em->flush();
+                }
             }
 
             $post->fromArray($data);
@@ -226,7 +297,9 @@ class UserPlanController extends CrudController{
             }
 
             if(isset($data['wallet'])){
-                $db_wallet = $em->getRepository('Wallet\Entity\Wallet')->findOneById($data['wallet']);
+                $wallet_id = str_replace('number:','',$data['wallet'])*1;
+                $db_wallet = $em->getRepository('Wallet\Entity\Wallet')->findOneById($wallet_id);
+
                 $db_contract->setWallet($db_wallet);
             }
 
@@ -359,23 +432,97 @@ class UserPlanController extends CrudController{
             $user_plan_id = $data['user_plan_id'];
             $value = $data['value'];
             $renovar = $data['renew'];
-            $resgatar = $data['user_plan_id'];
-            var_dump($data);
-            echo json_encode(array());
+            $resgatar = $data['cash_out'];
+            $account = $data['account'];
+
+            /**
+             * @var \UserPlan\Entity\UserPlan $db_user_plan
+             */
+            $db_user_plan = $em->getRepository('UserPlan\Entity\UserPlan')->findOneById($user_plan_id);
+            $db_user = $db_user_plan->getUser();
+            $db_account = $em->getRepository('Account\Entity\Account')->findOneById($account);
+            $db_user_plan->setAccount($db_account);
+            $em->persist($db_user_plan);
+            $em->flush();
+
+            $type = 0;
+            if($renovar != "false"){
+                $type = 1;
+            }
+
+            if($resgatar != "false"){
+                $type = 2;
+            }
+
+            /**
+             * @var Solicitation $db_solicitation
+             */
+            $db_solicitation = $em->getRepository('Solicitation\Entity\Solicitation')->findOneBy(array(
+                'user_plan' => $db_user_plan,
+                'type'      => $type,
+                'closed'    => 0
+            ));
+
+            $msg = 'Solicitação efetuada com sucesso!';
+            if($db_solicitation){
+                $msg = 'Há uma solicitação ainda não atendida!';
+                $db_solicitation->setValue($value);
+                $em->persist($db_solicitation);
+                $em->flush();
+            }else{
+                $db_solicitation = new Solicitation();
+                $db_solicitation->setValue($value);
+                $db_solicitation->setType($type);
+                $db_solicitation->setUser($db_user);
+                $db_solicitation->setUserPlan($db_user_plan);
+                $db_solicitation->setClosed(0);
+
+                $em->persist($db_solicitation);
+                $em->flush();
+
+                /**
+                 * @var UserPlan $service
+                 */
+                $service = $this->getServiceLocator()->get("UserPlan/Service/UserPlan");
+                $rota = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$this->url()->fromRoute('cash-out-panel',array('id' => $db_solicitation->getId()));
+
+                $result = $service->sendWithdrawal($db_solicitation,$rota);
+
+                if(!$result['result']){
+                    echo json_encode(array('result' => false,'message' => 'Houve erro ao notificar o administrador, entre em contato conosco.'));
+                    die;
+                }
+            }
+
+            echo json_encode(array('result' => true,'message' => $msg));
             die;
         }
     }
 
     public function cashOutPanelAction() {
         $em = $this->getEm();
+
         $db_solicitation_id = $this->params()->fromRoute('id',0);
         $db_solicitation = $em->getRepository('Solicitation\Entity\Solicitation')->findOneById($db_solicitation_id);
+        $db_user = $db_solicitation->getUser();
+
         $db_user_plan = $db_solicitation->getUserPlan();
-        $db_account = $db_user_plan->getAccount();
-        $db_user = $db_user_plan->getUser();
+
+        /** O usuário é diferente do dono do aporte **/
+        if($db_solicitation->getUserPlan()->getUser()->getId() != $db_user->getId()){
+
+            $db_account = $em->getRepository('Account\Entity\Account')->findOneBy(array(
+                'user' => $db_user
+            ),array(
+                'main' => 'DESC'
+            ));
+        }else{
+            $db_account = $db_user_plan->getAccount();
+        }
+
         $db_cycles = $em->getRepository('Cycle\Entity\Cycle')->findBy(array(),array(
-            'month' => 'DESC',
-            'year'  => 'DESC'
+            'year'  => 'DESC',
+            'month' => 'DESC'
         ));
 
         //$request = $this->getRequest();
@@ -404,11 +551,16 @@ class UserPlanController extends CrudController{
             $value = str_replace(',','.',str_replace('.','',$data['price']));
 
             $db_solicitation = $em->getRepository('Solicitation\Entity\Solicitation')->findOneById($data['solicitation_id']);
-
-            if(isset($data['cycle'])){
-                $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneById($data['cycle']);
+            $db_user = $db_solicitation->getUser();
+            switch ($db_solicitation->getType()){
+                case 3:
+                    $db_cycle = $db_solicitation->getUserPlan()->getFirstCycle();
+                    break;
+                default:
+                    if(isset($data['cycle'])){
+                        $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneById($data['cycle']);
+                    }
             }
-
 
             if($data['closed']){
                 $db_solicitation->setClosed(true);
@@ -423,8 +575,9 @@ class UserPlanController extends CrudController{
             }
 
             $db_transaction = new Transaction();
+            $db_transaction->setUser($db_user);
             $db_transaction->setValue($value);
-            $db_transaction->setType(0);//Credito
+            $db_transaction->setType(1);//Débito
             $db_transaction->setCategoryTransaction($db_category_transaction);
             $db_transaction->setCycle($db_cycle);
             $db_transaction->setDate((new \DateTime('now')));
@@ -470,7 +623,8 @@ class UserPlanController extends CrudController{
             $em->flush();
 
             $db_transactions = $em->getRepository('Transaction\Entity\Transaction')->findBy(array(
-                'user_plan' => $db_user_plan
+                'user_plan' => $db_user_plan,
+                'user'  => $db_user_plan->getUser()
             ));
 
             if(!empty($db_transactions))
@@ -520,6 +674,9 @@ class UserPlanController extends CrudController{
 
     public function applyBalanceAction() {
         $this->layout()->setTemplate('layout/admin_auth.phtml');
+        date_default_timezone_set("America/Sao_Paulo");
+        setlocale(LC_ALL, 'pt_BR');
+
         /**
          * @var ZF\ContentNegotiation\Request $request
          */
@@ -530,22 +687,58 @@ class UserPlanController extends CrudController{
          * @var Cycle $db_cycle
          * @var \UserPlan\Entity\UserPlan[] $db_user_plans
          * @var Transaction $db_transaction
+         * @var PercentGain $db_percent_gain
          */
 
-        $db_category_transaction = $em->getRepository('CategoryTransaction\Entity\CategoryTransaction')->findOneByCode('rendimento');
+        $db_category_transaction = $em
+            ->getRepository('CategoryTransaction\Entity\CategoryTransaction')
+            ->findOneByCode('rendimento');
 
         /** Buscar todos os aportes ativos **/
-        $db_user_plans = $em->getRepository('UserPlan\Entity\UserPlan')->findByStatus(1);
+        $db_user_plans = $em->getRepository('UserPlan\Entity\UserPlan')->findBy(array(
+            'status' => 1
+        ), array(
+            'user' => 'ASC'
+        ));
 
         if(!empty($db_user_plans)){
+            $db_user = null;
+            $percent = 0;
             foreach ($db_user_plans as $db_user_plan)
             {
                 /** Buscar um ciclo ativo, se não existir, criar **/
                 $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneByStatus(1);
-                if(!$db_cycle){
-                    $last_cycle = $em->getRepository('Cycle\Entity\Cycle')
-                        ->findOneBy(array(),array('year' => 'DESC','month' => 'DESC'));
 
+                /** Buscar o proximo ciclo inativo e depois transformar em ativo **/
+                if(!$db_cycle && date('d') == 1){
+                    $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneBy(array(
+                        'status' => 0
+                    ),array(
+                        'year' => 'DESC',
+                        'month' => 'DESC'
+                    ));
+
+                    if($db_cycle){
+                        $db_cycle->setStatus(1);
+                        $em->persist($db_cycle);
+                        $em->flush();
+                    }
+                }
+
+                /** Caso não tenha ciclo ativo e nem inativo **/
+                /** CRIAR OUTRO CICLO SOMENTE SE FOR DIA 1º DE CADA MES **/
+                if(!$db_cycle && date('d') == 1){
+
+                    /** BUSCAR O ÚLTIMO CICLO FINALIZADO **/
+                    $last_cycle = $em->getRepository('Cycle\Entity\Cycle')
+                        ->findOneBy(array(
+                            'status' => 2
+                        ),array(
+                            'year' => 'DESC',
+                            'month' => 'DESC'
+                        ));
+
+                    /** SE NÃO EXISTIR CICLO ALGUM **/
                     if(!$last_cycle){
                         $db_cycle = new Cycle();
                         $db_cycle->setStatus(1);
@@ -555,6 +748,7 @@ class UserPlanController extends CrudController{
                         $em->persist($db_cycle);
                         $em->flush();
                     }else{
+
                         if($last_cycle->getMonth() == 12){
                             $next_month = 1;
                             $next_year = $last_cycle->getYear()+1;
@@ -573,30 +767,148 @@ class UserPlanController extends CrudController{
                     }
                 }
 
+                if(!$db_cycle){
+                    throw new \Exception('Não existe ciclo ativo, e também não é o primeiro dia do mes para criar um ciclo novo.');
+                    die;
+                }
+
+                /** Verificar se o primeiro ciclo do aporte é igual ou maior que o aporte ativo **/
+                $plan_first_month = $db_user_plan->getFirstCycle()->getMonth();
+                $plan_first_year = $db_user_plan->getFirstCycle()->getYear();
+
+                /**
+                 * Ex:
+                 * Primeiro ciclo do aporte 2019 + (1 / 7) = 2026
+                 * Ciclo Atual 2019 + (1 / 7) = 2025
+                 * Então Continua porque o ciclo do aporte ainda não começou
+                 */
+                if($plan_first_year + ($plan_first_month / 100) > $db_cycle->getYear() + ($db_cycle->getMonth() / 100)){
+                    continue;
+                }
+
+                $ultimo_dia = 0;
+
+                if($db_user == null || $db_user->getId() != $db_user_plan->getUser()->getId())
+                {
+                    $db_user = $db_user_plan->getUser();
+
+                    $db_aportes = $em->getRepository('UserPlan\Entity\UserPlan')->findByUser($db_user);
+                    if(!empty($db_aportes)){
+                        $sum_prices = 0;
+                        foreach ($db_aportes as $db_aporte)
+                        {
+                            $sum_prices += $db_aporte->getPlan()->getPrice();
+                        }
+
+                        $db_percent_gain = $em->getRepository('PercentGain\Entity\PercentGain')->findOneByInterval($sum_prices);
+
+                        /** Pegando o total de dias no mês **/
+                        $mes = date('m'); // Mês desejado, pode ser por ser obtido por POST, GET, etc.
+                        $ano = date('Y'); // Ano atual
+                        $ultimo_dia = date("t", mktime(0,0,0,$mes,'01',$ano)); // Mágica, plim!
+
+                        /** Pegando o total de horas no mês **/
+                        $horas_total_mes = $ultimo_dia * 24;
+
+                        /** Obtendo o percentual por hora **/
+                        $fracao = $db_percent_gain->getPercent() / $horas_total_mes;
+
+                        /** Obter o total de horas que ja foram no mes atual **/
+                        if(date('d') != 1){
+                            $horas_total_atual = ((date('d')-1)*24) + date('H');
+                        }else{
+                            $horas_total_atual = date('H');
+                        }
+
+                        /** Obter o percentual até a hora corrente **/
+                        $percent = $horas_total_atual * $fracao;
+                    }
+                }
+
+                /** Finalizando o Ciclo no ultimo dia do mes na ultima hora **/
+                if($ultimo_dia == date('d') && date('H') == 23){
+                    $db_cycle->setStatus(2);
+
+                    $em->persist($db_cycle);
+                    $em->flush();
+                }
+
                 $db_transaction = $em->getRepository('Transaction\Entity\Transaction')->findOneBy(array(
                     'user_plan' =>  $db_user_plan,
                     'cycle'     =>  $db_cycle,
-                    'category_transaction' => $db_category_transaction
+                    'category_transaction' => $db_category_transaction,
+                    'user'  => $db_user_plan->getUser()
                 ));
 
                 if(!$db_transaction){
                     $db_transaction = new Transaction();
 
                     $db_transaction->setUserPlan($db_user_plan);
+                    $db_transaction->setUser($db_user_plan->getUser());
                     $db_transaction->setCycle($db_cycle);
                     $db_transaction->setCategoryTransaction($db_category_transaction);
                     $db_transaction->setType(0);
                 }
 
-                $db_transaction->setValue(1);
+                $value_transaction = $db_user_plan->getPlan()->getPrice() * ($percent / 100);
+
+                $db_transaction->setValue($value_transaction);
                 $db_transaction->setDate((new \DateTime('now')));
 
                 $em->persist($db_transaction);
                 $em->flush();
 
-                echo $db_cycle;
-                echo $db_transaction;
-                die;
+                $db_category_transaction_sponsor = $em
+                    ->getRepository('CategoryTransaction\Entity\CategoryTransaction')
+                    ->findOneBy(array(
+                        'code' => 'comissao'
+                    ));
+
+                if($db_category_transaction_sponsor && $db_user->getSponsor()){
+                    $db_transaction_sponsor = $em
+                        ->getRepository('Transaction\Entity\Transaction')
+                        ->findOneBy(array(
+                            'user_plan' => $db_user_plan,
+                            'user' => $db_user->getSponsor(),
+                            'cycle' => $db_cycle,
+                            'category_transaction' => $db_category_transaction_sponsor,
+                            'type' => 0
+                        ));
+
+                    if(!$db_transaction_sponsor){
+                        $db_transaction_sponsor = new Transaction();
+                        $db_transaction_sponsor->setUserPlan($db_user_plan);
+                        $db_transaction_sponsor->setUser($db_user->getSponsor());
+                        $db_transaction_sponsor->setCategoryTransaction($db_category_transaction_sponsor);
+                        $db_transaction_sponsor->setCycle($db_cycle);
+                        $db_transaction_sponsor->setType(0);
+                    }
+
+                    $db_transaction_sponsor->setValue($value_transaction);
+                    $db_transaction_sponsor->setDate(new \DateTime('now'));
+
+                    $em->persist($db_transaction_sponsor);
+                    $em->flush();
+                }
+
+                $expitarion_date = $db_user_plan->getExpirationDate();
+                $date_now = date('Y-m-d');
+
+                /** Se a data da expiração do aporte for igual a data atual, inativar aporte **/
+                if((new \DateTime($date_now)) >= $expitarion_date )
+                {
+                    $db_user_plan->setStatus(0);
+                    $em->persist($db_user_plan);
+                    $em->flush();
+
+                    /** NOTIFICAR O USUÁRIO QUE O PLANO EXPIROU**/
+                    /**
+                     * @var UserPlan $service
+                     */
+                    $service = $this->getServiceLocator()->get("UserPlan/Service/UserPlan");
+                    $rota = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$this->url()->fromRoute('user-auth');
+                    $result = $service->notificaExpiration($db_user_plan,$rota);
+                }
             }
         }
 

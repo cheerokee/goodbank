@@ -91,6 +91,7 @@ class AuthController extends AbstractActionController
 
     public function registerAction()
     {
+        $em = $this->getEm();
         $request = $this->getRequest();
 
         $this->layout()->setTemplate('layout/admin_auth.phtml');
@@ -98,6 +99,10 @@ class AuthController extends AbstractActionController
         if($request->isPost()){
 
             $data = $request->getPost()->toArray();
+
+            if(isset($data['sponsor'])){
+                $data['sponsor'] = $em->getRepository('Register\Entity\User')->findOneById($data['sponsor']);
+            }
 
             /**
              * @var \Register\Service\User $service
@@ -129,6 +134,10 @@ class AuthController extends AbstractActionController
                 return $this->redirect()->toRoute('user-register');
             }
         }
+
+        $db_sponsor = $em->getRepository('Register\Entity\User')->findOneById($_GET['sponsor']);
+
+        return new ViewModel(array('db_sponsor' => $db_sponsor));
     }
     
     public function logoutAction()

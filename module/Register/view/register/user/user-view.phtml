@@ -22,7 +22,7 @@ $continueds = array(
                 <!-- User Information -->
                 <section class="text-center g-mb-30 g-mb-50--md">
                     <div id="content_image_input<?= $name ?>" class="d-inline-block g-pos-rel g-mb-20">
-                        <a class="u-badge-v2--lg u-badge--bottom-right g-width-32 g-height-32 g-bg-secondary g-bg-primary--hover g-transition-0_3 g-mb-20 g-mr-20"
+                        <a class="u-badge-v2--lg u-badge--bottom-right g-width-32 g-height-32 g-transition-0_3 g-mb-20 g-mr-20 bg-green-light"
                            onclick="$('#image_input<?= $name ?>').trigger('click');"
                            href="">
                             <i class="hs-admin-pencil g-absolute-centered g-font-size-16 g-color-white"></i>
@@ -52,7 +52,7 @@ $continueds = array(
                     </h4>
 
                     <div class="progress g-height-4 g-rounded-2">
-                        <div class="progress-bar g-bg-lightblue-v3 g-rounded-3"
+                        <div class="progress-bar bg-green-light g-rounded-3"
                              role="progressbar"
                              style="width: {{ percent_fill }}%"
                              aria-valuenow="{{ percent_fill }}"
@@ -146,6 +146,25 @@ $continueds = array(
                             </h2>
                         </header>
                         <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-my-30--md" />
+                        <div class="row g-mb-20">
+                            <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
+                                <label class="mb-0" for="#sponsor">
+                                    <i class="hs-admin-link"></i>&nbsp;Patrocinador
+                                </label>
+                            </div>
+                            <div class="col-md-9 align-self-center">
+                                <div class="form-group g-pos-rel mb-0">
+                                    <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                        <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                                    </span>
+                                </div>
+                                <input class="form-control h-100 form-control-md g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-brd-primary--error g-rounded-4 g-px-20 g-py-12"
+                                       type="text"
+                                       value="<?=$db_user->getSponsor()?>"
+                                       readonly>
+                            </div>
+                        </div>
+
                         <?php
                         $hidden = array(
                             'hidden' => 1,
@@ -503,154 +522,7 @@ $continueds = array(
                         </h2>
                     </header>
                     <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-my-30--md" />
-                    <form id="form_{{ tab }}" name="form_{{ tab }}" ng-submit="updateAccount()" >
-                        <div class="row g-mb-20">
-                            <div class="col-md-6">
-                                <div class="row">
-                                    <div class="col-md-5 align-self-center g-mb-5 g-mb-0--md">
-                                        <label class="mb-0">
-                                            Pessoa: *
-                                        </label>
-                                    </div>
-                                    <div class="col-md-7 align-self-center">
-                                        <select ng-model="account.type_account"
-                                                name="type_account"
-                                                class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
-                                                required>
-                                            <option value="">Selecione...</option>
-                                            <option ng-value="0" value="0">Física</option>
-                                            <option ng-value="1" value="1">Jurídica</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div ng-if="account.type_account === 1" class="col-md-6">
-                                <div class="row">
-                                    <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
-                                        <label class="mb-0">
-                                            CNPJ:
-                                        </label>
-                                    </div>
-                                    <div class="col-md-9 align-self-center">
-                                        <input ng-model="account.cnpj" name="cnpj"
-                                               class="form-control cnpj form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
-                                               type="text"
-                                               onkeypress="mascara(this,mCNPJ)"
-                                               required>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row g-mb-20">
-                            <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
-                                <label class="mb-0">
-                                    Banco: *
-                                </label>
-                            </div>
-                            <div class="col-md-9 align-self-center">
-                                <select ng-model="account.bank"
-                                        name="bank"
-                                        class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
-                                        required>
-                                    <option value="">Selecione...</option>
-                                    <option ng-repeat="bank in banks" ng-value="bank.id" value="{{ bank.id }}">
-                                        {{ bank.name }}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row g-mb-20">
-                            <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
-                                <label class="mb-0">
-                                    Titular: *
-                                </label>
-                            </div>
-                            <div class="col-md-9 align-self-center">
-                                <input ng-model="account.holder"
-                                       name="holder"
-                                       class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
-                                       type="text"
-                                       placeholder="Ex. José Aparecido Costa, Empresa A"
-                                       required>
-                            </div>
-                        </div>
-                        <div class="row g-mb-20">
-                            <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
-                                <label class="mb-0">
-                                    Agência: *
-                                </label>
-                            </div>
-                            <div class="col-md-9 align-self-center">
-                                <input ng-model="account.agency"
-                                       name="agency"
-                                       class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
-                                       type="text"
-                                       placeholder="Ex. 4488"
-                                       required>
-                            </div>
-                        </div>
-                        <div class="row g-mb-20">
-                            <div class="col-md-6">
-                                <div class="row">
-                                    <div class="col-md-5 align-self-center g-mb-5 g-mb-0--md">
-                                        <label class="mb-0">
-                                            Tipo de Conta: *
-                                        </label>
-                                    </div>
-                                    <div class="col-md-7 align-self-center">
-                                        <select ng-model="account.type"
-                                                name="type"
-                                                class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
-                                                required>
-                                            <option value="">Selecione...</option>
-                                            <option ng-value="0" value="0">Corrente</option>
-                                            <option ng-value="1" value="1">Poupança</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="row">
-                                    <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
-                                        <label class="mb-0">
-                                            Operação: (Opcional)
-                                        </label>
-                                    </div>
-                                    <div class="col-md-9 align-self-center">
-                                        <input ng-model="account.operation"
-                                               name="operation"
-                                               class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
-                                               type="text"
-                                               placeholder="Ex. 013" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row g-mb-20">
-                            <div class="col-md-3 align-self-center g-mb-5 g-mb-0--md">
-                                <label class="mb-0">
-                                    Nº da Conta: *
-                                </label>
-                            </div>
-                            <div class="col-md-9 align-self-center">
-                                <input ng-model="account.account_number"
-                                       name="account_number"
-                                       class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-4 g-px-14 g-py-10"
-                                       type="text"
-                                       placeholder="Ex. 00001234"
-                                       required>
-                            </div>
-                        </div>
-                        <div class="row g-mb-20">
-                            <div class="col-md-12">
-                                <button type="submit" ng-class="{ 'btn-primary' : account.id == null,'btn-info' : account.id }" class="btn">
-                                    <i ng-class="{ 'hs-admin-plus' : account.id == null,'hs-admin-save' : account.id }"></i>&nbsp;
-                                    {{ (account.id) ? 'Atualizar Conta' : 'Adicionar Conta' }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
+                    <?=$this->partial('form-account');?>
                     <div class="row g-mb-20">
                         <div class="col-md-12">
                             <hr />
@@ -664,6 +536,7 @@ $continueds = array(
                                     <th>Agência</th>
                                     <th>Nº da Conta</th>
                                     <th>Operação</th>
+                                    <th>Principal?</th>
                                     <th>Ação</th>
                                 </tr>
                                 </thead>
@@ -676,12 +549,13 @@ $continueds = array(
                                     <td>{{ account.agency }}</td>
                                     <td>{{ account.account_number }}</td>
                                     <td>{{ account.operation }}</td>
-                                    <td>
+                                    <td>{{ (account.main) ? "Sim" : "Não" }}</td>
+                                    <td style="width: 100px">
                                         <button type="button" ng-click="editAccount(account.id)" class="btn btn-info">
-                                            <i class="hs-admin-pencil-alt"></i> Editar
+                                            <i class="hs-admin-pencil-alt"></i>
                                         </button>
                                         <button type="button" ng-click="delAccount(account.id)" class="btn btn-danger">
-                                            <i class="hs-admin-close"></i> Excluir
+                                            <i class="hs-admin-close"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -779,7 +653,7 @@ $continueds = array(
                                                required="required">
                                     </div>
 
-                                    <a class="form-text g-color-secondary"
+                                    <a class="form-text color-green-light"
                                        href="<?=$this->url('lostpassword')?>">
                                         <small class="g-font-size-default g-mt-8">
                                             Esqueceu sua senha?
@@ -832,7 +706,7 @@ $continueds = array(
                 </div>
                 <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-my-30--md">
                 <div ng-hide="(tab == 'wallet')">
-                    <button form="form_{{ tab }}" class="btn btn-md btn-xl--md u-btn-secondary g-width-160--md g-font-size-12 g-font-size-default--md g-mb-10" type="submit">
+                    <button form="form_{{ tab }}" class="btn btn-md btn-xl--md g-width-160--md g-font-size-12 g-font-size-default--md g-mb-10 bg-green-light" type="submit">
                         <i class="hs-admin-save"></i>&nbsp;Salvar
                     </button>
                 </div>

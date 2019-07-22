@@ -275,7 +275,8 @@ return array(
         'template_map' => array(
             'filter-user'     => __DIR__ . '/../view/partials/filter-user.phtml',
             'error/404'         => __DIR__ . '/../view/error/404.phtml',
-            'error/index'       => __DIR__ . '/../view/error/index.phtml'
+            'error/index'       => __DIR__ . '/../view/error/index.phtml',
+            'form-account'      => __DIR__ . '/../view/register/user/partials/form-account.phtml'
         ),
         'template_path_stack' => array(
             __DIR__ . '/../view'

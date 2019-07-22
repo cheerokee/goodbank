@@ -64,10 +64,10 @@ class Account extends \Account\Entity\Account implements \Doctrine\ORM\Proxy\Pro
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'id', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'bank', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'user', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'holder', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'agency', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'account_number', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'type', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'operation', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'type_account', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'cnpj', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'updated_at', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'created_at'];
+            return ['__isInitialized__', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'id', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'bank', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'user', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'holder', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'agency', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'account_number', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'type', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'operation', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'type_account', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'main', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'cnpj', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'updated_at', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'created_at'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'id', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'bank', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'user', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'holder', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'agency', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'account_number', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'type', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'operation', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'type_account', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'cnpj', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'updated_at', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'created_at'];
+        return ['__isInitialized__', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'id', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'bank', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'user', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'holder', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'agency', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'account_number', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'type', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'operation', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'type_account', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'main', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'cnpj', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'updated_at', '' . "\0" . 'Account\\Entity\\Account' . "\0" . 'created_at'];
     }
 
     /**
@@ -450,6 +450,39 @@ class Account extends \Account\Entity\Account implements \Doctrine\ORM\Proxy\Pro
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getName', []);
 
         return parent::getName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getMain()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getMain', []);
+
+        return parent::getMain();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getMainStr()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getMainStr', []);
+
+        return parent::getMainStr();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setMain($main)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setMain', [$main]);
+
+        return parent::setMain($main);
     }
 
 }

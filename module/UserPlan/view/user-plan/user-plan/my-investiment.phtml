@@ -13,7 +13,7 @@
         </li>
     </ul>
 </div>
-<div ng-app="panelInvestmentView" ng-controller="InvestimentViewController" class="col g-ml-45 g-ml-0--lg g-pb-65--md">
+<div ng-app="panelInvestmentView" ng-controller="InvestimentViewController" class="col g-ml-0--lg g-pb-65--md">
     <div class="g-pa-20">
         <div class="row">
             <div class="col-md-12">
@@ -64,8 +64,6 @@
                                                         </li>
                                                         <li>
                                                             <a ng-click="viewCashOut(user_plan)"
-                                                               data-toggle="modal"
-                                                               data-target="#modal_cash_out"
                                                                class="d-flex align-items-center u-link-v5 g-bg-gray-light-v8--hover g-font-size-12 g-font-size-default--md g-color-gray-dark-v6 g-px-25 g-py-14"
                                                                href="#">
                                                                 <i class="hs-admin-money g-font-size-18 g-color-gray-light-v6 g-mr-10 g-mr-15--md"></i>
@@ -81,9 +79,11 @@
                                     <h3 ng-class="{ 'g-color-green' : user_plan.balance > 0 }" class="g-font-weight-300 g-font-size-40 g-color-black g-mb-15">
                                         <strong>R$ {{ user_plan.balance  | currency:'':2:'pt-BR'}}</strong>
                                     </h3>
-                                    <span class="{{ getStatusColor(user_plan.status) }} u-tags-v1 text-center g-width-130 g-brd-around  g-color-white g-rounded-50 g-py-4 g-px-15">
-                                        {{ getStatus(user_plan.status) }}
+                                    <span class="{{ getStatusColor(user_plan.status) }} u-tags-v1 text-center g-brd-around  g-color-white g-rounded-50 g-py-4 g-px-15">
+                                        {{ (cycleFuture(user_plan._embedded.first_cycle))?"Início em " + getMonth(user_plan._embedded.first_cycle.month) :getStatus(user_plan.status) }}
                                     </span>
+                                    <br />
+
                                 </header>
 
                                 <hr class="d-flex g-brd-gray-light-v7 g-mx-20 g-mx-30--sm my-0">
@@ -106,6 +106,7 @@
                         </div>
                         <?=$this->partial('partials/modal-extract');?>
                         <?=$this->partial('partials/modal-cash_out');?>
+                        <?=$this->partial('partials/modal-select-account');?>
                     </div>
                 </div>
             </div>
