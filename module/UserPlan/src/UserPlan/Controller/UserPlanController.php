@@ -709,6 +709,33 @@ class UserPlanController extends CrudController{
                 /** Buscar um ciclo ativo, se não existir, criar **/
                 $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneByStatus(1);
 
+                /** Já deixar criado um próximo ciclo pendente **/
+                if($db_cycle){
+                    if($db_cycle->getMonth() == 12){
+                        $next_month = 1;
+                        $next_year = $db_cycle->getYear()+1;
+                    }else{
+                        $next_month = $db_cycle->getMonth() + 1;
+                        $next_year = $db_cycle->getYear();
+                    }
+
+                    $db_next_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneBy(array(
+                        'month' => $next_month,
+                        'year' => $next_year
+                    ));
+
+                    if(!$db_next_cycle){
+                        /** Criando o próximo ciclo **/
+                        $db_next_cycle = new Cycle();
+                        $db_next_cycle->setStatus(0);
+                        $db_next_cycle->setMonth($next_month);
+                        $db_next_cycle->setYear($next_year);
+
+                        $em->persist($db_next_cycle);
+                        $em->flush();
+                    }
+                }
+
                 /** Buscar o proximo ciclo inativo e depois transformar em ativo **/
                 if(!$db_cycle && date('d') == 1){
                     $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneBy(array(
@@ -833,6 +860,7 @@ class UserPlanController extends CrudController{
                     $em->flush();
                 }
 
+                /** SALVANDO A TRANSAÇÃO DO DONO DO APORTE **/
                 $db_transaction = $em->getRepository('Transaction\Entity\Transaction')->findOneBy(array(
                     'user_plan' =>  $db_user_plan,
                     'cycle'     =>  $db_cycle,
