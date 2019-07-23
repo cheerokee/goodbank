@@ -45,18 +45,17 @@ if(isset($action)){
 if($link['return'] == '') {
     $link['return'] = $this->url();
 }
-
 ?>
 
-<div class="g-hidden-sm-down g-bg-gray-light-v8 g-pa-20">
+<div class="g-hidden-sm-down bg-green-light g-pa-20">
     <ul class="u-list-inline g-color-gray-dark-v6">
 
         <li class="list-inline-item g-mr-10">
-            <a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle"
+            <a class="u-link-v5 g-color-white g-valign-middle"
                href="<?=$this->url('admin');?>">
-                Dashboard
+                <i class="fa fa-dashboard"></i>&nbsp;&nbsp;Dashboard
             </a>
-            <i class="hs-admin-angle-right g-font-size-12 g-color-gray-light-v6 g-valign-middle g-ml-10"></i>
+            <i class="hs-admin-angle-right g-font-size-12 g-color-white g-valign-middle g-ml-10"></i>
         </li>
         <?php
         if(isset($_GET['profile']))
@@ -67,11 +66,11 @@ if($link['return'] == '') {
             ));
             ?>
             <li class="list-inline-item g-mr-10">
-                <a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle"
+                <a class="u-link-v5 g-color-white g-valign-middle"
                    href="<?=$url?>">
                     <i class="<?=$this->icon?>"></i> <?=$this->title?>
                 </a>
-                <i class="hs-admin-angle-right g-font-size-12 g-color-gray-light-v6 g-valign-middle g-ml-10"></i>
+                <i class="hs-admin-angle-right g-font-size-12 g-color-white g-valign-middle g-ml-10"></i>
             </li>
             <?php
         }else{
@@ -80,18 +79,18 @@ if($link['return'] == '') {
             ));
             ?>
             <li class="list-inline-item g-mr-10">
-                <a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle"
+                <a class="u-link-v5 g-color-white g-valign-middle"
                    href="<?=$url?>">
-                    <i class="<?=$this->icon?>"></i> <?=$this->title?>
+                    <i class="fa <?=$this->_listView['icon']?>"></i>&nbsp;&nbsp;<?=$this->title?>
                 </a>
-                <i class="hs-admin-angle-right g-font-size-12 g-color-gray-light-v6 g-valign-middle g-ml-10"></i>
+                <i class="hs-admin-angle-right g-font-size-12 g-color-white g-valign-middle g-ml-10"></i>
             </li>
             <?php
         }
         ?>
         <li class="list-inline-item">
             <span class="g-valign-middle">
-                <?=$acao?>
+                <strong><i class="fa fa-edit"></i>&nbsp;&nbsp;<?=$acao?></strong>
             </span>
         </li>
     </ul>

@@ -243,7 +243,18 @@ $rotas = array(
                     'action' => 'user-view'
                 )
             )
-        )
+        ),
+        'resend-confirm' => array(
+            'type' => 'Literal',
+            'options' => array(
+                'route' => '/resend-confirm',
+                'defaults' => array(
+                    '__NAMESPACE__' => 'Register\Controller',
+                    'controller' => 'Auth',
+                    'action' => 'resend-confirm',
+                )
+            )
+        ),
     )
 );
 

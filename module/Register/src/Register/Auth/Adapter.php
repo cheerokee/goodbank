@@ -42,7 +42,7 @@ class Adapter implements AdapterInterface
             if($isAuthActive){
                 return new Result(Result::SUCCESS, array('user' => $user),array('OK'));
             }else{
-                $msg = 'Usuário inativo, por favor confira seu e-mail e ative sua conta ou comunique ao administrador para que seja feita a ativação!';
+                $msg = 'Usuário inativo, por favor confira seu e-mail e ative sua conta ou clique no botão abaixo para reenviar e-mail de confirmação!';
                 return new Result(Result::FAILURE_CREDENTIAL_INVALID, null,array($msg));
             }
         }else

@@ -1,14 +1,14 @@
-<div class="g-hidden-sm-down g-bg-gray-light-v8 g-pa-20">
-    <ul class="u-list-inline g-color-gray-dark-v6">
+<div class="g-hidden-sm-down bg-green-light g-pa-20">
+    <ul class="u-list-inline">
         <li class="list-inline-item g-mr-10">
-            <a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle" href="/admin-home">
-                Dashboard
+            <a class="u-link-v5 g-color-white g-valign-middle" href="/admin-home">
+                <i class="fa fa-dashboard"></i>&nbsp;&nbsp;Dashboard
             </a>
-            <i class="hs-admin-angle-right g-font-size-12 g-color-gray-light-v6 g-valign-middle g-ml-10"></i>
+            <i class="hs-admin-angle-right g-font-size-12 g-color-white g-valign-middle g-ml-10"></i>
         </li>
         <li class="list-inline-item">
             <span class="g-valign-middle">
-                Painel de Pagamento
+                <i class="hs-admin-desktop"></i>&nbsp;&nbsp;Painel de Pagamento
             </span>
         </li>
     </ul>
@@ -18,12 +18,14 @@
  * @var \Solicitation\Entity\Solicitation $db_solicitation
  * @var \UserPlan\Entity\UserPlan $db_user_plan
  * @var \Account\Entity\Account $db_account
+ * @var \Wallet\Entity\Wallet $db_wallet
  * @var \Register\Entity\User $db_user
  * @var \Cycle\Entity\Cycle[] $db_cycles
  */
 $db_solicitation = $this->db_solicitation;
 $db_user_plan   = $this->db_user_plan;
 $db_account     = $this->db_account;
+$db_wallet     = $this->db_wallet;
 $db_user        = $this->db_user;
 $db_cycles      = $this->db_cycles;
 
@@ -49,7 +51,7 @@ $db_cycles      = $this->db_cycles;
                     </header>
                     <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-mt-25--md g-mb-30--md">
                     <div class="row g-mx-minus-10 g-mb-60">
-                        <div class="col-md-7">
+                        <div class="col-md-6">
                             <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md g-mb-30">
                                 <h3 class="d-flex align-self-center text-uppercase g-font-size-12 g-font-size-default--md g-color-black g-mb-20">
                                     <i class="hs-admin-user"></i>&nbsp;
@@ -73,7 +75,7 @@ $db_cycles      = $this->db_cycles;
                                 </table>
                             </div>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-6">
                             <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md g-mb-30">
                                 <h3 class="d-flex align-self-center text-uppercase g-font-size-12 g-font-size-default--md g-color-black g-mb-20">
                                     <i class="hs-admin-thought"></i>&nbsp;Solicitação
@@ -83,6 +85,7 @@ $db_cycles      = $this->db_cycles;
                                     <tr>
                                         <th>Solicitação</th>
                                         <th>Valor</th>
+                                        <th>Forma de Pagamento</th>
                                         <th>Atendido?</th>
                                     </tr>
                                     </thead>
@@ -90,45 +93,77 @@ $db_cycles      = $this->db_cycles;
                                     <tr>
                                         <td><?=$db_solicitation->getTypeStr()?></td>
                                         <td><?=$db_solicitation->getValueStr()?></td>
+                                        <td><?=$db_solicitation->getReceiveMethodStr()?></td>
                                         <td><?=$db_solicitation->getClosedStr()?></td>
                                     </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                        <div class="col-md-12">
-                            <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md g-mb-30">
-                                <h3 class="d-flex align-self-center text-uppercase g-font-size-12 g-font-size-default--md g-color-black g-mb-20">
-                                    <i class="fa fa-bank"></i>&nbsp;Conta Bancária
-                                </h3>
-                                <table class="table table-striped table-bordered">
-                                    <thead>
-                                    <tr>
-                                        <th>Banco</th>
-                                        <th>Tipo de Conta</th>
-                                        <th>Agência</th>
-                                        <th>Conta</th>
-                                        <th>Operação</th>
-                                        <th>Titular</th>
-                                        <th>Pessoa</th>
-                                        <th>Documento</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td><?=$db_account->getBank()?></td>
-                                        <td><?=($db_account->getType())?"Poupança":"Corrente"?></td>
-                                        <td><?=$db_account->getAgency()?></td>
-                                        <td><?=$db_account->getAccountNumber()?></td>
-                                        <td><?=$db_account->getOperation()?></td>
-                                        <td><?=$db_account->getHolder()?></td>
-                                        <td><?=($db_account->getTypeAccount())?"Jurídica":"Física"?></td>
-                                        <td><?=$db_account->getCnpj()?></td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+                        <?php
+                        if($db_account) {
+                            ?>
+                            <div class="col-md-12">
+                                <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md g-mb-30">
+                                    <h3 class="d-flex align-self-center text-uppercase g-font-size-12 g-font-size-default--md g-color-black g-mb-20">
+                                        <i class="fa fa-bank"></i>&nbsp;Conta Bancária
+                                    </h3>
+                                    <table class="table table-striped table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>Banco</th>
+                                            <th>Tipo de Conta</th>
+                                            <th>Agência</th>
+                                            <th>Conta</th>
+                                            <th>Operação</th>
+                                            <th>Titular</th>
+                                            <th>Pessoa</th>
+                                            <th>Documento</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td><?= $db_account->getBank() ?></td>
+                                            <td><?= ($db_account->getType()) ? "Poupança" : "Corrente" ?></td>
+                                            <td><?= $db_account->getAgency() ?></td>
+                                            <td><?= $db_account->getAccountNumber() ?></td>
+                                            <td><?= $db_account->getOperation() ?></td>
+                                            <td><?= $db_account->getHolder() ?></td>
+                                            <td><?= ($db_account->getTypeAccount()) ? "Jurídica" : "Física" ?></td>
+                                            <td><?= $db_account->getCnpj() ?></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
+                            <?php
+                        }
+
+                        if($db_wallet){
+                            ?>
+                            <div class="col-md-12">
+                                <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md g-mb-30">
+                                    <h3 class="d-flex align-self-center text-uppercase g-font-size-12 g-font-size-default--md g-color-black g-mb-20">
+                                        <i class="fa fa-bitcoin"></i>&nbsp;Carteira Bitcoin
+                                    </h3>
+                                    <table class="table table-striped table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>Nº da carteira</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td><?=$db_wallet->getAccount()?></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <?php
+                        }
+                        ?>
+
                         <div class="col-md-12">
                             <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md g-mb-30">
                                 <h3 class="d-flex align-self-center text-uppercase g-font-size-12 g-font-size-default--md g-color-black g-mb-20">

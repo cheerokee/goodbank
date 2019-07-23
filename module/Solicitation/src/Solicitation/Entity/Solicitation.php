@@ -32,6 +32,15 @@ class Solicitation
     private $type;
 
     /**
+     * Método de recebimento
+     * @var string
+     * 0 - Conta Bancária
+     * 1 - Bitcoin
+     * @ORM\Column(name="receive_method", type="integer", nullable=false)
+     */
+    private $receive_method;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="value", type="float", nullable=false)
@@ -256,6 +265,27 @@ class Solicitation
     public function setClosed($closed)
     {
         $this->closed = $closed;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReceiveMethod()
+    {
+        return $this->receive_method;
+    }
+
+    public function getReceiveMethodStr()
+    {
+        return ($this->receive_method) ? "Carteira Bitcoin" : "Conta Bancária";
+    }
+
+    /**
+     * @param string $receive_method
+     */
+    public function setReceiveMethod($receive_method)
+    {
+        $this->receive_method = $receive_method;
     }
 
     public function __toString()

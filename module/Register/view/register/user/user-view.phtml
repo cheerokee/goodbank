@@ -3,6 +3,12 @@
  * @var \Register\Entity\User $db_user
  */
 $db_user = $this->db_user;
+if($db_user->getId() != $this->userIdentity('User')->getId()){
+    echo "Visualização Proibida<br />";
+    echo "<a class='btn btn-primary' href='" . $this->url('admin') . "'>Retornar</a>";
+    die;
+}
+
 $name = 'User';
 $form = $this->form;
 $continueds = array(
@@ -27,7 +33,8 @@ $continueds = array(
                            href="">
                             <i class="hs-admin-pencil g-absolute-centered g-font-size-16 g-color-white"></i>
                         </a>
-                        <img class="img-fluid rounded-circle" src="{{ user.image }}" alt="Image description">
+
+                        <img style="width: 200px; height: 200px;" class="img-fluid rounded-circle" src="{{ user.image }}" alt="">
 
                         <div id="content_image_input<?= $name ?>">
                             <input class="form-control"
@@ -522,6 +529,9 @@ $continueds = array(
                         </h2>
                     </header>
                     <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-my-30--md" />
+                    <p class="alert alert-danger">
+                        Atenção! Cadastro de contas bancárias apenas se você for o titular da conta.
+                    </p>
                     <?=$this->partial('form-account');?>
                     <div class="row g-mb-20">
                         <div class="col-md-12">
@@ -706,7 +716,7 @@ $continueds = array(
                 </div>
                 <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-my-30--md">
                 <div ng-hide="(tab == 'wallet')">
-                    <button form="form_{{ tab }}" class="btn btn-md btn-xl--md g-width-160--md g-font-size-12 g-font-size-default--md g-mb-10 bg-green-light" type="submit">
+                    <button form="form_{{ tab }}" class="btn btn-success btn-md btn-xl--md g-width-160--md g-font-size-12 g-font-size-default--md g-mb-10 bg-green-light" type="submit">
                         <i class="hs-admin-save"></i>&nbsp;Salvar
                     </button>
                 </div>

@@ -13,7 +13,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div ng-if="user_plan.balance >= 300" class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
                         <h4 class="text-center">
@@ -136,12 +136,82 @@
                     </center>
                 </span>
                 <div class="row">
-                    <div class="col-md-12">
-                        <hr class="m-2" />
-                        <h5>Conta Selecionada</h5>
-                        <p>
-                            {{ account._embedded.bank.name }} - Ag.: {{ account.agency }} Conta:{{ account.account_number }}
+                    <div class="col-md-12 form-group">
+                        <label>
+                            <strong>Você deseja receber o saque por onde?</strong>
+                        </label>
+                        <div class="btn-group justified-content">
+                            <label class="u-check">
+                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                       ng-model="receive_method"
+                                       checked=""
+                                       type="radio" ng-value="0" value="0">
+                                <span class="btn btn-md btn-block u-btn-outline-lightgray g-color-white--checked g-bg-primary--checked rounded-0">
+                                    <i class="fa fa-bank"></i>&nbsp;Conta Bancária
+                                </span>
+                            </label>
+                            <label class="u-check">
+                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                       ng-model="receive_method"
+                                       type="radio" ng-value="1" value="1">
+                                <span class="btn btn-md btn-block u-btn-outline-lightgray g-color-white--checked g-bg-primary--checked g-brd-left-none--md rounded-0">
+                                    <i class="fa fa-bitcoin"></i>&nbsp;Carteira Bitcoin
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    <div ng-show="receive_method == 0" class="col-md-12 form-group ">
+                        <label>
+                            <strong>Selecione sua conta bancária</strong>
+                        </label>
+                        <p ng-show="accounts.length == 0" class="alert alert-danger">
+                            Você não possui carteira cadastrada:
+                            <a class="btn btn-info" href="<?=$this->url('user-view',array('id' => $this->userIdentity('User')->getId()))?>?tab=account">
+                                Cadastrar Conta Bancária
+                            </a>
                         </p>
+                        <select ng-show="accounts.length > 0" class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10"
+                                name="wallet"
+                                ng-model="user_plan.account"
+                                required>
+                            <option value="">Selecione...</option>
+                            <option ng-repeat="account in accounts"
+                                    ng-value="account.id"
+                                    value="{{ account.id }}">
+                                {{ account.account_number }}
+                            </option>
+                        </select>
+                    </div>
+                    <div ng-if="receive_method == 1" class="col-md-12 form-group ">
+                        <label>
+                            <strong>Selecione sua carteira bitcoin</strong>
+                        </label>
+                        <p ng-show="wallets.length == 0" class="alert alert-danger">
+                            Você não possui carteira cadastrada:
+                            <a class="btn btn-info" href="<?=$this->url('user-view',array('id' => $this->userIdentity('User')->getId()))?>?tab=wallet">
+                                Cadastrar Carteira
+                            </a>
+                        </p>
+                        <select ng-show="wallets.length > 0" class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10"
+                                name="wallet"
+                                ng-model="user_plan.wallet"
+                                required>
+                            <option value="">Selecione...</option>
+                            <option ng-repeat="wallet in wallets"
+                                    ng-value="wallet.id"
+                                    value="{{ wallet.id }}">
+                                {{ wallet.account }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div ng-if="user_plan.balance < 300" class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4 class="text-center alert alert-danger">
+                            <i class="hs-admin-face-sad"></i>&nbsp;Ops! Você não pode solicitar saques abaixo de <strong>R$ 300,00</strong>
+                        </h4>
                     </div>
                 </div>
             </div>
@@ -150,6 +220,7 @@
                     Fechar
                 </button>
                 <button type="button"
+                        ng-if="user_plan.balance >= 300"
                         class="btn btn-primary"
                         ng-show="enableSolicitation"
                         ng-disabled="enableCashOut()"

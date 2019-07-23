@@ -451,6 +451,11 @@ class User
         return $this->gender;
     }
 
+    public function getGender()
+    {
+        return $this->gender;
+    }
+
     /**
      * @param bool $gender
      */

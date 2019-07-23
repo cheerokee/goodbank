@@ -151,11 +151,11 @@ class UserPlan extends FormBase{
                 'find_method' => array(
                     'name' => 'findBy',
                     'params' => array(
-                        'criteria' => array(),
+                        'criteria' => array('status' => 1),
                         'orderBy' => array('year' => 'DESC','month' => 'DESC')
                     )
                 ),
-                'label' => 'Primeiro Ciclo: * (Ciclos Inativos)',
+                'label' => 'Primeiro Ciclo: * (Ciclo Ativo)',
                 'column-size' => 'sm-4',
                 'label_attributes' => array('class' => 'col-sm-2 input-sm')
             ),

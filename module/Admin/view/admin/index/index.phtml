@@ -2,17 +2,64 @@
 $url_sponsor = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'];
 $url_sponsor .= $this->url('user-register');
 $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getId();
+/**
+ * @var \Register\Entity\User $db_user
+ */
+$db_user = $this->userIdentity('User');
+$incomplete = false;
+$needles = array(
+    'Celphone',
+    'Phone',
+    'Document',
+    'Birthdate',
+    'Gender'
+);
+
+if(!empty($needles)){
+    foreach ($needles as $needle){
+        $method = 'get' . $needle;
+        if($db_user->$method() === null || $db_user->$method() === ''){
+            $incomplete = true;
+        }
+    }
+}
+
 ?>
 <div class="g-hidden-sm-down bg-green-light g-pa-20">
-    <ul class="u-list-inline ">
+    <ul class="u-list-inline g-color-gray-dark-v6">
         <li class="list-inline-item g-mr-10">
-            <a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle" href="/admin-home">
-                <i class="hs-admin-dashboard"></i>&nbsp;Dashboard
+            <a class="u-link-v5 g-color-white g-valign-middle" href="/admin-home">
+                <i class="fa fa-dashboard"></i>&nbsp;&nbsp;Dashboard
             </a>
         </li>
     </ul>
 </div>
 <div class="g-pa-20">
+    <div class="row">
+        <div class="col-md-12">
+            <?php
+            if($incomplete){
+                ?>
+                <div style="margin-left: 0;margin-right: 0;" class="row alert alert-danger">
+                    <div class="col-md-9 pt-2">
+                        <i class="hs-admin-face-sad"></i>&nbsp;&nbsp;
+                        Você precisa completar suas informações de perfil,
+                        por favor acesse a área de informações gerais da conta.
+                    </div>
+                    <div class="col-md-3">
+                        <center>
+                            <a class="btn btn-info"
+                               href="<?=$this->url('user-view',array('id' => $this->userIdentity('User')->getId()));?>">
+                                Completar meu cadastro
+                            </a>
+                        </center>
+                    </div>
+                </div>
+                <?php
+            }
+            ?>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-6">
             <div class="card g-brd-gray-light-v7 g-rounded-3 mb-4">
@@ -195,7 +242,9 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getId();
                         </div>
                         <div class="col-md-12 form-group">
                             <div class="g-pos-rel">
-                                <button onclick="copyToClipboard();" class="btn u-input-btn--v1 g-width-100 g-bg-primary g-rounded-right-20 g-color-white" type="submit">
+                                <button onclick="copyToClipboard();"
+                                        class="btn u-input-btn--v1 g-width-100 g-bg-primary g-rounded-right-20 g-color-white"
+                                        type="button">
                                     <i class="fa fa-copy  g-font-size-16"></i>&nbsp;Copiar
                                 </button>
                                 <input id="copyInput"

@@ -176,11 +176,21 @@ class UserPlanController extends CrudController{
             $service->insertFile($db_entity,'receipt');
             $data = $post->toArray();
 
-            if($data['status'] != $db_entity->getStatus() && $data['status']){
+            if($data['status'] != $db_entity->getStatus() && $data['status'] == 1){
 
                 $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneById($data['first_cycle']);
                 $data['approved_date'] = new \DateTime('now');
 
+                /** NOTIFICAÇÃO DE APROVAÇÃO DE APORTE **/
+                /**
+                 * @var UserPlan $service
+                 */
+                $service = $this->getServiceLocator()->get("UserPlan/Service/UserPlan");
+                $rota = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$this->url()->fromRoute('my-investiment');
+                $service->notificaAprovacao($db_entity,$rota);
+                $this->flashMessenger()->addSuccessMessage("O usuário foi notificado sobre a aprovação do aporte!");
+
+                /** PAGAMENTO DE COMISSÃO **/
                 /**
                  * @var User $db_sponsor
                  */
@@ -315,6 +325,11 @@ class UserPlanController extends CrudController{
             $db_contract->setPlan($db_plan);
             $db_contract->setUser($db_user);
 
+            $db_first_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneByStatus(1);
+            if($db_first_cycle){
+                $db_contract->setFirstCycle($db_first_cycle);
+            }
+
             $em->persist($db_contract);
             $em->flush();
 
@@ -433,15 +448,28 @@ class UserPlanController extends CrudController{
             $value = $data['value'];
             $renovar = $data['renew'];
             $resgatar = $data['cash_out'];
+            $receive_method = $data['receive_method'];
+
             $account = $data['account'];
+            $wallet = $data['wallet'];
 
             /**
              * @var \UserPlan\Entity\UserPlan $db_user_plan
              */
             $db_user_plan = $em->getRepository('UserPlan\Entity\UserPlan')->findOneById($user_plan_id);
             $db_user = $db_user_plan->getUser();
+
             $db_account = $em->getRepository('Account\Entity\Account')->findOneById($account);
-            $db_user_plan->setAccount($db_account);
+            $db_wallet = $em->getRepository('Wallet\Entity\Wallet')->findOneById($wallet);
+
+            if($db_account){
+                $db_user_plan->setAccount($db_account);
+            }
+
+            if($db_wallet){
+                $db_user_plan->setWallet($db_wallet);
+            }
+
             $em->persist($db_user_plan);
             $em->flush();
 
@@ -467,6 +495,8 @@ class UserPlanController extends CrudController{
             if($db_solicitation){
                 $msg = 'Há uma solicitação ainda não atendida!';
                 $db_solicitation->setValue($value);
+                $db_solicitation->setReceiveMethod($receive_method);
+
                 $em->persist($db_solicitation);
                 $em->flush();
             }else{
@@ -476,6 +506,7 @@ class UserPlanController extends CrudController{
                 $db_solicitation->setUser($db_user);
                 $db_solicitation->setUserPlan($db_user_plan);
                 $db_solicitation->setClosed(0);
+                $db_solicitation->setReceiveMethod($receive_method);
 
                 $em->persist($db_solicitation);
                 $em->flush();
@@ -506,6 +537,9 @@ class UserPlanController extends CrudController{
         $db_solicitation = $em->getRepository('Solicitation\Entity\Solicitation')->findOneById($db_solicitation_id);
         $db_user = $db_solicitation->getUser();
 
+        /**
+         * @var \UserPlan\Entity\UserPlan $db_user_plan
+         */
         $db_user_plan = $db_solicitation->getUserPlan();
 
         /** O usuário é diferente do dono do aporte **/
@@ -516,8 +550,13 @@ class UserPlanController extends CrudController{
             ),array(
                 'main' => 'DESC'
             ));
+
+            $db_wallet = $em->getRepository('Wallet\Entity\Wallet')->findOneBy(array(
+                'user' => $db_user
+            ));
         }else{
             $db_account = $db_user_plan->getAccount();
+            $db_wallet = $db_user_plan->getWallet();
         }
 
         $db_cycles = $em->getRepository('Cycle\Entity\Cycle')->findBy(array(),array(
@@ -528,10 +567,11 @@ class UserPlanController extends CrudController{
         //$request = $this->getRequest();
         return new ViewModel(array(
             'db_solicitation'   =>  $db_solicitation,
-            'db_user_plan'  =>  $db_user_plan,
-            'db_account'    =>  $db_account,
-            'db_user'       =>  $db_user,
-            'db_cycles'        =>  $db_cycles
+            'db_user_plan'      =>  $db_user_plan,
+            'db_account'        =>  $db_account,
+            'db_wallet'         =>  $db_wallet,
+            'db_user'           =>  $db_user,
+            'db_cycles'         =>  $db_cycles
         ));
     }
 
@@ -681,7 +721,6 @@ class UserPlanController extends CrudController{
          * @var ZF\ContentNegotiation\Request $request
          */
         $em = $this->getEm();
-        //$request = $this->getRequest();
 
         /**
          * @var Cycle $db_cycle
@@ -838,6 +877,22 @@ class UserPlanController extends CrudController{
                         /** Pegando o total de horas no mês **/
                         $horas_total_mes = $ultimo_dia * 24;
 
+                        $approved_date = $db_user_plan->getApprovedDate();
+
+                        $day_approved = $approved_date->format('d');
+                        $month_approved = $approved_date->format('m');
+                        $year_approved = $approved_date->format('Y');
+
+                        $horas_a_remover = 0;
+                        /** Se a data de aprovação for no mesmo ciclo corrente, retirar as horas que contabilizaram até a hora da aprovação **/
+                        if($month_approved == $db_cycle->getMonth() && $year_approved == $db_cycle->getYear()){
+                            if($day_approved != 1){
+                                $horas_a_remover = (($day_approved-1)*24) + $approved_date->format('H');
+                            }else{
+                                $horas_a_remover = $approved_date->format('H');
+                            }
+                        }
+
                         /** Obtendo o percentual por hora **/
                         $fracao = $db_percent_gain->getPercent() / $horas_total_mes;
 
@@ -847,6 +902,8 @@ class UserPlanController extends CrudController{
                         }else{
                             $horas_total_atual = date('H');
                         }
+
+                        $horas_total_atual -= $horas_a_remover;
 
                         /** Obter o percentual até a hora corrente **/
                         $percent = $horas_total_atual * $fracao;

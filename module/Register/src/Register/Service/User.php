@@ -64,26 +64,7 @@ class User extends AbstractService
                 $this->em->flush();
             }
 
-            if(isset($data['reference']) && $data['reference'] == 'register'){
-                $data = array(
-                    'from'  =>  array(
-                        $this->getConfigurationMail()['mail']['connection_config']['from'] =>
-                            $this->getConfigurationMail()['mail']['connection_config']['name_from']
-                    ),
-                    'to'    =>  array(
-                        $data['email'] => $data['name']
-                    ),
-                    'id'   =>  $entity->getId(),
-                    'activeKey' =>  $entity->getActivationKey(),
-                    'name' => $data['name'],
-                    'email' => $data['email']
-                );
-
-                $subject = 'Cadastro efetuado no sistema';
-                $return = $this->sendMail($data,$subject,'add-user');
-            }else{
-                $return['result'] = true;
-            }
+            $return = $this->sendConfirm($data);
 
             if((isset($return['result']) && $return['result']) || $data['adminForm']){
                 return $entity;
@@ -91,6 +72,36 @@ class User extends AbstractService
                 return false;
             }
         }
+    }
+
+    public function sendConfirm($data){
+        /**
+         * @var \Register\Entity\User $entity
+         */
+        $entity = $this->em->getRepository('Register\Entity\User')->findOneByEmail($data['email']);
+
+        if(isset($data['reference']) && $data['reference'] == 'register'){
+            $data = array(
+                'from'  =>  array(
+                    $this->getConfigurationMail()['mail']['connection_config']['from'] =>
+                        $this->getConfigurationMail()['mail']['connection_config']['name_from']
+                ),
+                'to'    =>  array(
+                    $entity->getEmail() => $entity->getName()
+                ),
+                'id'   =>  $entity->getId(),
+                'activeKey' =>  $entity->getActivationKey(),
+                'name' => $entity->getName(),
+                'email' => $entity->getEmail()
+            );
+
+            $subject = 'Cadastro efetuado no sistema';
+            $return = $this->sendMail($data,$subject,'add-user');
+        }else{
+            $return['result'] = true;
+        }
+
+        return $return;
     }
 
     public function update(array $data)

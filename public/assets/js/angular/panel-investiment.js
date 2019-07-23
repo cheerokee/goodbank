@@ -31,8 +31,10 @@ angular.module("panelInvestmentView", [])
     $scope.accounts = [];
     $scope.banks = [];
 
+    $scope.receive_method = 0;
+
     /** Dias disponíveis para solicitar saque **/
-    $scope.canDays = [29,30,31,1,22];
+    $scope.canDays = [29,30,31,1,23];
 
     $scope.loadUser = function() {
         $http({
@@ -211,10 +213,10 @@ angular.module("panelInvestmentView", [])
         },300);
 
         $scope.loadAccounts();
+        $scope.loadWallets();
         $scope.account = {};
-        $("#modal_select_account").modal();
-
-        //$("#modal_cash_out").modal();
+        $scope.wallet = {};
+        $("#modal_cash_out").modal();
     };
 
     $scope.loadAccounts = function() {
@@ -547,11 +549,18 @@ angular.module("panelInvestmentView", [])
     };
 
     $scope.sendCashOut = function() {
+        if($scope.user_plan.account == null && $scope.user_plan.wallet == null){
+            errorNotify('Você precisa selecionar alguma conta ou carteira para finalizar saque');
+            return false;
+        }
+
         let data = {
             'renew' : $scope.renew,
             'cash_out'  :   $scope.cash_out,
             'user_plan_id' : $scope.user_plan.id,
-            'account': $scope.account.id
+            'account': $scope.user_plan.account,
+            'wallet' : $scope.user_plan.wallet,
+            'receive_method' : $scope.receive_method
         };
 
         let msg = '';
@@ -643,6 +652,7 @@ angular.module("panelInvestmentView", [])
     $('#modal_cash_out').on('hidden.bs.modal', function (e) {
         $scope.renew = false;
         $scope.cash_out = false;
+        $scope.receive_method = 0;
     });
 
     $(document).ready(function () {

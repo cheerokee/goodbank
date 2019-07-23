@@ -609,6 +609,17 @@ class User extends \Register\Entity\User implements \Doctrine\ORM\Proxy\Proxy
     /**
      * {@inheritDoc}
      */
+    public function getGender()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGender', []);
+
+        return parent::getGender();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setGender($gender)
     {
 

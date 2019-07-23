@@ -75,7 +75,7 @@ $(document).ready(function(){
         $( ".cep" ).each(function() {
             mascara( this, mCEP );
         });
-    },200);
+    },1000);
 
     $(".limit-number").each(function(){
         var id = this.id.replace('limit-number-','');
