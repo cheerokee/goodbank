@@ -983,6 +983,7 @@ class UserPlanController extends CrudController{
 
                         /** Obtendo o percentual por hora **/
                         $fracao = $db_percent_gain->getPercent() / $horas_total_mes;
+                        $fracao_sponsor = 5 / $horas_total_mes;
 
                         if($db_cycle->getStatus() == 1){
                             if($day != 1){
@@ -997,6 +998,7 @@ class UserPlanController extends CrudController{
                         $horas_total_atual -= $horas_a_remover;
                         /** Obter o percentual até a hora corrente **/
                         $percent = $horas_total_atual * $fracao;
+                        $percent_sponsor = $horas_total_atual * $fracao_sponsor;
                     }
                 }
 
@@ -1029,6 +1031,7 @@ class UserPlanController extends CrudController{
                 }
 
                 $value_transaction = $db_user_plan->getPlan()->getPrice() * ($percent / 100);
+                $value_transaction_sponsor = $db_user_plan->getPlan()->getPrice() * ($percent_sponsor / 100);
 
                 $db_transaction->setValue($value_transaction);
                 $db_transaction->setDate((new \DateTime('now')));
@@ -1082,7 +1085,7 @@ class UserPlanController extends CrudController{
                         $db_transaction_sponsor->setType(0);
                     }
 
-                    $db_transaction_sponsor->setValue($value_transaction);
+                    $db_transaction_sponsor->setValue($value_transaction_sponsor);
                     $db_transaction_sponsor->setDate(new \DateTime('now'));
 
                     $em->persist($db_transaction_sponsor);
