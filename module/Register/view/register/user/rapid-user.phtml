@@ -38,6 +38,18 @@
                 <input type="date" class="form-control" name="birthdate" ng-model="user.birthdate" value="" required>
             </div>
             <div class="col-md-4 form-group">
+                <label>Genero: *</label>
+                <select name="gender" ng-model="user.gender" class="form-control" required>
+                    <option value="">Selecione...</option>
+                    <option ng-value="0" value="0">
+                        Masculino
+                    </option>
+                    <option ng-value="1" value="1">
+                        Feminino
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-4 form-group">
                 <label>&nbsp;</label>
                 <button  ng-show="user.id == null" class="btn btn-success form-control g-color-white">
                     <i class="fa fa-save"></i>&nbsp;Salvar
@@ -74,7 +86,8 @@
                                 <span ng-if="user.birthdate">
                                     {{ user.birthdate.date | brdateFilter | date:"dd/MM/yyyy HH:mm"}}
                                 </span>
-                            </strong>
+                            </strong><br />
+                            Gênero: <strong>{{ (user.gender)?"Feminino":"Masculino" }}</strong>
                         </td>
                         <td>
                             E-mail: <strong>{{ user.email }}</strong><br />

@@ -25,7 +25,8 @@ angular.module("rapidUserApp", []).filter("brdateFilter", function(){
             document: null,
             phone: null,
             celphone: null,
-            birthdate: null
+            birthdate: null,
+            gender: null
         };
 
         $scope.user_plan = {
@@ -87,7 +88,8 @@ angular.module("rapidUserApp", []).filter("brdateFilter", function(){
             email: user.email,
             document: user.document,
             phone: user.phone,
-            celphone: user.celphone
+            celphone: user.celphone,
+            gender: (user.gender)?1:0
         };
 
         let date = user.birthdate.date;
