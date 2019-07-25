@@ -36,7 +36,7 @@ class Solicitation
      * @var string
      * 0 - Conta Bancária
      * 1 - Bitcoin
-     * @ORM\Column(name="receive_method", type="integer", nullable=false)
+     * @ORM\Column(name="receive_method", type="integer", nullable=true)
      */
     private $receive_method;
 

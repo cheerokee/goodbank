@@ -34,7 +34,8 @@
         "zfcampus/zf-content-negotiation": "^1.4",
         "zendframework/zend-eventmanager": "2.6.4",
         "zendframework/zend-stdlib": "2.7.7",
-        "zendframework/zend-hydrator": "1.1"
+        "zendframework/zend-hydrator": "1.1",
+        "phpoffice/phpexcel": "dev-develop"
     },
     "require-dev": {
         "zendframework/zend-developer-tools": "^1.1",

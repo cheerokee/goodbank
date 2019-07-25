@@ -1757,7 +1757,7 @@ return [
             ],
             9 => [
                 'name' => 'activationKey',
-                'required' => true,
+                'required' => false,
                 'filters' => [
                     0 => [
                         'name' => \Zend\Filter\StringTrim::class,
@@ -1778,13 +1778,13 @@ return [
             ],
             10 => [
                 'name' => 'updatedAt',
-                'required' => true,
+                'required' => false,
                 'filters' => [],
                 'validators' => [],
             ],
             11 => [
                 'name' => 'createdAt',
-                'required' => true,
+                'required' => false,
                 'filters' => [],
                 'validators' => [],
             ],
@@ -1801,7 +1801,7 @@ return [
                 'name' => 'image',
             ],
             14 => [
-                'required' => true,
+                'required' => false,
                 'validators' => [],
                 'filters' => [],
                 'name' => 'id',
@@ -1817,6 +1817,12 @@ return [
                 'validators' => [],
                 'filters' => [],
                 'name' => 'gender',
+            ],
+            17 => [
+                'required' => false,
+                'validators' => [],
+                'filters' => [],
+                'name' => 'sponsor',
             ],
         ],
         'api\\V1\\Rest\\Role\\Validator' => [

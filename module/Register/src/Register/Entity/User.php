@@ -145,6 +145,14 @@ class User
     private $user_roles;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     * @ORM\OneToMany(targetEntity="UserPlan\Entity\UserPlan",
+     *      cascade={"persist", "remove","merge","refresh"},
+     *      mappedBy="user", orphanRemoval=true)
+     */
+    private $user_plans;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="friendly_url", type="string", length=255, nullable=true)
@@ -462,5 +470,21 @@ class User
     public function setGender($gender)
     {
         $this->gender = $gender;
+    }
+
+    /**
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUserPlans()
+    {
+        return $this->user_plans;
+    }
+
+    /**
+     * @param \Doctrine\Common\Collections\Collection $user_perfis
+     */
+    public function setUserPlans($user_plans)
+    {
+        $this->user_plans = $user_plans;
     }
 }

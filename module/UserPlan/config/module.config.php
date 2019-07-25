@@ -163,6 +163,28 @@ $rotas = array(
                 )
             )
         ),
+        'read-xls' => array(
+            'type' => 'Segment',
+            'options' => array(
+                'route'=>'/read-xls',
+                'defaults' => array(
+                    '__NAMESPACE__' => 'UserPlan\Controller',
+                    'controller' => 'UserPlan',
+                    'action' => 'read-xls'
+                )
+            )
+        ),
+        'save-user-plan' => array(
+            'type' => 'Segment',
+            'options' => array(
+                'route'=>'/admin/save-user-plan',
+                'defaults' => array(
+                    '__NAMESPACE__' => 'UserPlan\Controller',
+                    'controller' => 'UserPlan',
+                    'action' => 'save-user-plan'
+                )
+            )
+        )
     )
 );
 

@@ -255,6 +255,17 @@ $rotas = array(
                 )
             )
         ),
+        'rapid-user' => array(
+            'type' => 'Literal',
+            'options' => array(
+                'route' => '/rapid-user',
+                'defaults' => array(
+                    '__NAMESPACE__' => 'Register\Controller',
+                    'controller' => 'User',
+                    'action' => 'rapid-user',
+                )
+            )
+        ),
     )
 );
 
