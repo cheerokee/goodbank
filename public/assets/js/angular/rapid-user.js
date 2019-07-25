@@ -133,55 +133,71 @@ angular.module("rapidUserApp", []).filter("brdateFilter", function(){
     }
 
     $scope.loadUsers = function() {
-        $http({
-            url: "/api/user",
+
+        $.ajax({
+            url: "api/user",
             async: false,
             type: "GET",
-            dataType: "json"
-        }).then(function successCallback(response) {
-            $timeout(function () {
-                $scope.users = response.data._embedded.user;
+            dataType: "json",
+            data: {
+                'order-by' : [
+                    {
+                        'type':'field',
+                        'field':'id',
+                        'direction': 'desc',
+                    }
+                ]
+            },
+            success: function (response) {
+                $timeout(function () {
+                    $scope.users = response._embedded.user;
 
-                for(index in $scope.users){
-                    let user = $scope.users[index];
+                    for(index in $scope.users){
+                        let user = $scope.users[index];
 
-                    $.ajax({
-                        url: "/api/user-plan",
-                        type: "GET",
-                        data: {
-                            "filter"    :   [
-                                {
-                                    'type' : 'andx',
-                                    'conditions' : [
-                                        {'field' :'user', 'type':'eq', 'value' : user.id}
-                                    ],
-                                    'where'  :  'and'
+                        $.ajax({
+                            url: "/api/user-plan",
+                            type: "GET",
+                            data: {
+                                "filter"    :   [
+                                    {
+                                        'type' : 'andx',
+                                        'conditions' : [
+                                            {'field' :'user', 'type':'eq', 'value' : user.id}
+                                        ],
+                                        'where'  :  'and'
+                                    }
+                                ]
+                            },
+                            async: false,
+                            dataType: "json",
+                            success: function (response) {
+                                if(response._embedded.user_plan.length > 0){
+                                    let user_id = response._embedded.user_plan[0]._embedded.user.id;
+
+                                    // Procurando no meio do array de usuários, o id que bate com o id do aporte pesquisado
+                                    let i = $scope.users.findIndex(x => x.id === user_id);
+
+                                    $timeout(function () {
+                                        $scope.users[i].user_plans = response._embedded.user_plan;
+                                    },600);
                                 }
-                            ]
-                        },
-                        async: false,
-                        dataType: "json",
-                        success: function (response) {
-                            if(response._embedded.user_plan.length > 0){
-                                let user_id = response._embedded.user_plan[0]._embedded.user.id;
-
-                                // Procurando no meio do array de usuários, o id que bate com o id do aporte pesquisado
-                                let i = $scope.users.findIndex(x => x.id === user_id);
-
-                                $timeout(function () {
-                                    $scope.users[i].user_plans = response._embedded.user_plan;
-                                },600);
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                errorNotify("Erro ao consultar as carteiras bitcoin");
                             }
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            errorNotify("Erro ao consultar as carteiras bitcoin");
-                        }
-                    });
-                }
+                        });
+                    }
 
-                console.log($scope.users);
-            },300);
+                    console.log($scope.users);
+                },300);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                errorNotify("Erro ao listar os usuários");
+            }
         });
+
+
     };
 
     $scope.loadUsers();
