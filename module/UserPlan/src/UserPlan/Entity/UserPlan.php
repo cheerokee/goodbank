@@ -23,7 +23,8 @@ class UserPlan
     /**
      * @var \Register\Entity\User
      *
-     * @ORM\ManyToOne(targetEntity="Register\Entity\User")
+     * @ORM\ManyToOne(targetEntity="Register\Entity\User",
+     *      inversedBy="user_plans", fetch="LAZY")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="user_id", referencedColumnName="id",
      *      nullable=false,

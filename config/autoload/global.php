@@ -10,7 +10,7 @@ return array(
             'ssl' => 'tls',
             'port' => 587,
             'from' => 'contato@inovensti.com.br',
-            'name_from' => 'Britago',
+            'name_from' => 'GoodBank',
             'charset' => 'UTF8',
             'driverOptions' => array(
                 'charset' => 'UTF8',

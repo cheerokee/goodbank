@@ -230,12 +230,17 @@
             <!-- Footer -->
             <footer id="footer" class="u-footer--bottom-sticky g-bg-white g-color-gray-dark-v6 g-brd-top g-brd-gray-light-v7 g-pa-20">
                 <div class="row align-items-center">
-                    <div class="col-md-4 text-center text-md-left">
+                    <div class="col-md-5 text-center text-md-left">
                         <small class="d-block g-font-size-default">&copy;
-                            <?=date('Y')?> <a href="http://www.britago.com.br" target="_blank">Britago</a>. Todos os direitos reservados.
+                            <?=date('Y')?> <a href="<?=$this->getConfiguration("DOMINIO");?>" target="_blank"><?=$this->getConfiguration('NOMEEMPRESA')?></a>. Todos os direitos reservados.
                         </small>
                     </div>
-                    <div class="col-md-4 offset-md-4 text-center text-md-right">
+                    <div class="col-md-2">
+                        <center>
+                            <img style="height: 40px" class="img-fluid" src="/assets/img/certificado-ssl.png">
+                        </center>
+                    </div>
+                    <div class="col-md-5 text-center text-md-right">
                         <small class="d-block g-font-size-default">
                             Desenvolvido por <a target="_blank" href="http://inovensti.com.br">Inovens TI.</a> - Fábrica de Software ©
                         </small>

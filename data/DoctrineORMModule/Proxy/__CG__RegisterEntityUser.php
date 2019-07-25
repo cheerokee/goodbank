@@ -64,10 +64,10 @@ class User extends \Register\Entity\User implements \Doctrine\ORM\Proxy\Proxy
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'id', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'name', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'email', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'password', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'document', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'sponsor', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'active', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'phone', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'celphone', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'birthdate', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'gender', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'image', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'salt', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'activationKey', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'updated_at', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'created_at', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'user_roles', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'friendlyUrl'];
+            return ['__isInitialized__', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'id', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'name', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'email', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'password', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'document', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'sponsor', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'active', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'phone', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'celphone', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'birthdate', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'gender', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'image', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'salt', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'activationKey', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'updated_at', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'created_at', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'user_roles', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'user_plans', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'friendlyUrl'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'id', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'name', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'email', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'password', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'document', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'sponsor', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'active', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'phone', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'celphone', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'birthdate', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'gender', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'image', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'salt', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'activationKey', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'updated_at', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'created_at', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'user_roles', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'friendlyUrl'];
+        return ['__isInitialized__', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'id', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'name', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'email', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'password', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'document', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'sponsor', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'active', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'phone', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'celphone', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'birthdate', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'gender', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'image', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'salt', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'activationKey', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'updated_at', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'created_at', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'user_roles', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'user_plans', '' . "\0" . 'Register\\Entity\\User' . "\0" . 'friendlyUrl'];
     }
 
     /**
@@ -609,12 +609,45 @@ class User extends \Register\Entity\User implements \Doctrine\ORM\Proxy\Proxy
     /**
      * {@inheritDoc}
      */
+    public function getGender()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getGender', []);
+
+        return parent::getGender();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setGender($gender)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setGender', [$gender]);
 
         return parent::setGender($gender);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getUserPlans()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getUserPlans', []);
+
+        return parent::getUserPlans();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setUserPlans($user_plans)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUserPlans', [$user_plans]);
+
+        return parent::setUserPlans($user_plans);
     }
 
 }

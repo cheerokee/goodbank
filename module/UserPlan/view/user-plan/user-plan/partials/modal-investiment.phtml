@@ -1,3 +1,6 @@
+<?php
+$fracao = 1 / $this->getConfiguration('BITCOIN');
+?>
 <div class="modal fade"
      id="investimentModal"
      tabindex="-1"
@@ -103,34 +106,36 @@
                         </div>
                         <div class="col-md-12 form-group">
                             <h3 class="mb-4 text-center">Siga as instruções abaixo!</h3>
-                            <p><strong>1</strong> - Clique no botão de "Efetuar Pagamento".</p>
+                            <p><strong>1</strong> - Acesse sua plataforma de bitcoin.</p>
                             <p>
-                                <strong>2</strong> - Na plataforma do Blockchain, informe o valor do aporte de <strong>R$ {{ user_plan._embedded.plan.price | currency:'':2:'pt-BR' }}</strong>,
-                                <span class="text-danger"><strong>mesmo que a plataforma informe um valor diferente a ser pago</strong>,</span> veja abaixo o exemplo:
+                                <strong>2</strong> - Na plataforma, efetue uma transferência no valor de
+                                <strong>R$ {{ user_plan._embedded.plan.price | currency:'':2:'pt-BR' }} em Bitcoin ( torno de <i class="fa fa-bitcoin"></i>&nbsp;{{ (user_plan._embedded.plan.price * <?=$fracao?>).toFixed(5) }})</strong> para a carteira abaixo:<br />
+                                <span class="text-danger"><strong>Obs: Tire uma print ou foto da tela de comprovante.</strong></span>
                             </p>
-                            <p>
-                                <center><img class="img-fluid" src="/assets/pagamento.png" /></center>
-                            </p>
-                            <p><strong>3</strong> - Na plataforma do Blockchain,  tire uma print ou uma foto da tela de comprovante de pagamento.</p>
-                            <p><strong>4</strong> - Selecione a carteira bitcoin</p>
+                            <h2 class="text-align">
+                                <div class="g-pos-rel">
+                                    <button type="button" onclick="copyToClipboard();"
+                                            class="btn u-input-btn--v1 g-width-100 g-bg-primary g-rounded-right-20 g-color-white">
+                                        <i class="fa fa-copy  g-font-size-16"></i>&nbsp;Copiar
+                                    </button>
+                                    <input id="copyInput"
+                                           class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-20 g-px-14 g-py-10"
+                                           type="text"
+                                           readonly="true"
+                                           placeholder=""
+                                           value="<?=$this->getConfiguration('CARTEIRABITCOIN')?>">
+                                </div>
+                            </h2>
+                            <p><strong>3</strong> - Abaixo selecione a sua carteira bitcoin</p>
+                            <p><strong>4</strong> - Selecione a foto ou print do comprovante de pagamento e selecione no campo abaixo "Seu Comprovante".</p>
                             <p><strong>5</strong> - Leia os termos e clique na caixa de confirmação</p>
-                            <p><strong>6</strong> - Clique no botão "Aportar"</p>
-                            <p class="card g-rounded-50 p-4 text-center mt-3">
+
+                            <p class="card g-rounded-50 p-4 text-center mt-3 text-danger">
                                 <strong>
                                     A solicitação juntamente com o comprovante será enviado para o administrador.<br />
-                                    Você receberá um e-mail com a aprovação do aporte que entrará em vigor no próximo ciclo possível.
+                                    Você receberá um e-mail com a aprovação do aporte que entrará em vigor no mesmo instante da aprovação.
                                 </strong>
                             </p>
-                        </div>
-                        <div class="col-md-12 form-group">
-                            <center>
-                                <a class="btn btn-xl g-brd-around g-rounded-50 u-btn-gradient-v1 g-font-size-30"
-                                   target="_blank"
-                                   href="{{ plan.bitcoin_payment_url }}">
-                                    Efetuar Pagamento
-                                </a>
-                            </center>
-                            <hr />
                         </div>
                         <div class="col-md-6 form-group ">
                             <label>

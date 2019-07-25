@@ -55,9 +55,14 @@ $name = $this->name;
                 $scope.user.<?=$element->getName()?> = '<?=$element->getValue()?>';
                 <?php
             }
-            ?>
 
-            $scope.tab = 'general';
+            if(isset($_GET['tab'])){
+                echo '$scope.tab = "' . $_GET['tab'].'";';
+            }else{
+                echo '$scope.tab = "general";';
+            }
+            ?>
+            $scope.user.image = '';
 
             $scope.percent_fill = 0;
             $scope.current_password = '';
@@ -84,9 +89,14 @@ $name = $this->name;
                         switch (get_class($element)){
                             case 'Zend\Form\Element\Date':
                                 ?>
-                                let date = response.data.<?=$element->getName()?>.date;
-                                date = new Date(date);
-                                $scope.user.<?=$element->getName()?> = date;
+                                if(response.data.<?=$element->getName()?>){
+                                    let date = response.data.<?=$element->getName()?>.date;
+                                    date = new Date(date);
+                                    $scope.user.<?=$element->getName()?> = date;
+                                }else{
+                                    $scope.user.<?=$element->getName()?> = null;
+                                }
+
                                 <?php
                                 break;
                             default:
@@ -98,6 +108,7 @@ $name = $this->name;
                     ?>
 
                     $scope.user.id = response.data.id;
+                    console.log(response.data);
                     $scope.user.image = (response.data.image != null)? response.data.image : '/assets/sem_imagem.jpg';
 
                     if($scope.user.gender === false){
@@ -904,9 +915,6 @@ $name = $this->name;
             };
 
             $scope.load();
-
-            /** CROP IMAGE START **/
-
 
             $scope.changeTab = function (tab) {
                 $scope.tab = tab;

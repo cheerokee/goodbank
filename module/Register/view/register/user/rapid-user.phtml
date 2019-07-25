@@ -1,0 +1,203 @@
+<div ng-app="rapidUserApp" ng-controller="rapidUserController" class="container">
+    <form method="post" name="user_form" ng-submit="save()">
+        <div class="row">
+            <div class="col-md-12 text-center alert alert-danger">
+                Campos com "*" são obrigatórios
+            </div>
+            <div class="col-md-4 form-group">
+                <label>Patrocinador:</label>
+                <select name="sponsor" ng-model="user.sponsor" class="form-control">
+                    <option value="">Selecione...</option>
+                    <option ng-repeat="user in users" ng-value="user.id" value="{{ user.id }}">
+                        {{ user.name }}
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-4 form-group">
+                <label>Nome: *</label>
+                <input class="form-control" name="name" ng-model="user.name" value="" required>
+            </div>
+            <div class="col-md-4 form-group">
+                <label>E-mail: *</label>
+                <input type="email" class="form-control" name="email" ng-model="user.email" value="" required>
+            </div>
+            <div class="col-md-4 form-group">
+                <label>CPF: *</label>
+                <input class="form-control cpf" name="document" ng-model="user.document" value="" required>
+            </div>
+            <div class="col-md-4 form-group">
+                <label>Telefone: *</label>
+                <input class="form-control telefone" name="phone" ng-model="user.phone" value="" required>
+            </div>
+            <div class="col-md-4 form-group">
+                <label>Celular: *</label>
+                <input class="form-control telefone" name="celphone" ng-model="user.celphone" value="" required>
+            </div>
+            <div class="col-md-4 form-group">
+                <label>Data de Nascimento: *</label>
+                <input type="date" class="form-control" name="birthdate" ng-model="user.birthdate" value="" required>
+            </div>
+            <div class="col-md-4 form-group">
+                <label>&nbsp;</label>
+                <button  ng-show="user.id == null" class="btn btn-success form-control g-color-white">
+                    <i class="fa fa-save"></i>&nbsp;Salvar
+                </button>
+                <button ng-show="user.id != null" class="btn btn-info  form-control g-color-white">
+                    <i class="fa fa-save"></i>&nbsp;Atualizar
+                </button>
+            </div>
+        </div>
+    </form>
+    <div class="row">
+        <div class="col-md-12">
+            <hr />
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Patrocinador</th>
+                        <th>Usuário</th>
+                        <th>Contato</th>
+                        <th>Planos</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="user in users">
+                        <td>
+                            {{ (user._embedded.sponsor)? user._embedded.sponsor.name : "" }}
+                        </td>
+                        <td>
+                            Nome: <strong>{{ user.name }}</strong><br />
+                            CPF: <strong>{{ user.document }}</strong><br />
+                            Data de Nascimento:
+                            <strong>
+                                <span ng-if="user.birthdate">
+                                    {{ user.birthdate.date | brdateFilter | date:"dd/MM/yyyy HH:mm"}}
+                                </span>
+                            </strong>
+                        </td>
+                        <td>
+                            E-mail: <strong>{{ user.email }}</strong><br />
+                            Telefone: <strong>{{ user.phone }}</strong><br />
+                            Celular: <strong>{{ user.celphone }}</strong>
+                        </td>
+                        <td>
+                            <p ng-repeat="user_plan in user.user_plans" class="card p-2">
+                                <strong>{{ user_plan._embedded.plan.name }}</strong><br />                                Valor:
+                                <strong>
+                                    R$ {{ user_plan._embedded.plan.price  | currency:'':2:'pt-BR' }}
+                                </strong>
+                                <br />
+                                <span ng-if="user_plan.approved_date">
+                                    Aprovado em:
+                                    <strong>{{ user_plan.approved_date.date | brdateFilter | date:"dd/MM/yyyy HH:mm" }}</strong>
+                                </span>
+                            </p>
+                        </td>
+                        <td>
+                            <button ng-click="edit(user)" class="btn btn-primary mb-1" title="Editar">
+                                <i class="fa fa-edit"></i>&nbsp;Editar
+                            </button><br />
+                            <button ng-click="changeUserPlans(user.id)" type="button" class="btn btn-info mb-1" data-toggle="modal" data-target="#exampleModalLong">
+                                <i class="fa fa-list"></i>&nbsp;Planos ({{ (user.user_plans.length > 0)?user.user_plans.length:0 }})
+                            </button><br />
+                            <button ng-click="del(user.id)" type="button" class="btn btn-danger mb-1" title="Excluir">
+                                <i class="fa fa-close"></i>&nbsp;Excluir
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">
+                        Planos do Usuário
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" name="user_form" ng-submit="saveUserPlan()">
+                        <div class="row">
+                            <div class="col-md-4 form-group">
+                                <label>Plano: *</label>
+                                <select name="plan"
+                                        class="form-control"
+                                        ng-model="user_plan.plan"
+                                        required>
+                                    <option value="">Selecione...</option>
+                                    <option ng-repeat="plan in plans" value="{{ plan.id }}" ng-value="plan.id">
+                                        {{ plan.name }} - {{ plan.price | currency:'':2:'pt-BR' }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <label>Data de Aprovação: *</label>
+                                <input type="datetime-local"
+                                       class="form-control"
+                                       name="approved_date"
+                                       ng-model="user_plan.approved_date"
+                                       required>
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <label>&nbsp;</label>
+                                <button  type="submit" ng-show="user_plan.id == null"
+                                         class="btn btn-success form-control g-color-white">
+                                    <i class="fa fa-save"></i>&nbsp;Salvar
+                                </button>
+                                <button type="submit" ng-show="user_plan.id != null"
+                                        class="btn btn-info  form-control g-color-white">
+                                    <i class="fa fa-save"></i>&nbsp;Atualizar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Plano</th>
+                                        <th>Data da Aprovação</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="user_plan in user_plans">
+                                        <td>{{ user_plan.id }}</td>
+                                        <td>{{ user_plan._embedded.plan.name }} - {{ user_plan._embedded.plan.price | currency:'':2:'pt-BR' }}</td>
+                                        <td>
+                                            <span ng-if="user_plan.approved_date">
+                                                {{ user_plan.approved_date.date | brdateFilter | date:"dd/MM/yyyy"}}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button ng-click="editUserPlan(user_plan.id)" class="btn btn-primary" title="Editar">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button ng-click="delUserPlan(user_plan._embedded.user.id,user_plan.id)" class="btn btn-danger" title="Excluir">
+                                                <i class="fa fa-close"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/assets/js/angular/rapid-user.js"></script>

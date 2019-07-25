@@ -28,6 +28,16 @@ class Solicitation extends FormBase{
             ->setAttribute('class','form-control');
         $this->add($field);
 
+        $field = new \Zend\Form\Element\Select("receive_method");
+        $field->setLabel($this->translate("Método de Recebimento: "))
+            ->setValueOptions(array(
+                '0' => $this->translate("Conta Bancária"),
+                '1' => $this->translate("Carteira Bitcoin")
+            ))
+            ->setAttribute('value','0')
+            ->setAttribute('class','form-control');
+        $this->add($field);
+
         $field = new \Zend\Form\Element\Text("value");
         $field->setLabel($this->translate("Valor: "))
             ->setAttribute('type','text')
@@ -69,7 +79,8 @@ class Solicitation extends FormBase{
             ),
             'attributes' => array(
                 'class' => 'form-control',
-                'component' => 'autocomplete'
+                'component' => 'autocomplete',
+                'required' => 'required'
             )
         ));
 
@@ -94,7 +105,8 @@ class Solicitation extends FormBase{
             ),
             'attributes' => array(
                 'class' => 'form-control',
-                'component' => 'autocomplete'
+                'component' => 'autocomplete',
+                'required' => 'required'
             )
         ));
 

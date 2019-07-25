@@ -25,6 +25,20 @@ class IndexController extends AbstractActionController{
         $em = $this->getEm();
         $db_cycle_active = $em->getRepository('Cycle\Entity\Cycle')->findOneByStatus(1);
         $db_user = $this->getLogin();
+
+        $db_user_plans_all = $em->getRepository('UserPlan\Entity\UserPlan')->findBy(array(
+            'status' => 1
+        ));
+
+        $db_user_plans_all_deactives = $em->getRepository('UserPlan\Entity\UserPlan')->findBy(array(
+            'status' => 0
+        ));
+
+        $db_solicitations_all_deactives = $em->getRepository('Solicitation\Entity\Solicitation')
+            ->findBy(array(
+                'closed' => 0
+            ));
+
         $db_user_plans = $em->getRepository('UserPlan\Entity\UserPlan')->findBy(array(
            'user' => $db_user,
            'status' => 1
@@ -33,6 +47,8 @@ class IndexController extends AbstractActionController{
         $db_transactions = $em->getRepository('Transaction\Entity\Transaction')->findBy(array(
            'user' => $db_user
         ));
+
+        $db_transactions_all = $em->getRepository('Transaction\Entity\Transaction')->findAll();
 
         $db_indicados = $em->getRepository('Register\Entity\User')->findBySponsor($db_user);
 
@@ -50,6 +66,18 @@ class IndexController extends AbstractActionController{
             }
         }
 
+        $total_rendimento_all = 0;
+        if(!empty($db_transactions_all)){
+            foreach($db_transactions_all as $db_transaction)
+            {
+                if($db_transaction->getType()){
+                    $total_rendimento_all -= $db_transaction->getValue();
+                }else{
+                    $total_rendimento_all += $db_transaction->getValue();
+                }
+            }
+        }
+
         if(!empty($db_user_plans)){
             foreach($db_user_plans as $db_user_plan)
             {
@@ -57,14 +85,28 @@ class IndexController extends AbstractActionController{
             }
         }
 
+        $total_investido_all = 0;
+        if(!empty($db_user_plans_all)){
+            foreach($db_user_plans_all as $db_user_plan)
+            {
+                $total_investido_all += $db_user_plan->getPlan()->getPrice();
+            }
+        }
+
         return new ViewModel(array(
             'db_cycle_active' => $db_cycle_active,
             'db_user' => $db_user,
             'db_transactions' => $db_transactions,
+            'db_transactions_all' => $db_transactions_all,
             'db_user_plans' => $db_user_plans,
+            'db_user_plans_all' => $db_user_plans_all,
             'total_rendimento' => $total_rendimento,
+            'total_rendimento_all' => $total_rendimento_all,
             'total_investido' => $total_investido,
-            'db_indicados' => $db_indicados
+            'total_investido_all' => $total_investido_all,
+            'db_indicados' => $db_indicados,
+            'db_user_plans_all_deactives' => $db_user_plans_all_deactives,
+            'db_solicitations_all_deactives' => $db_solicitations_all_deactives
         ));
     }
 

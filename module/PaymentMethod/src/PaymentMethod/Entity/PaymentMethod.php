@@ -30,7 +30,7 @@ class PaymentMethod
     /**
      * @var string
      *
-     * @ORM\Column(name="$friendly_url", type="string", length=255, nullable=true)
+     * @ORM\Column(name="friendly_url", type="string", length=255, nullable=true)
      */
     private $friendly_url;
 

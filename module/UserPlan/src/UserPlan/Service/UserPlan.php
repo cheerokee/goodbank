@@ -141,6 +141,30 @@ class UserPlan extends AbstractService{
         return $return;
     }
 
+    public function notificaAprovacao($entity,$rota){
+        $data = array(
+            'from'  =>  array(
+                $this->getConfigurationMail()['mail']['connection_config']['from'] =>
+                    $this->getConfigurationMail()['mail']['connection_config']['name_from']
+            ),
+            'to'    =>  array(
+                $entity->getUser()->getEmail() => $entity->getUser()->getName()
+            ),
+            'name'  => $entity->getUser()->getName(),
+            'value' => "R$" . number_format($entity->getPlan()->getPrice(), 2, ',', '.'),
+            'name_plan' => $entity->getPlan()->getName(),
+            'data'  => new \DateTime('now'),
+            'id'    => $entity->getId(),
+            'email' => $entity->getUser()->getEmail(),
+            'rota'  => $rota,
+        );
+
+        $subject = 'Parabéns seu aporte foi aprovado';
+        $return = $this->sendMail($data,$subject,'notify-aprovacao');
+
+        return $return;
+    }
+
     public function sendMail($data,$subject, $template){
         $mail = new Mail($this->transport, $this->view,$template);
         $mail->setData($data)->prepare();

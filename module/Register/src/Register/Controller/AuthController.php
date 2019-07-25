@@ -65,7 +65,14 @@ class AuthController extends AbstractActionController
                     return $this->redirect()->toRoute('admin',array('controller'=>'admin'));
                 }else{
                     if(!empty($result->getMessages())){
+                        $_SESSION['link_ativacao_resend'] = false;
                         foreach ($result->getMessages() as $message){
+
+                            if(strstr($message,'Usuário inativo')){
+                                $_SESSION['link_ativacao_resend'] = true;
+                                $_SESSION['email_ativacao_resend'] = $data['email'];
+                            }
+
                             $this->flashMessenger()->addErrorMessage($message);
                         }
                     }else{
@@ -184,6 +191,31 @@ class AuthController extends AbstractActionController
         }
     
         return new ViewModel(array('form'=>$form,'error'=>$error));
+    }
+
+    public function resendConfirmAction() {
+
+        $request = $this->getRequest();
+
+        if($request->isPost()){
+            $data = $request->getPost()->toArray();
+
+            /**
+             * @var \Register\Service\User $service
+             */
+            $service = $this->getServiceLocator()->get('Register\Service\User');
+            $return = $service->sendConfirm($data);
+
+            if($return['result']){
+                $this->flashMessenger()->addSuccessMessage('E-mail de confirmação reenviado, por favor confira sua caixa de entrada, caso o e-mail não tenha chegado, procure na caixa de span');
+                return $this->redirect()->toRoute('user-auth');
+            }else{
+                $this->flashMessenger()->addErrorMessage('Houve algum erro ao enviar o e-mail de confirmação, por favor entre em contato com o administrador');
+                return $this->redirect()->toRoute('user-auth');
+            }
+        }
+
+        return $this->redirect()->toRoute('user-auth');
     }
 
     /**
