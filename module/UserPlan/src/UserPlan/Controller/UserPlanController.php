@@ -973,6 +973,7 @@ class UserPlanController extends CrudController{
 
                         $horas_a_remover = 0;
                         /** Se a data de aprovação for no mesmo ciclo corrente, retirar as horas que contabilizaram até a hora da aprovação **/
+
                         if($month_approved == $db_cycle->getMonth() && $year_approved == $db_cycle->getYear()){
                             if($day_approved != 1){
                                 $horas_a_remover = (($day_approved-1)*24) + $approved_date->format('H');
