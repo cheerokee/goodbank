@@ -1109,7 +1109,7 @@ class UserPlanController extends CrudController{
                      */
                     $service = $this->getServiceLocator()->get("UserPlan/Service/UserPlan");
                     $rota = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$this->url()->fromRoute('user-auth');
-                    $result = $service->notificaExpiration($db_user_plan,$rota);
+                    //$result = $service->notificaExpiration($db_user_plan,$rota);
                 }
             }
         }
