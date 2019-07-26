@@ -434,26 +434,26 @@ function roundNumber(num, scale) {
 
 function ValidarCPF(Objcpf){
     var cpf = Objcpf.value;
-    exp = /\.|\-/g
-    cpf = cpf.toString().replace( exp, "" );
-    var digitoDigitado = eval(cpf.charAt(9)+cpf.charAt(10));
-    var soma1=0, soma2=0;
-    var vlr =11;
 
-    for(i=0;i<9;i++){
-        soma1+=eval(cpf.charAt(i)*(vlr-1));
-        soma2+=eval(cpf.charAt(i)*vlr);
-        vlr--;
+    cpf = cpf.replace(/\D/g, '');
+    if(cpf.toString().length != 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+    var result = true;
+    [9,10].forEach(function(j){
+        var soma = 0, r;
+        cpf.split(/(?=)/).splice(0,j).forEach(function(e, i){
+            soma += parseInt(e) * ((j+2)-(i+1));
+        });
+        r = soma % 11;
+        r = (r <2)?0:11-r;
+        if(r != cpf.substring(j, j+1)) result = false;
+    });
+
+    if (!result){
+        errorNotify('CPF Inválido');
+        $(".cpf").val('');
+    }else{
+
     }
-    soma1 = (((soma1*10)%11)==10 ? 0:((soma1*10)%11));
-    soma2=(((soma2+(2*soma1))*10)%11);
-
-    var digitoGerado=(soma1*10)+soma2;
-    if(digitoGerado!=digitoDigitado){
-       errorNotify('CPF Inválido');
-       $(".cpf").val('');
-    }
-
 }
 
 function copyToClipboard() {

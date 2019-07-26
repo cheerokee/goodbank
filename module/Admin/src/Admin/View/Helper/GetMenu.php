@@ -205,6 +205,12 @@ class GetMenu extends AbstractHelper implements ServiceLocatorAwareInterface{
                         'authorize' => false,
                     )
                 ),
+            ),
+            'site' => array(
+                'titulo'    =>  'Site',
+                'active'    => true,
+                'icon' => 'fa fa-desktop',
+                'rota' => '/',
             )
         );
     }
