@@ -57,6 +57,7 @@ return [
     'Administrator',
     'Employee',
     'Customer',
+    'Site',
     'api',
     'Admin'
 ];
