@@ -22,7 +22,7 @@ abstract class CrudController extends AbstractActionController{
     public $functions;
 
     public function __construct(){
-
+        $this->functions = new BaseFunctions();
     }
     
     public function indexAction($list = null,$count = 10) {
@@ -44,7 +44,6 @@ abstract class CrudController extends AbstractActionController{
          * @var User $db_login
          */
         $db_login = $this->getLogin();
-        $this->functions = new BaseFunctions();
 
         ///not-have-permission
         $request = $this->getRequest();

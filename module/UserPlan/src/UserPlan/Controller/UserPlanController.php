@@ -16,7 +16,7 @@ use PHPExcel_IOFactory;
 
 class UserPlanController extends CrudController{
     public function __construct() {
-        $this->title = $this->translate("Planos dos Usuários");
+        $this->title = $this->translate("Aportes");
         $this->table = 'UserPlan';
         $this->entity = 'UserPlan\Entity\\'.$this->table ;
         $this->service = 'UserPlan\Service\\'.$this->table ;
@@ -750,6 +750,11 @@ class UserPlanController extends CrudController{
 
             return $this->redirect()->toRoute('cash-out-panel',array('id' => $db_solicitation->getId()));
         }
+    }
+
+    public function userNetworkAction() {
+
+        return new ViewModel(array());
     }
 
     /**
