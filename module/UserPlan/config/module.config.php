@@ -152,6 +152,17 @@ $rotas = array(
                 )
             )
         ),
+        'user-network' => array(
+            'type' => 'Segment',
+            'options' => array(
+                'route'=>'/admin/user-network',
+                'defaults' => array(
+                    '__NAMESPACE__' => 'UserPlan\Controller',
+                    'controller' => 'UserPlan',
+                    'action' => 'user-network'
+                )
+            )
+        ),
         'apply-balance' => array(
             'type' => 'Segment',
             'options' => array(

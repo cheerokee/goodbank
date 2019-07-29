@@ -3,6 +3,7 @@
 namespace Register\Controller;
 
 use Acl\Entity\Role;
+use Base\Controller\BaseFunctions;
 use Register\Entity\User;
 use Register\Entity\UserRole;
 use Zend\Mvc\Controller\AbstractActionController;
@@ -18,6 +19,7 @@ class UserController extends CrudController
 
     public function __construct() 
     {
+        $this->functions = new BaseFunctions();
         $this->table = 'user';
         $this->entity = 'Register\Entity\User' ;
         $this->service = 'Register\Service\\'.$this->table ;
@@ -163,6 +165,12 @@ class UserController extends CrudController
         if($request->isPost()){
             $data = $request->getPost();
             $data_arr = $data->toArray();
+
+            if(!isset($data_arr['password']) && $data_arr['password'] == '')
+            {
+                $data_arr['password'] = "123mudar";
+            }
+
             $data_arr['document'] = $this->functions->soNumero($data_arr['document']);
 
             $data->fromArray($data_arr);

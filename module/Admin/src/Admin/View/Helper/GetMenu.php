@@ -52,6 +52,12 @@ class GetMenu extends AbstractHelper implements ServiceLocatorAwareInterface{
                 'icon' => 'hs-admin-money',
                 'rota' => '/admin/my-investiment',
             ),
+            'user-network' => array(
+                'titulo'    =>  'Cadastros na Rede',
+                'active'    => true,
+                'icon' => 'fa fa-sitemap',
+                'rota' => '/admin/user-network',
+            ),
             'users' => array(
                 'titulo'    =>  'Usuários',
                 'active'    => true,
@@ -83,13 +89,13 @@ class GetMenu extends AbstractHelper implements ServiceLocatorAwareInterface{
                     )
                 )
             ),
-            'cadastros' => array(
-                'titulo'    =>  'Cadastros',
+            'investiment' => array(
+                'titulo'    =>  'Fundo de Investimento',
                 'active'    => true,
-                'icon' => 'hs-admin-layout-grid-3',
+                'icon' => 'hs-admin-money',
                 'itens'     =>  array(
                     'user-plan' => array(
-                        'titulo' => 'Planos dos Usuários',
+                        'titulo' => 'Aportes',
                         'icon' => 'hs-admin-layout-list-thumb',
                         'rota' => '/admin/user-plan',
                         'authorize' => false,
@@ -98,6 +104,31 @@ class GetMenu extends AbstractHelper implements ServiceLocatorAwareInterface{
                         'titulo' => 'Transações',
                         'icon' => 'hs-admin-exchange-vertical',
                         'rota' => '/admin/transaction',
+                        'authorize' => false,
+                    ),
+                    'solicitation' => array(
+                        'titulo' => 'Solicitações de Aporte',
+                        'icon' => 'hs-admin-thought',
+                        'rota' => '/admin/solicitation',
+                        'authorize' => false,
+                    ),
+                )
+            ),
+            'cadastros' => array(
+                'titulo'    =>  'Cadastros',
+                'active'    => true,
+                'icon' => 'hs-admin-layout-grid-3',
+                'itens'     =>  array(
+                    'plan' => array(
+                        'titulo' => 'Planos',
+                        'icon' => 'hs-admin-package',
+                        'rota' => '/admin/plan',
+                        'authorize' => false,
+                    ),
+                    'cycle' => array(
+                        'titulo' => 'Ciclos',
+                        'icon' => 'hs-admin-calendar',
+                        'rota' => '/admin/cycle',
                         'authorize' => false,
                     ),
                     'bank' => array(
@@ -112,18 +143,7 @@ class GetMenu extends AbstractHelper implements ServiceLocatorAwareInterface{
                         'rota' => '/admin/account',
                         'authorize' => false,
                     ),
-                    'plan' => array(
-                        'titulo' => 'Planos',
-                        'icon' => 'hs-admin-package',
-                        'rota' => '/admin/plan',
-                        'authorize' => false,
-                    ),
-                    'cycle' => array(
-                        'titulo' => 'Ciclos',
-                        'icon' => 'hs-admin-calendar',
-                        'rota' => '/admin/cycle',
-                        'authorize' => false,
-                    ),
+
                     'category-transaction' => array(
                         'titulo' => 'Categorias de Transação',
                         'icon' => 'hs-admin-menu-alt',
@@ -152,12 +172,6 @@ class GetMenu extends AbstractHelper implements ServiceLocatorAwareInterface{
                         'titulo' => 'Percentuais de Ganho',
                         'icon' => 'hs-admin-money',
                         'rota' => '/admin/percent-gain',
-                        'authorize' => false,
-                    ),
-                    'solicitation' => array(
-                        'titulo' => 'Solicitações de Aporte',
-                        'icon' => 'hs-admin-thought',
-                        'rota' => '/admin/solicitation',
                         'authorize' => false,
                     ),
                 ),

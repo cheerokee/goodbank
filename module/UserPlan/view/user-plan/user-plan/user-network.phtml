@@ -1,0 +1,292 @@
+<div class="g-hidden-sm-down bg-green-light g-pa-20">
+    <ul class="u-list-inline">
+        <li class="list-inline-item g-mr-10">
+            <a class="u-link-v5 g-color-white g-valign-middle" href="/admin-home">
+                <i class="fa fa-dashboard"></i>&nbsp;&nbsp;Dashboard
+            </a>
+            <i class="hs-admin-angle-right g-font-size-12 g-color-white g-valign-middle g-ml-10"></i>
+        </li>
+        <li class="list-inline-item">
+            <span class="g-valign-middle">
+                <i class="fas fa-project-diagram"></i>&nbsp;&nbsp;Cadastros na Rede
+            </span>
+        </li>
+    </ul>
+</div>
+<div ng-app="user-network" ng-controller="userNetworkController" class="col g-ml-0--lg g-pb-65--md">
+    <input type="hidden" id="user" value="<?=$this->userIdentity("User")->getId();?>">
+    <div class="g-pa-20">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="media-md align-items-center g-mb-30">
+                    <div class="d-flex g-mb-15 g-mb-0--md">
+                        <h3 class="g-font-weight-400 g-font-size-16 g-color-black mb-0">
+                            <i class="fa fa-sitemap"></i>&nbsp;Minha Rede
+                        </h3>
+                    </div>
+
+                    <div class="d-flex ml-auto">
+                        <div class="input-group g-pos-rel g-width-320--md">
+                            <input class="form-control g-font-size-default g-brd-gray-light-v7 g-brd-lightblue-v3--focus g-rounded-20 g-pl-20 g-pr-50 g-py-10"
+                                   type="text"
+                                   placeholder="Pesquise por nome"
+                                   ng-model="searchInput"
+                                   ng-keyup="keyUpSearch()"
+                                   ng-keydown="keyDownSearch()">
+                            <button class="btn g-pos-abs g-top-0 g-right-0 g-z-index-2 g-width-60 h-100 g-bg-transparent g-font-size-16 g-color-primary g-color-secondary--hover rounded-0" type="submit">
+                                <i class="hs-admin-search g-absolute-centered"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="g-mb-40">
+                    <div class="table-responsive">
+                        <table class="js-datatable table u-table--v3 u-editable-table--v1 g-color-black"
+                               data-dt-info="#datatableInfo4"
+                               data-dt-search="#datatableSearch4"
+                               data-dt-entries="#datatableEntries4"
+                               data-dt-is-show-paging="true"
+                               data-dt-pagination="datatablePagination4"
+                               data-dt-page-length="5"
+                               data-dt-is-responsive="false"
+                               data-dt-pagination-classes="list-inline text-right mb-0"
+                               data-dt-pagination-items-classes="list-inline-item g-hidden-sm-down"
+                               data-dt-pagination-links-classes="u-pagination-v1__item u-pagination-v1-2 g-bg-secondary--active g-color-white--active g-brd-gray-light-v7 g-brd-secondary--hover g-brd-secondary--active g-rounded-4 g-py-8 g-px-15"
+                               data-dt-pagination-next-classes="list-inline-item"
+                               data-dt-pagination-next-link-classes="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                               data-dt-pagination-next-link-markup='<span class="g-line-height-1 g-valign-middle" aria-hidden="true"><i class="hs-admin-angle-right"></i></span><span class="sr-only">Next</span>'
+                               data-dt-pagination-prev-classes="list-inline-item"
+                               data-dt-pagination-prev-link-classes="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                               data-dt-pagination-prev-link-markup='<span class="g-line-height-1 g-valign-middle" aria-hidden="true"><i class="hs-admin-angle-left"></i></span><span class="sr-only">Prev</span>'
+                               data-dt-details-invoker=".js-details-show">
+                            <thead>
+                            <tr>
+                                <th class="g-first-child">
+                                    <div class="d-flex align-self-center">
+                                        Código
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="d-flex align-self-center">
+                                        Nome
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="d-flex align-self-center">
+                                        E-mail
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="d-flex align-self-center">
+                                        Status
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="d-flex align-self-center">
+                                        Aportes
+                                    </div>
+                                </th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="g-parent"
+                                    ng-repeat="user in users"
+                                    data-details='<div class="media align-items-center"><div class="d-flex"><span class="u-tags-v1 text-center g-width-130 g-brd-around g-brd-teal-v2 g-bg-teal-v2 g-color-white g-rounded-50 g-py-4 g-px-15">Online</span></div><span class="d-flex align-items-center g-color-gray-light-v6 g-ml-40"><i class="hs-admin-bell g-font-size-18"></i><span class="g-hidden-sm-down g-color-gray-dark-v6 g-ml-8">Activity</span></span><div class="media-body text-left g-ml-40">Uploaded Design to Unify Project</div></div>'>
+                                    <td>
+                                        {{ user.id }}
+                                    </td>
+                                    <td >
+                                        {{ user.name }}
+                                    </td>
+                                    <td >
+                                        {{ user.email }}
+                                    </td>
+                                    <td >
+                                        <span ng-if="user.active" class="u-tags-v1 text-center g-width-110 g-brd-around g-brd-teal-v2 g-bg-teal-v2 g-font-weight-400 g-color-white g-rounded-50 g-py-4 g-px-15">Ativo</span>
+                                        <span ng-if="!user.active" class="u-tags-v1 text-center g-width-110 g-brd-around g-brd-primary g-bg-primary g-font-weight-400 g-color-white g-rounded-50 g-py-4 g-px-15">Inativo</span>
+                                    </td>
+                                    <td >
+                                        {{ (user.totAportes > 0)? user.totAportes : 0 }}
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="g-pos-rel g-top-3 d-inline-block">
+                                            <a id="dropDown{{user.id}}" class="u-link-v5 g-line-height-0 g-font-size-24 g-color-gray-light-v6 g-color-secondary--hover"
+                                               href="#"
+                                               aria-controls="dropDown4_{{user.id}}"
+                                               aria-haspopup="true"
+                                               aria-expanded="false"
+                                               data-dropdown-event="click"
+                                               data-dropdown-target="#dropDown4_{{user.id}}">
+                                                <i class="hs-admin-more-alt"></i>
+                                            </a>
+
+                                            <div id="dropDown4_{{user.id}}"
+                                                 class="u-shadow-v31 g-pos-abs g-right-0 g-z-index-2 g-bg-white u-dropdown--css-animation u-dropdown--hidden u-dropdown--reverse-y"
+                                                 aria-labelledby="dropDown4_1Invoker">
+                                                <ul class="list-unstyled g-nowrap mb-0">
+                                                    <li>
+                                                        <a class="d-flex align-items-center u-link-v5 g-bg-gray-light-v8--hover g-font-size-12 g-font-size-default--md g-color-gray-dark-v6 g-px-25 g-py-14"
+                                                           data-toggle="modal"
+                                                           data-target="#modalAportes"
+                                                           ng-click="selectAportes(user)"
+                                                           href="">
+                                                            <i class="hs-admin-pencil g-font-size-18 g-color-gray-light-v6 g-mr-10 g-mr-15--md"></i>
+                                                            Ver Aportes
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="6">
+                                        <nav class="d-flex ml-auto"
+                                             aria-label="Page Navigation">
+                                            <ul class="list-inline text-right mb-0">
+                                                <li class="list-inline-item">
+                                                    <a id="datatablePagination7Next"
+                                                       class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                                                       href=""
+                                                       aria-label="Previous"
+                                                       ng-click="previous('user')">
+                                                        <span class="g-line-height-1 g-valign-middle" aria-hidden="true">
+                                                            <i class="hs-admin-angle-left"></i>
+                                                        </span>
+                                                        <span class="sr-only">Anterior</span>
+                                                    </a>
+                                                </li>
+                                                <li class="list-inline-item g-hidden-sm-down">
+                                                    <a id="datatablePaginationPage0"
+                                                       class="u-pagination-v1__item u-pagination-v1-2 g-bg-secondary--active g-color-white--active g-brd-gray-light-v7 g-brd-secondary--hover g-brd-secondary--active g-rounded-4 g-py-8 g-px-15 active"
+                                                       href="#!"
+                                                       data-dt-page-to="0">
+                                                        1
+                                                    </a>
+                                                </li>
+                                                <li class="list-inline-item g-hidden-sm-down">
+                                                    <a id="datatablePagination71"
+                                                       class="u-pagination-v1__item u-pagination-v1-2 g-bg-secondary--active g-color-white--active g-brd-gray-light-v7 g-brd-secondary--hover g-brd-secondary--active g-rounded-4 g-py-8 g-px-15"
+                                                       href="#!"
+                                                       data-dt-page-to="1">
+                                                        2
+                                                    </a>
+                                                </li>
+                                                <li class="list-inline-item">
+                                                    <a id="datatablePagination7Next"
+                                                       class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                                                       href=""
+                                                       aria-label="Next"
+                                                       ng-click="next('user')">
+                                                        <span class="g-line-height-1 g-valign-middle" aria-hidden="true">
+                                                            <i class="hs-admin-angle-right"></i>
+                                                        </span>
+                                                        <span class="sr-only">Próximo</span>
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalAportes" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">
+                        Aportes
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h3 class="text-center">
+                        <strong>{{ user.name }}</strong>
+                    </h3>
+
+                    <table class="js-datatable table u-table--v3 u-editable-table--v1 g-color-black"
+                           data-dt-info="#datatableInfo4"
+                           data-dt-search="#datatableSearch4"
+                           data-dt-entries="#datatableEntries4"
+                           data-dt-is-show-paging="true"
+                           data-dt-pagination="datatablePagination4"
+                           data-dt-page-length="5"
+                           data-dt-is-responsive="false"
+                           data-dt-pagination-classes="list-inline text-right mb-0"
+                           data-dt-pagination-items-classes="list-inline-item g-hidden-sm-down"
+                           data-dt-pagination-links-classes="u-pagination-v1__item u-pagination-v1-2 g-bg-secondary--active g-color-white--active g-brd-gray-light-v7 g-brd-secondary--hover g-brd-secondary--active g-rounded-4 g-py-8 g-px-15"
+                           data-dt-pagination-next-classes="list-inline-item"
+                           data-dt-pagination-next-link-classes="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                           data-dt-pagination-next-link-markup='<span class="g-line-height-1 g-valign-middle" aria-hidden="true"><i class="hs-admin-angle-right"></i></span><span class="sr-only">Next</span>'
+                           data-dt-pagination-prev-classes="list-inline-item"
+                           data-dt-pagination-prev-link-classes="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                           data-dt-pagination-prev-link-markup='<span class="g-line-height-1 g-valign-middle" aria-hidden="true"><i class="hs-admin-angle-left"></i></span><span class="sr-only">Prev</span>'
+                           data-dt-details-invoker=".js-details-show">
+                        <thead>
+                        <tr>
+                            <th class="g-first-child">
+                                <div class="d-flex align-self-center">
+                                    Código
+                                </div>
+                            </th>
+                            <th>
+                                <div class="d-flex align-self-center">
+                                    Plano
+                                </div>
+                            </th>
+                            <th>
+                                <div class="d-flex align-self-center">
+                                    Valor
+                                </div>
+                            </th>
+                            <th>
+                                <div class="d-flex align-self-center">
+                                    Status
+                                </div>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="g-parent"
+                            ng-repeat="user_plan in user_plans"
+                            data-details='<div class="media align-items-center"><div class="d-flex"><span class="u-tags-v1 text-center g-width-130 g-brd-around g-brd-teal-v2 g-bg-teal-v2 g-color-white g-rounded-50 g-py-4 g-px-15">Online</span></div><span class="d-flex align-items-center g-color-gray-light-v6 g-ml-40"><i class="hs-admin-bell g-font-size-18"></i><span class="g-hidden-sm-down g-color-gray-dark-v6 g-ml-8">Activity</span></span><div class="media-body text-left g-ml-40">Uploaded Design to Unify Project</div></div>'>
+                            <td>
+                                {{ user_plan.id }}
+                            </td>
+                            <td >
+                                {{ user_plan._embedded.plan.name }}
+                            </td>
+                            <td >
+                                R$ {{ user_plan._embedded.plan.price | currency:'':2:'pt-BR' }}
+                            </td>
+                            <td >
+                                <span ng-if="user_plan.status == 1" class="u-tags-v1 text-center g-width-110 g-brd-around g-brd-teal-v2 g-bg-teal-v2 g-font-weight-400 g-color-white g-rounded-50 g-py-4 g-px-15">Ativo</span>
+                                <span ng-if="user_plan.status != 1"  class="u-tags-v1 text-center g-width-110 g-brd-around g-brd-primary g-bg-primary g-font-weight-400 g-color-white g-rounded-50 g-py-4 g-px-15">Inativo</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/assets/js/angular/user-network.js"></script>
