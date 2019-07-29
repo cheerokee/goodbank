@@ -142,7 +142,7 @@ class AuthController extends AbstractActionController
             }
         }
 
-        $db_sponsor = $em->getRepository('Register\Entity\User')->findOneById($_GET['sponsor']);
+        $db_sponsor = $em->getRepository('Register\Entity\User')->findOneByFriendlyUrl($_GET['sponsor']);
 
         return new ViewModel(array('db_sponsor' => $db_sponsor));
     }

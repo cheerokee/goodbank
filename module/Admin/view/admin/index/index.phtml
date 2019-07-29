@@ -1,7 +1,7 @@
 <?php
 $url_sponsor = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'];
 $url_sponsor .= $this->url('user-register');
-$url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getId();
+$url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
 /**
  * @var \Register\Entity\User $db_user
  */

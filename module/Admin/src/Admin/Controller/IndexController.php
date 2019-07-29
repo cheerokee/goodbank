@@ -41,9 +41,6 @@ class IndexController extends AbstractActionController{
             }
         }
 
-
-
-
         /**
          * @var User $db_user
          * @var Transaction[] $db_transactions
