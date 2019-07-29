@@ -82,6 +82,10 @@ class UserPlanController extends CrudController{
                 'firstCycle'=>array(
                     'label' => $this->translate('Primeiro Ciclo'),
                     'list' => true,
+                ),
+                'approvedDateStr'=>array(
+                    'label' => $this->translate('Data de Aprovação'),
+                    'list' => true,
                 )
             ),
             'filters' => array(

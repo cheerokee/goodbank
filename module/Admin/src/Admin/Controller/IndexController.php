@@ -1,6 +1,7 @@
 <?php
 namespace Admin\Controller;
 
+use Base\Controller\BaseFunctions;
 use Register\Entity\User;
 use Transaction\Entity\Transaction;
 use UserPlan\Entity\UserPlan;
@@ -12,9 +13,36 @@ class IndexController extends AbstractActionController{
     public $em;
     
     public function __construct(){
+
     }
     
     public function indexAction(){
+        $em = $this->getEm();
+
+        $bit_str = json_decode(file_get_contents("https://www.mercadobitcoin.net/api/BTC/ticker/"),true);
+        if($bit_str){
+            $db_config = $em->getRepository('Configuration\Entity\Configuration')->findOneByChave('BITCOIN');
+            if($db_config){
+                $db_config->setValue($bit_str['ticker']['last']);
+
+                $em->persist($db_config);
+                $em->flush();
+            }
+        }
+
+        $dol_str = json_decode(file_get_contents("https://economia.awesomeapi.com.br/all/USD-BRL"),true);
+        if($dol_str){
+            $db_config = $em->getRepository('Configuration\Entity\Configuration')->findOneByChave('DOLLAR');
+            if($db_config){
+                $db_config->setValue((new BaseFunctions())->moedaToFloat($dol_str['USD']['low']));
+
+                $em->persist($db_config);
+                $em->flush();
+            }
+        }
+
+
+
 
         /**
          * @var User $db_user
@@ -22,7 +50,6 @@ class IndexController extends AbstractActionController{
          * @var UserPlan[] $db_user_plans
          * @var User[] $db_indicados
          */
-        $em = $this->getEm();
         $db_cycle_active = $em->getRepository('Cycle\Entity\Cycle')->findOneByStatus(1);
         $db_user = $this->getLogin();
 

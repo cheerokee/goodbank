@@ -109,7 +109,7 @@ $fracao = 1 / $this->getConfiguration('BITCOIN');
                             <p><strong>1</strong> - Acesse sua plataforma de bitcoin.</p>
                             <p>
                                 <strong>2</strong> - Na plataforma, efetue uma transferência no valor de
-                                <strong>R$ {{ user_plan._embedded.plan.price | currency:'':2:'pt-BR' }} em Bitcoin ( torno de <i class="fa fa-bitcoin"></i>&nbsp;{{ (user_plan._embedded.plan.price * <?=$fracao?>).toFixed(5) }})</strong> para a carteira abaixo:<br />
+                                <strong>R$ {{ user_plan._embedded.plan.price | currency:'':2:'pt-BR' }} em Bitcoin ( torno de <i class="fa fa-bitcoin"></i>&nbsp;{{ ( (user_plan._embedded.plan.price * <?=$fracao?>) + (25 * <?=$fracao?>) ).toFixed(5) }})</strong> para a carteira abaixo:<br />
                                 <span class="text-danger"><strong>Obs: Tire uma print ou foto da tela de comprovante.</strong></span>
                             </p>
                             <h2 class="text-align">

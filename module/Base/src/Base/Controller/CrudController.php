@@ -243,10 +243,27 @@ abstract class CrudController extends AbstractActionController{
 
                     }
 
+
                     if($element->getAttributes()['name'] == 'name' || $element->getAttributes()['name'] == 'title')
                     {
                         $data['friendlyUrl'] = $this->functions->strToFriendlyUrl($element->getValue());
-                        $data['friendly_url'] = $this->functions->strToFriendlyUrl($element->getValue());
+
+                        $tmp = $em->getRepository($this->entity)->findOneByFriendlyUrl($data['friendlyUrl']);
+
+                        if($tmp){
+                            if($action == 'new' || ($action == 'edit' && $tmp->getId() != $data['id'])) {
+                                $count_friendly = 1;
+                                while ($tmp) {
+
+                                    $data['friendlyUrl'] = $this->functions->strToFriendlyUrl($element->getValue()) . '-' . $count_friendly;
+
+                                    $tmp = $em->getRepository($this->entity)->findOneByFriendlyUrl($data['friendlyUrl']);
+                                    $count_friendly++;
+                                }
+                            }
+                        }
+
+                        $data['friendly_url'] = $data['friendlyUrl'];
                     }
 
                     if($element->getAttributes()['moeda']){

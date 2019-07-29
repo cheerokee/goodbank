@@ -187,6 +187,13 @@ class UserPlan extends FormBase{
             ->setAttribute('class','form-control');
         $this->add($field);
 
+        $field = new \Zend\Form\Element\DateTime("approved_date");
+        $field->setLabel("Data da Aprovação: *")
+            ->setAttribute('required','required')
+            ->setAttribute('component','datetime')
+            ->setAttribute('class','form-control');
+        $this->add($field);
+
         $this->add(array(
             'name' => 'submit',
             'type'=>'Zend\Form\Element\Submit',
