@@ -11,10 +11,12 @@ angular.module("user-network", [])
     $scope.user_links = {};
     $scope.page_user = 1;
     $scope.user_tot_pages = 0;
+    $scope.user_pages = [];
 
     $scope.user_plan_links = {};
     $scope.page_user_plan = 1;
     $scope.user_plan_tot_pages = 0;
+    $scope.user_plan_pages = [];
 
     $scope.loadUsers = function(url = '') {
         if(url == ''){
@@ -45,12 +47,21 @@ angular.module("user-network", [])
             dataType: "json",
             success: function (response) {
                 $timeout(function(){
+                    $scope.user_pages = $scope.numberArray(response.page_count);
+
+                    $timeout(function () {
+                        $.HSCore.components.HSDropdown.init($('[data-dropdown-target]'), {dropdownHideOnScroll: false});
+                        $.HSCore.helpers.HSHamburgers.init('.hamburger');
+                    },2000);
+
                     $scope.user_tot_pages = response.page_count;
+
                     $scope.user_links = response._links;
 
                     $scope.users = response._embedded.user;
                     for(index in $scope.users){
                         let user = $scope.users[index];
+
 
                         $.ajax({
                             url: "/api/user-plan",
@@ -102,21 +113,27 @@ angular.module("user-network", [])
                 $scope.page_user--;
                 break;
             case "user_plan":
-                $scope.loadUserPlans($scope.user_plan_links.prev.href);
+                $scope.loadCustomerAportes($scope.user_plan_links.prev.href);
                 $scope.page_user_plan--;
                 break;
         }
     };
 
     $scope.next = function(resource) {
+        console.log(resource);
         switch (resource) {
             case "user":
                 $scope.loadUsers($scope.user_links.next.href);
-                $scope.page_user++;
+                if($scope.page_user != $scope.user_tot_pages){
+                    $scope.page_user++;
+                }
                 break;
             case "user_plan":
-                $scope.loadUserPlans($scope.user_plan_links.next.href);
-                $scope.page_user_plan++;
+                console.log(resource,$scope.user_plan_links.next.href);
+                $scope.loadCustomerAportes($scope.user_plan_links.next.href);
+                if($scope.page_user_plan != $scope.user_plan_tot_pages){
+                    $scope.page_user_plan++;
+                }
                 break;
         }
     };
@@ -124,21 +141,20 @@ angular.module("user-network", [])
     $scope.page = function(pagination,resource) {
         switch (resource) {
             case "user":
-                $scope.loadUsers($scope.user_links.next.href);
-                $scope.page_user++;
+                $scope.loadUsers('/api/user?page=' + pagination);
+                $scope.page_user = pagination;
                 break;
             case "user_plan":
-                $scope.loadUserPlans($scope.user_plan_links.next.href);
-                $scope.page_user_plan++;
+                $scope.loadCustomerAportes($scope.user_plan_links.next.href);
+                $scope.page_user_plan = pagination;
                 break;
         }
     };
 
     $scope.selectAportes = function(user) {
-        console.log(user);
         $scope.user = user;
         $.ajax({
-            url: "/api/user-plan",
+            url: '/api/user-plan',
             type: "GET",
             data: {
                 "filter"    :   [
@@ -154,7 +170,11 @@ angular.module("user-network", [])
             async: false,
             dataType: "json",
             success: function (response) {
-                $scope.user_plans = response._embedded.user_plan;
+                $timeout(function(){
+                    $scope.user_plan_links = response._links;
+                    $scope.user_plans = response._embedded.user_plan;
+                    $scope.user_plan_pages = $scope.numberArray(response.page_count);
+                },300);
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 errorNotify("Erro ao consultar os aportes");
@@ -163,7 +183,7 @@ angular.module("user-network", [])
     };
 
     $scope.typingTimer = null;
-    $scope.doneTypingInterval = 5000;
+    $scope.doneTypingInterval = 1000;
 
     $scope.doneTyping = function() {
         $.ajax({
@@ -199,6 +219,16 @@ angular.module("user-network", [])
                 errorNotify('Erro ao carregar os aportes');
             }
         });
+    };
+
+    $scope.numberArray = function(number){
+        var arr = [];
+
+        for(var i = 1; i <= number; i++){
+            arr.push(i);
+        }
+
+        return arr
     };
 
     $scope.keyUpSearch = function() {

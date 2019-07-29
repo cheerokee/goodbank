@@ -30,6 +30,31 @@ class User  extends FormBase
         $criteria->where($criteria->expr()->neq('name', 'superadmin'));
         $criteria->orderBy(array('id' => 'ASC'));
 
+        $this->add(array(
+            'name' => 'sponsor',
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',
+            'options' => array(
+                'disable_inarray_validator' => true,
+                'object_manager' => $objectManager,
+                'target_class' => 'Register\Entity\User',
+                'property' => 'name',
+                'display_empty_item' => true,
+                'empty_item_label' => 'Selecione...',
+                'is_method' => true,
+                'find_method' => array(
+                    'name' => 'findAll',
+                    'params' => array()
+                ),
+                'label' => 'Patrocinador: *',
+                'column-size' => 'sm-4',
+                'label_attributes' => array('class' => 'col-sm-2 input-sm')
+            ),
+            'attributes' => array(
+                'class' => 'form-control',
+                'component' => 'autocomplete'
+            )
+        ));
+
         $name = new \Zend\Form\Element\Text("name");
         $name->setLabel($this->translate("Nome: *"))
             ->setAttribute('class','form-control')

@@ -138,6 +138,8 @@ if($link['return'] == '') {
                          */
 
                         foreach ($form as $element) {
+
+
                             $type = $element->getAttributes()['type'];
 
                             $element->setAttribute('form',$form->getName());

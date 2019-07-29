@@ -35,6 +35,22 @@ class User extends AbstractService
     public function insert(array $data) {
         $data['friendlyUrl'] = $this->functions->strToFriendlyUrl($data['name']);
 
+        $tmp = $this->em->getRepository('Register\Entity\User')->findOneBy(array(
+            'friendlyUrl' => $data['friendlyUrl']
+        ));
+
+        if($tmp){
+            $count_friendly = 1;
+            while ($tmp) {
+                $data['friendlyUrl'] = $this->functions->strToFriendlyUrl($data['name']) . '-' . $count_friendly;
+
+                $tmp = $this->em->getRepository($this->entity)->findOneBy(array(
+                    'friendlyUrl' => $data['friendlyUrl']
+                ));
+                $count_friendly++;
+            }
+        }
+
         $entity = parent::insert($data);
 
         if($entity)
@@ -107,6 +123,26 @@ class User extends AbstractService
     public function update(array $data)
     {
         $entity = $this->em->getReference($this->entity, $data['id']);
+
+        $data['friendlyUrl'] = $this->functions->strToFriendlyUrl($data['name']);
+
+        $tmp = $this->em->getRepository('Register\Entity\User')->findOneBy(array(
+            'friendlyUrl' => $data['friendlyUrl']
+        ));
+
+        if($tmp){
+            $count_friendly = 1;
+            if($tmp->getId() != $data['id']){
+                while ($tmp) {
+                    $data['friendlyUrl'] = $this->functions->strToFriendlyUrl($data['name']) . '-' . $count_friendly;
+
+                    $tmp = $this->em->getRepository($this->entity)->findOneBy(array(
+                        'friendlyUrl' => $data['friendlyUrl']
+                    ));
+                    $count_friendly++;
+                }
+            }
+        }
 
         if(empty($data['password']))
             unset($data['password']);
