@@ -177,7 +177,7 @@ class User extends AbstractService
         }
     }
 
-    public function lostPassword(array $data){
+    public function lostPassword(array $data,$rota){
 
         $db_user = $this->em->getRepository('Register\Entity\User')->findOneByEmail($data['email']);
 
@@ -198,6 +198,7 @@ class User extends AbstractService
                     $db_user->getEmail() => $db_user->getName()
                 ),
                 'name' => $db_user->getName(),
+                'rota' => $rota,
                 'senha' => $novaSenha
             );
 

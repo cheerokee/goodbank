@@ -76,7 +76,12 @@ class AuthController extends AbstractActionController
                             $this->flashMessenger()->addErrorMessage($message);
                         }
                     }else{
-                        $this->flashMessenger()->addErrorMessage('Usuário ou senha inválido');
+                        $db_user = $this->getEm()->getRepository('Register\Entity\User')->findOneByEmail($data['email']);
+                        if($db_user && $db_user->getPassword() == md5('123')){
+                            $this->flashMessenger()->addErrorMessage('Você é um usuário antigo no sistema, sua senha foi alterada devido a importação de dados entre sistemas, por favor clique em "Esqueceu a senha?" para gerar uma nova senha.');
+                        }else{
+                            $this->flashMessenger()->addErrorMessage('Usuário ou senha inválido');
+                        }
                     }
 
                     return $this->redirect()->toRoute('user-auth');
@@ -174,8 +179,8 @@ class AuthController extends AbstractActionController
                  * @var \Register\Service\User $service
                  */
                 $service = $this->getServiceLocator()->get('Register\Service\User');
-
-                $result = $service->lostPassword($data);
+                $rota = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$this->url()->fromRoute('user-auth');
+                $result = $service->lostPassword($data,$rota);
 
                 if($result['result'])
                 {
