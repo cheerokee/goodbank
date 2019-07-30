@@ -239,7 +239,7 @@ abstract class CrudController extends AbstractActionController{
                 foreach ($form as $element) {
                     $type = $element->getAttributes()['type'];
                     if($type == 'date' || $type == 'datetime') {
-
+                        str_replace('T',' ',$data[$element->getName()]);
                         $data[$element->getName()] = new \DateTime($data[$element->getName()]);
                         var_dump($data[$element->getName()]);
                         die;
