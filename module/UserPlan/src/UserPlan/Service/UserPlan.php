@@ -55,6 +55,33 @@ class UserPlan extends AbstractService{
         return $value;
     }
 
+    public function sumComission($db_user_plan){
+        $value = 0;
+
+        /**
+         * @var Transaction[] $db_transactions
+         */
+
+        $db_transactions = $this->em->getRepository('Transaction\Entity\Transaction')->findBy(array(
+            'user_plan' => $db_user_plan,
+            'user'      => $db_user_plan->getUser()
+        ));
+
+        if(!empty($db_transactions))
+        {
+            foreach($db_transactions as $db_transaction)
+            {
+                if($db_transaction->getType()){
+                    $value -= $db_transaction->getValue();
+                }else{
+                    $value += $db_transaction->getValue();
+                }
+            }
+        }
+
+        return $value;
+    }
+
     public function sendWithdrawal($entity,$rota) {
         /**
          * @var Solicitation $entity

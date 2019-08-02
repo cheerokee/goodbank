@@ -35,10 +35,29 @@ class GetMenu extends AbstractHelper implements ServiceLocatorAwareInterface{
         $this->em = $em;
     }
 
+    public function getLogin(){
+
+        $session = (array) $_SESSION['User'];
+        /**
+         * @var User $user
+         */
+        foreach($session as $v){
+            if(isset($v['storage']))
+                $login = $v['storage'];
+        }
+
+        if($login) {
+            return $login;
+        }else{
+            return $this->redirect()->toRoute('not-have-permission');
+        }
+    }
+
     public function __invoke() {
         $sessionStorage = new SessionStorage('User');
         $this->authService = new AuthenticationService;
         $this->authService->setStorage($sessionStorage);
+
         return array(
             'panel-investiment' => array(
                 'titulo'    =>  'Invista',
@@ -57,6 +76,18 @@ class GetMenu extends AbstractHelper implements ServiceLocatorAwareInterface{
                 'active'    => true,
                 'icon' => 'fa fa-sitemap',
                 'rota' => '/admin/user-network',
+            ),
+            'my-wallets' => array(
+                'titulo'    =>  'Minhas Carteiras Bitcoin',
+                'active'    => true,
+                'icon' => 'hs-admin-wallet',
+                'rota' => '/admin/user-view/' . $this->getLogin()->getId() . '?tab=wallet',
+            ),
+            'my-accounts' => array(
+                'titulo'    =>  'Minhas Contas Bancárias',
+                'active'    => true,
+                'icon' => 'fa fa-bank',
+                'rota' => '/admin/user-view/' . $this->getLogin()->getId() . '?tab=account',
             ),
             'users' => array(
                 'titulo'    =>  'Usuários',

@@ -69,6 +69,18 @@ class Transaction
     private $category_transaction;
 
     /**
+     * @var \Transaction\Entity\Transaction
+     *
+     * @ORM\ManyToOne(targetEntity="Transaction\Entity\Transaction")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="transaction_id", referencedColumnName="id",
+     *      nullable=true,
+     *      onDelete="SET NULL")
+     * })
+     */
+    private $transaction_reference;
+
+    /**
      * @var string
      * 0 - Crédito
      * 1 - Débito
@@ -282,6 +294,22 @@ class Transaction
     public function setUser($user)
     {
         $this->user = $user;
+    }
+
+    /**
+     * @return Transaction
+     */
+    public function getTransactionReference()
+    {
+        return $this->transaction_reference;
+    }
+
+    /**
+     * @param Transaction $transaction_reference
+     */
+    public function setTransactionReference($transaction_reference)
+    {
+        $this->transaction_reference = $transaction_reference;
     }
 
     public function __toString()

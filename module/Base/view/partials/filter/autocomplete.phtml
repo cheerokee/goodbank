@@ -95,7 +95,11 @@ switch($controller){
 //        $db_entities = $em->getRepository($this->entity)->findByCompany($db_login->getId());
 //        break;
     case 'user': // Listar funcionários da mesma empresa
-        $db_entities = $em->getRepository($this->entity)->findAll();
+        switch ($chave){
+            case 'user':
+                $db_entities = $em->getRepository('Register\Entity\User')->findAll();
+                break;
+        }
         break;
     default:
         echo 'CONFIGURE O FILTRO AUTOCOMPLETE PARA ESSE CONTROLLER';
