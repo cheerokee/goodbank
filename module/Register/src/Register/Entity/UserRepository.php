@@ -19,8 +19,8 @@ class UserRepository extends EntityRepository
 
         $where = "1=1";
 
-        if(isset($data['user_id']) && $data['user_id'] != ''){
-            $where .= " AND x.id = " . $data['user_id'];
+        if(isset($data['user_user_id']) && $data['user_user_id'] != ''){
+            $where .= " AND x.id = " . $data['user_user_id'];
         }
 
         if(isset($data['user_email']) && $data['user_email'] != ''){

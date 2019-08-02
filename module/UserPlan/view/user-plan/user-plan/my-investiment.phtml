@@ -13,6 +13,11 @@
         </li>
     </ul>
 </div>
+<?php
+$url_sponsor = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'];
+$url_sponsor .= $this->url('user-register');
+$url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
+?>
 <div ng-app="panelInvestmentView" ng-controller="InvestimentViewController" class="col g-ml-0--lg g-pb-65--md">
     <div class="g-pa-20">
         <div class="row">
@@ -20,107 +25,316 @@
                 <div class="g-pos-rel h-100 g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-30--md">
                     <header>
                         <h2>
-                            <i class=""></i>&nbsp;Meus Investimentos
+                            Meus Investimentos
                         </h2>
                         <p>Gerencie seus investimentos</p>
                     </header>
                     <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-mt-25--md g-mb-30--md">
                     <div class="row g-mx-minus-10 g-mb-60">
-                        <div ng-repeat="user_plan in user_plans" class="col-md-6 col-lg-4 g-mb-30">
-                            <div class="card h-100 g-brd-gray-light-v7 rounded">
-                                <header class="card-header g-bg-transparent g-brd-bottom-none g-pa-20 g-pa-30--sm">
-                                    <div class="media g-mb-15">
-                                        <div class="d-flex align-self-center">
-                                            Plano {{ user_plan._embedded.plan.name }}
-                                        </div>
-
-                                        <div class="media-body d-flex justify-content-end">
-                                            <div class="g-pos-rel g-z-index-2">
-                                                <a id="dropDown1Invoker"
-                                                   class="u-link-v5 g-line-height-0 g-font-size-24 g-color-gray-light-v6 g-color-secondary--hover"
-                                                   href="#"
-                                                   aria-controls="dropDown1"
-                                                   aria-haspopup="true"
-                                                   aria-expanded="false"
-                                                   data-dropdown-event="click"
-                                                   data-dropdown-target="#dropDown{{ user_plan.id }}"
-                                                   data-dropdown-type="jquery-slide">
-                                                    <i class="hs-admin-more-alt g-ml-20"></i>
-                                                </a>
-                                                <div id="dropDown{{ user_plan.id }}"
-                                                     class="u-shadow-v31 g-pos-abs g-right-0 g-z-index-2 g-bg-white u-dropdown--css-animation u-dropdown--hidden u-dropdown--reverse-y u-dropdown--jquery-slide"
-                                                     aria-labelledby="dropDown1Invoker"
-                                                     style="display: none;">
-                                                    <ul class="list-unstyled g-nowrap mb-0">
-                                                        <li>
-                                                            <a ng-click="viewExtract(user_plan.id)"
-                                                               data-toggle="modal"
-                                                               data-target="#modal_extract"
-                                                               class="d-flex align-items-center u-link-v5 g-bg-gray-light-v8--hover g-font-size-12 g-font-size-default--md g-color-gray-dark-v6 g-px-25 g-py-14"
-                                                               href="#">
-                                                                <i class="hs-admin-layout-list-thumb-alt g-font-size-18 g-color-gray-light-v6 g-mr-10 g-mr-15--md"></i>
-                                                                Visualizar Extrato
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a ng-click="viewCashOut(user_plan)"
-                                                               class="d-flex align-items-center u-link-v5 g-bg-gray-light-v8--hover g-font-size-12 g-font-size-default--md g-color-gray-dark-v6 g-px-25 g-py-14"
-                                                               href="#">
-                                                                <i class="hs-admin-money g-font-size-18 g-color-gray-light-v6 g-mr-10 g-mr-15--md"></i>
-                                                                Solicitar Saque
-                                                            </a>
-                                                        </li>
-                                                    </ul>
+                        <div class="col-md-6">
+                            <h3 class="mb-4">
+                                Meus Aportes
+                            </h3>
+                            <div class="row">
+                                <div ng-repeat="user_plan in user_plans" class="col-md-12 g-mb-30">
+                                    <div class="card h-100 g-brd-gray-light-v7 rounded">
+                                        <header class="card-header g-bg-transparent g-brd-bottom-none g-pa-10 g-pa-10--sm">
+                                            <div class="media g-mb-15">
+                                                <div class="d-flex align-self-center pr-3">
+                                                    <strong>
+                                                        Plano {{ user_plan._embedded.plan.name }}
+                                                    </strong>
                                                 </div>
+                                                <span class="{{ getStatusColor(user_plan.status) }} u-tags-v1 text-center g-brd-around  g-color-white g-rounded-50 g-py-4 g-px-15">
+                                                    {{ (cycleFuture(user_plan._embedded.first_cycle))?"Início em " + getMonth(user_plan._embedded.first_cycle.month) :getStatus(user_plan.status) }}
+                                                </span>
+
+                                                <div class="media-body d-flex justify-content-end">
+                                                    <div class="g-pos-rel g-z-index-2">
+                                                        <a id="dropDown1Invoker"
+                                                           class="u-link-v5 g-line-height-0 g-font-size-24 g-color-gray-light-v6 g-color-secondary--hover"
+                                                           href="#"
+                                                           aria-controls="dropDown1"
+                                                           aria-haspopup="true"
+                                                           aria-expanded="false"
+                                                           data-dropdown-event="click"
+                                                           data-dropdown-target="#dropDown{{ user_plan.id }}"
+                                                           data-dropdown-type="jquery-slide">
+                                                            <i class="hs-admin-more-alt g-ml-20"></i>
+                                                        </a>
+                                                        <div id="dropDown{{ user_plan.id }}"
+                                                             class="u-shadow-v31 g-pos-abs g-right-0 g-z-index-2 g-bg-white u-dropdown--css-animation u-dropdown--hidden u-dropdown--reverse-y u-dropdown--jquery-slide"
+                                                             aria-labelledby="dropDown1Invoker"
+                                                             style="display: none;">
+                                                            <ul class="list-unstyled g-nowrap mb-0">
+                                                                <li>
+                                                                    <a ng-click="viewExtract(user_plan.id)"
+                                                                       data-toggle="modal"
+                                                                       data-target="#modal_extract"
+                                                                       class="d-flex align-items-center u-link-v5 g-bg-gray-light-v8--hover g-font-size-12 g-font-size-default--md g-color-gray-dark-v6 g-px-25 g-py-14"
+                                                                       href="#">
+                                                                        <i class="hs-admin-layout-list-thumb-alt g-font-size-18 g-color-gray-light-v6 g-mr-10 g-mr-15--md"></i>
+                                                                        Visualizar Extrato
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a ng-click="viewCashOut(user_plan)"
+                                                                       class="d-flex align-items-center u-link-v5 g-bg-gray-light-v8--hover g-font-size-12 g-font-size-default--md g-color-gray-dark-v6 g-px-25 g-py-14"
+                                                                       href="#">
+                                                                        <i class="hs-admin-money g-font-size-18 g-color-gray-light-v6 g-mr-10 g-mr-15--md"></i>
+                                                                        Solicitar Saque
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h3 ng-class="{ 'g-color-green' : user_plan.balance > 0 }" class="g-font-weight-300 g-font-size-40 g-color-black">
+                                                <strong>R$ {{ user_plan.balance  | currency:'':2:'pt-BR'}}</strong>
+                                            </h3>
+                                        </header>
+                                        <div class="card-block">
+                                            <h4 class="media g-font-weight-300 g-font-size-16 g-mb-10 g-mb-20--md">
+                                                <span class="d-flex align-self-center g-color-gray-dark-v6 g-font-weight-400">
+                                                    Dias para expirar o aporte
+                                                </span>
+                                                <span class="media-body align-self-center text-right g-font-size-18--md g-color-black">
+                                                    {{ getExpirationDays(user_plan.approved_date) }}
+                                                </span>
+                                            </h4>
+
+                                            <div class="progress g-height-6 g-rounded-3 g-mb-10 g-mb-15--md">
+                                                <div class="progress-bar g-bg-lightblue-v3 g-rounded-3" role="progressbar" style="width: {{ getPercentDays(user_plan.approved_date) }}%" aria-valuenow="{{ getPercentDays(user_plan.approved_date) }}" aria-valuemin="0" aria-valuemax="100"></div>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <h3 ng-class="{ 'g-color-green' : user_plan.balance > 0 }" class="g-font-weight-300 g-font-size-40 g-color-black g-mb-15">
-                                        <strong>R$ {{ user_plan.balance  | currency:'':2:'pt-BR'}}</strong>
-                                    </h3>
-                                    <span class="{{ getStatusColor(user_plan.status) }} u-tags-v1 text-center g-brd-around  g-color-white g-rounded-50 g-py-4 g-px-15">
-                                        {{ (cycleFuture(user_plan._embedded.first_cycle))?"Início em " + getMonth(user_plan._embedded.first_cycle.month) :getStatus(user_plan.status) }}
-                                    </span>
-                                    <br />
-
-                                </header>
-
-                                <hr class="d-flex g-brd-gray-light-v7 g-mx-20 g-mx-30--sm my-0">
-
-                                <div class="card-block g-pa-20">
-                                    <h4 class="media g-font-weight-300 g-font-size-16 g-mb-10 g-mb-20--md">
-                                        <span class="d-flex align-self-center g-color-gray-dark-v6 g-font-weight-400">
-                                            Dias para expirar o aporte
-                                        </span>
-                                        <span class="media-body align-self-center text-right g-font-size-18--md g-color-black">
-                                            {{ getExpirationDays(user_plan.approved_date) }}
-                                        </span>
-                                    </h4>
-
-                                    <div class="progress g-height-6 g-rounded-3 g-mb-10 g-mb-15--md">
-                                        <div class="progress-bar g-bg-lightblue-v3 g-rounded-3" role="progressbar" style="width: {{ getPercentDays(user_plan.approved_date) }}%" aria-valuenow="{{ getPercentDays(user_plan.approved_date) }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
                                 </div>
+                                <div ng-if="user_plans.length == 0" class="col-md-12 g-mb-30">
+                                    <h2 class="alert alert-danger text-center pt-4">
+                                        <i class="hs-admin-face-sad g-font-size-60"></i><br />Você não possui nenhum aporte, não perca oportunidade, faça seu primeiro investimento!<br />
+                                        <a class="btn btn-xl g-brd-around g-rounded-50 u-btn-gradient-v1 g-font-size-30 mt-5 mb-4"
+                                           href="<?=$this->url('panel-investiment')?>">
+                                            <i class="hs-admin-money"></i>&nbsp;Investir
+                                        </a>
+                                    </h2>
+                                </div>
+                                <?=$this->partial('partials/modal-extract');?>
+                                <?=$this->partial('partials/modal-cash_out');?>
+                                <?=$this->partial('partials/modal-select-account');?>
                             </div>
                         </div>
-                        <div ng-if="user_plans.length == 0">
-                            <h2 class="alert alert-danger text-center pt-4">
-                                <i class="hs-admin-face-sad g-font-size-60"></i><br />Você não possui nenhum aporte, não perca oportunidade, faça seu primeiro investimento!<br />
-                                <a class="btn btn-xl g-brd-around g-rounded-50 u-btn-gradient-v1 g-font-size-30 mt-5 mb-4"
-                                   href="<?=$this->url('panel-investiment')?>">
-                                    <i class="hs-admin-money"></i>&nbsp;Investir
-                                </a>
-                            </h2>
+                        <div class="col-md-6">
+                            <h3 class="mb-4">
+                                Aportes Comissionados
+                            </h3>
+                            <div class="row">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="5">
+                                                <h4>Total de Comissão: <strong class="text-success">R$ {{ total_comission | currency:'':2:'pt-BR' }}</strong></h4>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <th>
+                                                Usuário
+                                            </th>
+                                            <th>
+                                                Plano
+                                            </th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="comission in comissions">
+                                            <td>{{ comission._embedded.user.name }}</td>
+                                            <td>
+                                                {{ comission._embedded.plan.name }}<br />
+                                                R$ {{ comission._embedded.plan.price | currency:'':2:'pt-BR' }}<br />
+                                                Aprovado Em: {{ formatDate(comission.approved_date) }}
+
+                                            </td>
+
+                                            <td>
+                                                <button type="button"
+                                                        class="btn btn-primary"
+                                                        ng-click="loadComissionTransactions(comission)"
+                                                        data-toggle="modal"
+                                                        data-target="#modalHistoric">
+                                                    Ver Relatório
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr ng-if="comissions.length == 0">
+                                            <td colspan="5">
+                                                <p class="alert alert-warning">
+                                                    <i class="hs-admin-face-sad"></i>&nbsp;Você ainda não indicou ninguém, envie já o link de indicação para seus amigos
+                                                </p>
+                                                <div class="row">
+                                                    <div class="col-md-12 form-group">
+                                                        <div class="g-pos-rel">
+                                                            <button onclick="copyToClipboard();"
+                                                                    class="btn u-input-btn--v1 g-width-100 g-bg-primary g-rounded-right-20 g-color-white"
+                                                                    type="button">
+                                                                <i class="fa fa-copy  g-font-size-16"></i>&nbsp;Copiar
+                                                            </button>
+                                                            <input id="copyInput"
+                                                                   class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3 g-rounded-20 g-px-14 g-py-10"
+                                                                   type="text"
+                                                                   readonly="true"
+                                                                   placeholder=""
+                                                                   value="<?=$url_sponsor?>">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="5">
+                                                <nav class="d-flex ml-auto"
+                                                     aria-label="Page Navigation">
+                                                    <ul class="list-inline text-right mb-0">
+                                                        <li class="list-inline-item">
+                                                            <a id="datatablePagination7Next"
+                                                               class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                                                               href=""
+                                                               aria-label="Previous"
+                                                               ng-click="previous_comissions()">
+                                                        <span class="g-line-height-1 g-valign-middle" aria-hidden="true">
+                                                            <i class="hs-admin-angle-left"></i>
+                                                        </span>
+                                                                <span class="sr-only">Anterior</span>
+                                                            </a>
+                                                        </li>
+                                                        <li ng-repeat="i in comission_pages" class="list-inline-item g-hidden-sm-down">
+                                                            <a class="u-pagination-v1__item u-pagination-v1-2 g-bg-primary--active g-color-white--active g-brd-gray-light-v7 g-brd-primary--hover g-brd-primary--active g-rounded-4 g-py-8 g-px-15"
+                                                               href=""
+                                                               ng-class="{'active' : i == page_comission }"
+                                                               ng-click="page_comissions(i)"
+                                                               data-dt-page-to="{{ i }}">
+                                                                {{ i }}
+                                                            </a>
+                                                        </li>
+                                                        <li class="list-inline-item">
+                                                            <a id="datatablePagination7Next"
+                                                               class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                                                               href=""
+                                                               aria-label="Next"
+                                                               ng-click="next_comissions()">
+                                                        <span class="g-line-height-1 g-valign-middle" aria-hidden="true">
+                                                            <i class="hs-admin-angle-right"></i>
+                                                        </span>
+                                                                <span class="sr-only">Próximo</span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </nav>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
                         </div>
-                        <?=$this->partial('partials/modal-extract');?>
-                        <?=$this->partial('partials/modal-cash_out');?>
-                        <?=$this->partial('partials/modal-select-account');?>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <?=$this->partial('partials/modal-investiment');?>
+    <div class="modal fade" id="modalHistoric" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">
+                        Relatório de Rendimentos
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Aporte</th>
+                            <th>Ciclo</th>
+                            <th>Tipo</th>
+                            <th>Valor</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="transaction in comission_transactions">
+                            <td>
+                                {{ transaction._embedded.user_plan._embedded.plan.name }} - {{ transaction._embedded.user_plan._embedded.plan.price | currency:'':2:'pt-BR' }}
+                            </td>
+                            <td>
+                                {{ getMonthStr(transaction._embedded.cycle.month) }} de {{ transaction._embedded.cycle.year }}
+                            </td>
+                            <td>
+                                {{ transaction._embedded.category_transaction.name }}
+                            </td>
+                            <td>
+                                R$ {{ transaction.value | currency:'':2:'pt-BR' }}
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="4">
+                                <nav class="d-flex ml-auto"
+                                     aria-label="Page Navigation">
+                                    <ul class="list-inline text-right mb-0">
+                                        <li class="list-inline-item">
+                                            <a id="datatablePagination7Next"
+                                               class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                                               href=""
+                                               aria-label="Previous"
+                                               ng-click="previous_comission_transactions()">
+                                                        <span class="g-line-height-1 g-valign-middle" aria-hidden="true">
+                                                            <i class="hs-admin-angle-left"></i>
+                                                        </span>
+                                                <span class="sr-only">Anterior</span>
+                                            </a>
+                                        </li>
+                                        <li ng-repeat="i in comission_transaction_pages" class="list-inline-item g-hidden-sm-down">
+                                            <a class="u-pagination-v1__item u-pagination-v1-2 g-bg-primary--active g-color-white--active g-brd-gray-light-v7 g-brd-primary--hover g-brd-primary--active g-rounded-4 g-py-8 g-px-15"
+                                               href=""
+                                               ng-class="{'active' : i == page_comission_transaction }"
+                                               ng-click="page_comission_transactions(i)"
+                                               data-dt-page-to="{{ i }}">
+                                                {{ i }}
+                                            </a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <a id="datatablePagination7Next"
+                                               class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                                               href=""
+                                               aria-label="Next"
+                                               ng-click="next_comission_transactions()">
+                                                        <span class="g-line-height-1 g-valign-middle" aria-hidden="true">
+                                                            <i class="hs-admin-angle-right"></i>
+                                                        </span>
+                                                <span class="sr-only">Próximo</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="/assets/js/angular/panel-investiment.js" />

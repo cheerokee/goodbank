@@ -94,6 +94,17 @@ $rotas = array(
                 )
             )
         ),
+        'comission' => array(
+            'type' => 'Segment',
+            'options' => array(
+                'route'=>'/admin/comission',
+                'defaults' => array(
+                    '__NAMESPACE__' => 'UserPlan\Controller',
+                    'controller' => 'UserPlan',
+                    'action' => 'comission'
+                )
+            )
+        ),
         'send-cash-out' => array(
             'type' => 'Segment',
             'options' => array(

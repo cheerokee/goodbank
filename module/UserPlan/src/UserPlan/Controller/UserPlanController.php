@@ -483,6 +483,86 @@ class UserPlanController extends CrudController{
         }
     }
 
+    public function comissionAction() {
+
+        $em = $this->getEm();
+        $request = $this->getRequest();
+
+        if($request->isPost()) {
+            $data = $request->getPost()->toArray();
+
+            $comissions = array();
+
+            $db_patrocinador = $em->getRepository('Register\Entity\User')->findOneById($data['id_patrocinador']);
+
+            if(isset($data['id_indicado']) && $data['id_indicado'] != ''){
+                $db_user_plans = $em->getRepository('UserPlan\Entity\UserPlan')->findByUser($data['id_indicado']);
+
+                if(!empty($db_user_plans)){
+                    $count = 0;
+                    foreach($db_user_plans as $db_user_plan)
+                    {
+                        $comissions[$count] = array(
+                            'user_plan' => $db_user_plan->getId(),
+                            'value' => 0
+                        );
+
+                        $db_transactions = $em->getRepository('Transaction\Entity\Transaction')->findBy(array(
+                            'user' => $db_patrocinador->getId(),
+                            'user_plan' => $db_user_plan->getId()
+                        ));
+
+                        if(!empty($db_transactions)){
+                            foreach($db_transactions as $db_transaction)
+                            {
+                                $db_transaction->getValue();
+
+                                $comissions[$count]['value'] +=  $db_transaction->getValue();
+                            }
+                        }
+                        $count++;
+                    }
+                }
+            }else{
+                $db_indicados = $em->getRepository('Register\Entity\User')->findBySponsor($db_patrocinador);
+                if(!empty($db_indicados)){
+                    $count = 0;
+                    foreach( $db_indicados as $db_indicado){
+                        $db_user_plans = $em->getRepository('UserPlan\Entity\UserPlan')->findByUser($db_indicado);
+
+                        if(!empty($db_user_plans)){
+                            foreach($db_user_plans as $db_user_plan)
+                            {
+                                $comissions[$count] = array(
+                                    'user_plan' => $db_user_plan->getId(),
+                                    'value' => 0
+                                );
+
+                                $db_transactions = $em->getRepository('Transaction\Entity\Transaction')->findBy(array(
+                                    'user' => $db_patrocinador->getId(),
+                                    'user_plan' => $db_user_plan->getId()
+                                ));
+
+                                if(!empty($db_transactions)){
+                                    foreach($db_transactions as $db_transaction)
+                                    {
+                                        $db_transaction->getValue();
+
+                                        $comissions[$count]['value'] +=  $db_transaction->getValue();
+                                    }
+                                }
+                                $count++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            echo json_encode($comissions);
+            die;
+        }
+    }
+
     public function sendCashOutAction(){
         $em = $this->getEm();
         $request = $this->getRequest();
@@ -832,6 +912,7 @@ class UserPlanController extends CrudController{
                 $em->persist($db_cycle);
                 $em->flush();
             }
+
         }else{
             /** Buscar um ciclo ativo, se não existir, criar **/
             $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneByStatus(1);
@@ -932,6 +1013,7 @@ class UserPlanController extends CrudController{
         if(!empty($db_user_plans)){
             $db_user = null;
             $percent = 0;
+
             foreach ($db_user_plans as $db_user_plan)
             {
                 /** Verificar se o primeiro ciclo do aporte é igual ou maior que o aporte ativo **/
@@ -1039,7 +1121,6 @@ class UserPlanController extends CrudController{
                     $db_transaction->setCategoryTransaction($db_category_transaction);
                     $db_transaction->setType(0);
                 }
-
                 $value_transaction = $db_user_plan->getPlan()->getPrice() * ($percent / 100);
                 $value_transaction_sponsor = $db_user_plan->getPlan()->getPrice() * ($percent_sponsor / 100);
 
@@ -1151,6 +1232,8 @@ class UserPlanController extends CrudController{
             $date_tmp = substr($data['approved_date'], 0, strpos($data['approved_date'], '('));
             $date_tmp = date('Y-m-d h:i:s', strtotime($date_tmp));
             $approved_date = new \DateTime($date_tmp);
+
+
 
             $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneBy(array(
                 'month' => $approved_date->format('m') * 1,

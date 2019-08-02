@@ -84,10 +84,9 @@
                                 </th>
                                 <th>
                                     <div class="d-flex align-self-center">
-                                        Aportes
+                                        Ações
                                     </div>
                                 </th>
-                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -103,14 +102,11 @@
                                     <td >
                                         {{ user.email }}
                                     </td>
-                                    <td >
+                                    <td class="d-flex justify-content-center">
                                         <span ng-if="user.active" class="u-tags-v1 text-center g-width-110 g-brd-around g-brd-teal-v2 g-bg-teal-v2 g-font-weight-400 g-color-white g-rounded-50 g-py-4 g-px-15">Ativo</span>
                                         <span ng-if="!user.active" class="u-tags-v1 text-center g-width-110 g-brd-around g-brd-primary g-bg-primary g-font-weight-400 g-color-white g-rounded-50 g-py-4 g-px-15">Inativo</span>
                                     </td>
-                                    <td >
-                                        {{ (user.totAportes > 0)? user.totAportes : 0 }}
-                                    </td>
-                                    <td class="text-right">
+                                    <td class="text-center">
                                         <div class="g-pos-rel g-top-3 d-inline-block">
                                             <a id="dropDown{{user.id}}" class="u-link-v5 g-line-height-0 g-font-size-24 g-color-gray-light-v6 g-color-secondary--hover"
                                                href="#"
@@ -194,7 +190,7 @@
         </div>
     </div>
     <div class="modal fade" id="modalAportes" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLongTitle">
@@ -205,7 +201,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <h3 class="text-center">
+                    <h3 class="text-left">
                         <strong>{{ user.name }}</strong>
                     </h3>
 
@@ -229,11 +225,6 @@
                            data-dt-details-invoker=".js-details-show">
                         <thead>
                         <tr>
-                            <th class="g-first-child">
-                                <div class="d-flex align-self-center">
-                                    Código
-                                </div>
-                            </th>
                             <th>
                                 <div class="d-flex align-self-center">
                                     Plano
@@ -241,12 +232,32 @@
                             </th>
                             <th>
                                 <div class="d-flex align-self-center">
+                                    Data de Aprovação
+                                </div>
+                            </th>
+                            <th>
+                                <div class="d-flex align-self-center">
                                     Valor
+                                </div>
+                            </th>
+<!--                            <th>-->
+<!--                                <div class="d-flex align-self-center">-->
+<!--                                    Rendimento-->
+<!--                                </div>-->
+<!--                            </th>-->
+                            <th>
+                                <div class="d-flex align-self-center">
+                                    Total Ganho
                                 </div>
                             </th>
                             <th>
                                 <div class="d-flex align-self-center">
                                     Status
+                                </div>
+                            </th>
+                            <th>
+                                <div class="d-flex align-self-center">
+                                    Ações
                                 </div>
                             </th>
                         </tr>
@@ -255,23 +266,129 @@
                         <tr class="g-parent"
                             ng-repeat="user_plan in user_plans"
                             data-details='<div class="media align-items-center"><div class="d-flex"><span class="u-tags-v1 text-center g-width-130 g-brd-around g-brd-teal-v2 g-bg-teal-v2 g-color-white g-rounded-50 g-py-4 g-px-15">Online</span></div><span class="d-flex align-items-center g-color-gray-light-v6 g-ml-40"><i class="hs-admin-bell g-font-size-18"></i><span class="g-hidden-sm-down g-color-gray-dark-v6 g-ml-8">Activity</span></span><div class="media-body text-left g-ml-40">Uploaded Design to Unify Project</div></div>'>
-                            <td>
-                                {{ user_plan.id }}
-                            </td>
                             <td >
                                 {{ user_plan._embedded.plan.name }}
                             </td>
                             <td >
+                                {{ formatDate(user_plan.approved_date) }}
+                            </td>
+                            <td >
                                 R$ {{ user_plan._embedded.plan.price | currency:'':2:'pt-BR' }}
+                            </td>
+<!--                            <td >-->
+<!--                                R$ {{ user_plan.balance | currency:'':2:'pt-BR' }}-->
+<!--                            </td>-->
+                            <td >
+                                R$ {{ (user_plan.comission)?user_plan.comission:0 | currency:'':2:'pt-BR' }}
                             </td>
                             <td >
                                 <span ng-if="user_plan.status == 1" class="u-tags-v1 text-center g-width-110 g-brd-around g-brd-teal-v2 g-bg-teal-v2 g-font-weight-400 g-color-white g-rounded-50 g-py-4 g-px-15">Ativo</span>
                                 <span ng-if="user_plan.status != 1"  class="u-tags-v1 text-center g-width-110 g-brd-around g-brd-primary g-bg-primary g-font-weight-400 g-color-white g-rounded-50 g-py-4 g-px-15">Inativo</span>
                             </td>
+                            <td>
+                                <button type="button"
+                                        class="btn btn-primary"
+                                        ng-click="loadTransactions(user_plan)"
+                                        data-toggle="modal"
+                                        data-target="#modalHistoric">
+                                    Ver Relatório
+                                </button>
+                            </td>
                         </tr>
                         </tbody>
                         <tfoot>
 
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalHistoric" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">
+                        Relatório de Rendimentos
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Aporte</th>
+                                <th>Ciclo</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="transaction in transactions">
+                                <td>
+                                    {{ transaction._embedded.user_plan._embedded.plan.name }} - {{ transaction._embedded.user_plan._embedded.plan.price | currency:'':2:'pt-BR' }}
+                                </td>
+                                <td>
+                                    {{ getMonthStr(transaction._embedded.cycle.month) }} de {{ transaction._embedded.cycle.year }}
+                                </td>
+                                <td>
+                                    {{ transaction._embedded.category_transaction.name }}
+                                </td>
+                                <td>
+                                    {{ transaction.value | currency:'':2:'pt-BR' }}
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="4">
+                                <nav class="d-flex ml-auto"
+                                     aria-label="Page Navigation">
+                                    <ul class="list-inline text-right mb-0">
+                                        <li class="list-inline-item">
+                                            <a id="datatablePagination7Next"
+                                               class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                                               href=""
+                                               aria-label="Previous"
+                                               ng-click="previous_transactions()">
+                                                        <span class="g-line-height-1 g-valign-middle" aria-hidden="true">
+                                                            <i class="hs-admin-angle-left"></i>
+                                                        </span>
+                                                <span class="sr-only">Anterior</span>
+                                            </a>
+                                        </li>
+                                        <li ng-repeat="i in transaction_pages" class="list-inline-item g-hidden-sm-down">
+                                            <a class="u-pagination-v1__item u-pagination-v1-2 g-bg-primary--active g-color-white--active g-brd-gray-light-v7 g-brd-primary--hover g-brd-primary--active g-rounded-4 g-py-8 g-px-15"
+                                               href=""
+                                               ng-class="{'active' : i == page_transaction }"
+                                               ng-click="page_transactions(i)"
+                                               data-dt-page-to="{{ i }}">
+                                                {{ i }}
+                                            </a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <a id="datatablePagination7Next"
+                                               class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                                               href=""
+                                               aria-label="Next"
+                                               ng-click="next_transactions()">
+                                                        <span class="g-line-height-1 g-valign-middle" aria-hidden="true">
+                                                            <i class="hs-admin-angle-right"></i>
+                                                        </span>
+                                                <span class="sr-only">Próximo</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </td>
+                        </tr>
                         </tfoot>
                     </table>
                 </div>

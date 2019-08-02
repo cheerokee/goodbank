@@ -90,8 +90,8 @@ class UserController extends CrudController
                 )
             ),
             'filters' => array(
-                'name' => array(
-                    'label'     => 'Nome',
+                'user' => array(
+                    'label'     => 'Usuário',
                     'type'      => 'autocomplete',
                     'column'    => 'col-md-12'
                 ),

@@ -31,10 +31,24 @@ angular.module("panelInvestmentView", [])
     $scope.accounts = [];
     $scope.banks = [];
 
+    $scope.comissions = [];
+    $scope.total_comission = 0;
+    $scope.comission_links = {};
+    $scope.page_comission = 1;
+    $scope.comission_tot_pages = 0;
+    $scope.comission_pages = [];
+
+    $scope.comission = {};
+    $scope.comission_transactions = [];
+    $scope.comission_transaction_links = {};
+    $scope.page_comission_transaction = 1;
+    $scope.comission_transaction_tot_pages = 0;
+    $scope.comission_transaction_pages = [];
+
     $scope.receive_method = 0;
 
     /** Dias disponíveis para solicitar saque **/
-    $scope.canDays = [29,30,31,1,23];
+    $scope.canDays = [29,30,31,1];
 
     $scope.loadUser = function() {
         $http({
@@ -164,6 +178,162 @@ angular.module("panelInvestmentView", [])
         });
     };
     $scope.loadUserPlans();
+
+    $scope.loadComissions = function(url = '') {
+        if(url == ''){
+            url = "/api/user-plan";
+        }
+
+        $.ajax({
+            url: url,
+            type: "GET",
+            data: {
+                'filter'    :   [
+                    {'type' : 'innerjoin', 'field' : 'user', 'alias' : 'u'},
+                    {
+                        'type' : 'andx',
+                        'conditions' : [
+                            {'type' : 'eq', 'alias' : 'u', 'field' : 'sponsor', 'value' : $scope.user_id},
+                            {'field' :'status', 'type':'eq', 'value' : 1 }
+                        ],
+                        'where'  :  'and'
+                    }
+                ]
+            },
+            dataType: "json",
+            success: function (response) {
+                $scope.comission_pages = $scope.numberArray(response.page_count);
+                $scope.comission_tot_pages = response.page_count;
+
+                $scope.comission_links = response._links;
+
+                $scope.comissions = response._embedded.user_plan;
+
+                if(response.page_count > 0){
+                    for(i in $scope.comissions){
+                        let comission = $scope.comissions[i];
+                        $.ajax({
+                            url: "/admin/comission",
+                            type: "POST",
+                            dataType: "json",
+                            data: {id_patrocinador : $scope.user_id, id_indicado: comission._embedded.user.id},
+                            success: function (response) {
+                                for(index in $scope.comissions){
+                                    let user_plan = $scope.comissions[index];
+                                    $timeout(function () {
+                                        var i = response.findIndex(x => x.user_plan === user_plan.id);
+                                        $scope.comissions[index].comission = response[i].value;
+
+                                    },300);
+                                }
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+
+                            }
+                        });
+                    }
+                }
+
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                errorNotify('Erro ao carregar os aportes');
+            }
+        });
+    };
+    $scope.loadComissions();
+
+    $scope.loadTotalComission = function() {
+        $.ajax({
+            url: "/admin/comission",
+            type: "POST",
+            dataType: "json",
+            data: {id_patrocinador : $scope.user_id},
+            success: function (response) {
+                for(i in response){
+                    $scope.total_comission += response[i].value;
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+
+            }
+        });
+    };
+    $scope.loadTotalComission();
+
+    $scope.loadComissionTransactions = function(user_plan,url = '') {
+        $scope.comission = user_plan;
+        if(url == ''){
+            url = "/api/transaction";
+        }
+
+        $.ajax({
+            url: url,
+            type: "GET",
+            data: {
+                'filter'    :   [
+                    {'type' : 'innerjoin', 'field' : 'user_plan', 'alias' : 'up'},
+                    {
+                        'type' : 'andx',
+                        'conditions' : [
+                            {'type' : 'eq', 'alias' : 'up', 'field' : 'id', 'value' : user_plan.id},
+                            {'field' :'user', 'type':'eq', 'value' : $scope.user_id }
+                        ],
+                        'where'  :  'and'
+                    }
+
+                ],
+                'order-by' : [
+                    {
+                        'type':'field',
+                        'field':'date',
+                        'direction': 'desc',
+                    }
+                ]
+            },
+            dataType: "json",
+            success: function (response) {
+                $timeout(function(){
+                    $scope.comission_transaction_pages = $scope.numberArray(response.page_count);
+                    $scope.comission_transaction_tot_pages = response.page_count;
+                    $scope.comission_transaction_links = response._links;
+                    $scope.comission_transactions = response._embedded.transaction;
+                },300);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                errorNotify('Erro ao carregar os aportes');
+            }
+        });
+    };
+
+    $scope.previous_comission_transactions = function() {
+        $scope.loadComissionTransactions($scope.comission,$scope.comission_transaction_links.prev.href);
+        $scope.page_comission_transaction--;
+    };
+
+    $scope.next_comission_transactions = function() {
+        $scope.loadComissionTransactions($scope.comission,$scope.comission_transaction_links.next.href);
+        $scope.page_comission_transaction++;
+    };
+
+    $scope.page_comission_transactions = function(pagination) {
+        $scope.loadComissionTransactions($scope.comission,'/api/transaction?page=' + pagination);
+        $scope.page_comission_transaction = pagination;
+    };
+
+    $scope.next_comissions = function() {
+        $scope.loadComissions($scope.comission_links.next.href);
+        $scope.page_comission++;
+    };
+
+    $scope.previous_comissions = function() {
+        $scope.loadComissions($scope.comission_links.prev.href);
+        $scope.page_comission--;
+    };
+
+    $scope.page_comissions = function(pagination) {
+        $scope.loadComissions('/api/user-plan?page=' + pagination);
+        $scope.page_comission = pagination;
+    };
 
     $scope.loadTransactions = function(user_plan_id) {
         $.ajax({
@@ -649,6 +819,16 @@ angular.module("panelInvestmentView", [])
         return false;
     }
 
+    $scope.numberArray = function(number){
+        var arr = [];
+
+        for(var i = 1; i <= number; i++){
+            arr.push(i);
+        }
+
+        return arr
+    };
+
     $('#modal_cash_out').on('hidden.bs.modal', function (e) {
         $scope.renew = false;
         $scope.cash_out = false;
@@ -666,5 +846,50 @@ angular.module("panelInvestmentView", [])
             $('.js-select').selectpicker();
         },2000);
     });
+
+    $scope.getMonthStr = function(month) {
+        month_str = "";
+
+        switch (month) {
+            case 1:
+                month_str = "Janeiro";
+                break;
+            case 2:
+                month_str = "Fevereiro";
+                break;
+            case 3:
+                month_str = "Março";
+                break;
+            case 4:
+                month_str = "Abril";
+                break;
+            case 5:
+                month_str = "Maio";
+                break;
+            case 6:
+                month_str = "Junho";
+                break;
+            case 7:
+                month_str = "Julho";
+                break;
+            case 8:
+                month_str = "Agosto";
+                break;
+            case 9:
+                month_str = "Setembro";
+                break;
+            case 10:
+                month_str = "Outubro";
+                break;
+            case 11:
+                month_str = "Novembro";
+                break;
+            case 12:
+                month_str = "Dezembro";
+                break;
+        }
+
+        return month_str;
+    };
 
 }]);
