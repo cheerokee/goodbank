@@ -266,6 +266,17 @@ $rotas = array(
                 )
             )
         ),
+        'attr-role' => array(
+            'type' => 'Literal',
+            'options' => array(
+                'route' => '/attr-role',
+                'defaults' => array(
+                    '__NAMESPACE__' => 'Register\Controller',
+                    'controller' => 'User',
+                    'action' => 'attr-role',
+                )
+            )
+        ),
     )
 );
 

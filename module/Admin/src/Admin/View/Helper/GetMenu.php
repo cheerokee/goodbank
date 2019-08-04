@@ -94,22 +94,10 @@ class GetMenu extends AbstractHelper implements ServiceLocatorAwareInterface{
                 'active'    => true,
                 'icon' => 'hs-admin-user',
                 'itens'     =>  array(
-                    'user' => array(
-                        'icon' => 'hs-admin-user',
-                        'titulo' => 'Usuários',
-                        'rota' => '/admin/user',
-                        'authorize' => false,
-                    ),
                     'administrator' => array(
                         'icon' => 'hs-admin-user',
                         'titulo' => 'Administradores',
                         'rota' => '/admin/administrator',
-                        'authorize' => false,
-                    ),
-                    'employee' => array(
-                        'icon' => 'hs-admin-user',
-                        'titulo' => 'Funcionários',
-                        'rota' => '/admin/employee',
                         'authorize' => false,
                     ),
                     'customer' => array(

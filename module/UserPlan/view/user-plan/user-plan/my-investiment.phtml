@@ -24,19 +24,47 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
             <div class="col-md-12">
                 <div class="g-pos-rel h-100 g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-30--md">
                     <header>
-                        <h2>
-                            Meus Investimentos
-                        </h2>
-                        <p>Gerencie seus investimentos</p>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h2>
+                                    Meus Investimentos
+                                </h2>
+                                <p>Gerencie seus investimentos</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h3 class="text-center text-uppercase">
+                                    Seu Saldo
+                                </h3>
+                                <h3 class="text-center">
+                                    <strong class="text-success">
+                                        R$ {{ total_balances + total_comission | currency:'':2:'pt-BR' }}
+                                    </strong>
+                                </h3>
+                            </div>
+                        </div>
                     </header>
                     <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-mt-25--md g-mb-30--md">
                     <div class="row g-mx-minus-10 g-mb-60">
                         <div class="col-md-6">
-                            <h3 class="mb-4">
-                                Meus Aportes
-                            </h3>
                             <div class="row">
-                                <div ng-repeat="user_plan in user_plans" class="col-md-12 g-mb-30">
+                                <div class="col-md-12">
+                                    <div class="card h-100 g-brd-gray-light-v7 rounded">
+                                        <div class="col-md-12 pt-3 pb-2">
+                                            <h3 class="mb-4 text-center text-uppercase">
+                                                Meus Aportes
+                                            </h3>
+                                            <h5>
+                                                Rendimento Total:
+                                            </h5>
+                                            <h3 class="text-center">
+                                                <strong class="text-success">
+                                                    R$ {{ total_balances | currency:'':2:'pt-BR' }}
+                                                </strong>
+                                            </h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-repeat="user_plan in user_plans" class="col-md-12">
                                     <div class="card h-100 g-brd-gray-light-v7 rounded">
                                         <header class="card-header g-bg-transparent g-brd-bottom-none g-pa-10 g-pa-10--sm">
                                             <div class="media g-mb-15">
@@ -126,15 +154,27 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <h3 class="mb-4">
-                                Aportes Comissionados
-                            </h3>
-                            <div class="row">
-                                <table class="table table-bordered">
-                                    <thead>
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <table class="table table-bordered">
+                                        <thead>
                                         <tr>
                                             <th colspan="5">
-                                                <h4>Total de Comissão: <strong class="text-success">R$ {{ total_comission | currency:'':2:'pt-BR' }}</strong></h4>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <h3 class="mb-4 text-center text-uppercase">
+                                                            Aportes Comissionados
+                                                        </h3>
+                                                        <h5>
+                                                            Total de Comissão + Bonus:
+                                                        </h5>
+                                                        <h3 class="text-center">
+                                                            <strong class="text-success">
+                                                                R$ {{ total_comission | currency:'':2:'pt-BR' }}
+                                                            </strong>
+                                                        </h3>
+                                                    </div>
+                                                </div>
                                             </th>
                                         </tr>
                                         <tr>
@@ -146,8 +186,8 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                             </th>
                                             <th>Ações</th>
                                         </tr>
-                                    </thead>
-                                    <tbody>
+                                        </thead>
+                                        <tbody>
                                         <tr ng-repeat="comission in comissions">
                                             <td>{{ comission._embedded.user.name }}</td>
                                             <td>
@@ -163,7 +203,7 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                                         ng-click="loadComissionTransactions(comission)"
                                                         data-toggle="modal"
                                                         data-target="#modalHistoric">
-                                                    Ver Relatório
+                                                    Relatório de Transações
                                                 </button>
                                             </td>
                                         </tr>
@@ -191,8 +231,8 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                                 </div>
                                             </td>
                                         </tr>
-                                    </tbody>
-                                    <tfoot>
+                                        </tbody>
+                                        <tfoot>
                                         <tr>
                                             <td colspan="5">
                                                 <nav class="d-flex ml-auto"
@@ -235,9 +275,11 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                                 </nav>
                                             </td>
                                         </tr>
-                                    </tfoot>
-                                </table>
+                                        </tfoot>
+                                    </table>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
