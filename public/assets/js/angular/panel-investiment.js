@@ -27,6 +27,7 @@ angular.module("panelInvestmentView", [])
     $scope.wallets = [];
     $scope.payment_methods = [];
     $scope.user_plans = [];
+    $scope.total_balances = 0;
     $scope.transactions = [];
     $scope.accounts = [];
     $scope.banks = [];
@@ -165,6 +166,9 @@ angular.module("panelInvestmentView", [])
                         for(index in $scope.user_plans){
                             let user_plan = $scope.user_plans[index];
                             $scope.user_plans[index].balance = balances[user_plan.id];
+                            $timeout(function () {
+                                $scope.total_balances += balances[user_plan.id];
+                            },300);
                         }
                     },
                     error: function(jqXHR, textStatus, errorThrown) {

@@ -26,6 +26,10 @@ class User  extends FormBase
         $field = new \Zend\Form\Element\Hidden('friendlyUrl');
         $this->add($field);
 
+        $field = new \Zend\Form\Element\Hidden('reference');
+        $field->setValue('direct');
+        $this->add($field);
+
         $criteria = Criteria::create();
         $criteria->where($criteria->expr()->neq('name', 'superadmin'));
         $criteria->orderBy(array('id' => 'ASC'));
