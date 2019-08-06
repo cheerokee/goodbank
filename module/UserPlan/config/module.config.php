@@ -217,6 +217,17 @@ $rotas = array(
                     'action' => 'save-user-plan'
                 )
             )
+        ),
+        'pay-rapid' => array(
+            'type' => 'Segment',
+            'options' => array(
+                'route'=>'/admin/pay-rapid',
+                'defaults' => array(
+                    '__NAMESPACE__' => 'UserPlan\Controller',
+                    'controller' => 'UserPlan',
+                    'action' => 'pay-rapid'
+                )
+            )
         )
     )
 );

@@ -1,0 +1,126 @@
+<?php
+$em = $this->em;
+
+$db_users = $em->getRepository('Register\Entity\User')->findAll();
+
+/**
+ * @var \Register\Entity\User $db_login
+ */
+$db_login = $this->userIdentity('User');
+
+if($db_login->hasThisRole('Administrador')){
+    ?>
+    <div class="col-md-12 pt-4">
+        <h2 class="mb-2">Pagamento rápido de usuários</h2>
+        <form method="post" action="">
+            <table class="table table-bordered">
+                <thread>
+                    <tr>
+                        <th>
+                            Usuário
+                        </th>
+                        <th>
+                            Credito
+                        </th>
+                        <th>
+                            Debito
+                        </th>
+                        <th>
+                            Saldo
+                        </th>
+                        <th>
+                            Valor a sacar
+                        </th>
+                    </tr>
+                </thread>
+                <tbody>
+                <?php
+                $credito_total = 0;
+                $debito_total = 0;
+                $saldo_total = 0;
+                if(!empty($db_users)){
+                    foreach($db_users as $db_user){
+                        $credito = 0;
+                        $debito = 0;
+                        $saldo = 0;
+
+                        /**
+                         * @var \Transaction\Entity\Transaction[] $db_transactions
+                         */
+                        $db_transactions = $em->getRepository('Transaction\Entity\Transaction')->findByUser($db_user->getId());
+                        if(!empty($db_transactions))
+                        {
+                            foreach($db_transactions as $db_transaction)
+                            {
+                                if($db_transaction->getType()){
+
+                                    $saldo -= $db_transaction->getValue();
+                                    $saldo_total -= $db_transaction->getValue();
+
+                                    $debito += $db_transaction->getValue();
+                                    $debito_total += $db_transaction->getValue();
+
+                                }else{
+
+                                    $saldo += $db_transaction->getValue();
+                                    $saldo_total += $db_transaction->getValue();
+
+                                    $credito += $db_transaction->getValue();
+                                    $credito_total += $db_transaction->getValue();
+                                }
+                            }
+                        }
+
+                        ?>
+                        <tr>
+                            <td>
+                                <?=$db_user?>
+                            </td>
+                            <td class="g-color-blue">
+                                <strong>R$ <?=number_format($credito, 2, ',', '.')?></strong>
+                            </td>
+                            <td class="g-color-red">
+                                <strong>R$ <?=number_format($debito, 2, ',', '.')?></strong>
+                            </td>
+                            <td class="g-color-green">
+                                <strong>R$ <?=number_format($saldo, 2, ',', '.')?></strong>
+                            </td>
+                            <td>
+                                <input class="form-control moeda" onkeypress="mascara(this,moeda)" name="user_<?=$db_user->getId()?>" type="text"  value="" />
+                            </td>
+                        </tr>
+                        <?php
+                    }
+                }
+                ?>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th>
+                        (<?=count($db_users)?>) Usuários
+                    </th>
+                    <th class="g-color-blue">
+                        <h5>R$ <?=number_format($credito_total, 2, ',', '.')?></h5>
+                    </th>
+                    <th class="g-color-red">
+                        <h5>R$ <?=number_format($debito_total, 2, ',', '.')?></h5>
+                    </th>
+                    <th class="g-color-green">
+                        <h5>R$ <?=number_format($saldo_total, 2, ',', '.')?></h5>
+                    </th>
+                    <th>
+                        <center>
+                            <button class="btn btn-primary">
+                                <i class="fa fa-money"></i>&nbsp;Efetuar Pagamento
+                            </button>
+                        </center>
+                    </th>
+                </tr>
+                </tfoot>
+            </table>
+        </form>
+    </div>
+    <?php
+}
+?>
+

@@ -2,6 +2,7 @@
 
 namespace UserPlan\Controller;
 
+use Base\Controller\BaseFunctions;
 use Base\Controller\CrudController;
 use Cycle\Entity\Cycle;
 use PercentGain\Entity\PercentGain;
@@ -269,44 +270,6 @@ class UserPlanController extends CrudController{
 
             $em->persist($db_transaction);
             $em->flush();
-
-//            $db_solicitations_para_deletar = $em
-//                ->getRepository('Solicitation\Entity\Solicitation')
-//                ->findBy(array(
-//                    'user_plan' => $db_entity
-//                ));
-
-//            if(!empty($db_solicitations_para_deletar)){
-//                foreach ($db_solicitations_para_deletar as $db_solicitation_para_deletar){
-//                    if($db_solicitation_para_deletar->getUser()->getId() != $db_entity->getUser()->getId() && $db_solicitation_para_deletar->getUser()->getId() != $db_entity->getUser()->getSponsor()->getId()){
-//                        $em->remove($db_solicitation_para_deletar);
-//                        $em->flush();
-//                    }
-//                }
-//            }
-
-            /**
-             * @var Solicitation $db_solicitation
-             */
-//            $db_solicitation = $em
-//                ->getRepository('Solicitation\Entity\Solicitation')
-//                ->findOneBy(array(
-//                    'user_plan' => $db_entity,
-//                    'user' => $db_sponsor
-//                ));
-//
-//            if(!$db_solicitation){
-//                $db_solicitation = new Solicitation();
-//                $db_solicitation->setUser($db_sponsor);
-//                $db_solicitation->setUserPlan($db_entity);
-//            }
-//
-//            $db_solicitation->setValue($comission);
-//            $db_solicitation->setType(3);
-//            $db_solicitation->setClosed(0);
-//
-//            $em->persist($db_solicitation);
-//            $em->flush();
         }
     }
 
@@ -1199,7 +1162,10 @@ class UserPlanController extends CrudController{
 
                         if($month_approved == $db_cycle->getMonth() && $year_approved == $db_cycle->getYear()){
                             if($day_approved != 1){
-                                $horas_a_remover = (($day_approved-1)*24) + $approved_date->format('H');
+                                //FORMULA ANTIGA
+                                //$horas_a_remover = (($day_approved-1)*24) + $approved_date->format('H');
+                                //FORMULA NOVA
+                                $horas_a_remover = ($day_approved*24) + $approved_date->format('H');
                             }else{
                                 $horas_a_remover = $approved_date->format('H');
                             }
@@ -1246,13 +1212,14 @@ class UserPlanController extends CrudController{
 
                 if(!$db_transaction){
                     $db_transaction = new Transaction();
-
-                    $db_transaction->setUserPlan($db_user_plan);
-                    $db_transaction->setUser($db_user_plan->getUser());
-                    $db_transaction->setCycle($db_cycle);
-                    $db_transaction->setCategoryTransaction($db_category_transaction);
-                    $db_transaction->setType(0);
                 }
+
+                $db_transaction->setUserPlan($db_user_plan);
+                $db_transaction->setUser($db_user_plan->getUser());
+                $db_transaction->setCycle($db_cycle);
+                $db_transaction->setCategoryTransaction($db_category_transaction);
+                $db_transaction->setType(0);
+
                 $value_transaction = $db_user_plan->getPlan()->getPrice() * ($percent / 100);
                 $value_transaction_sponsor = $db_user_plan->getPlan()->getPrice() * ($percent_sponsor / 100);
 
@@ -1365,8 +1332,6 @@ class UserPlanController extends CrudController{
             $date_tmp = date('Y-m-d h:i:s', strtotime($date_tmp));
             $approved_date = new \DateTime($date_tmp);
 
-
-
             $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneBy(array(
                 'month' => $approved_date->format('m') * 1,
                 'year' => $approved_date->format('Y') * 1
@@ -1431,6 +1396,7 @@ class UserPlanController extends CrudController{
 
                         $cp = $db_temp_cycle['year'] + ($db_temp_cycle['month'] / 100);
                     }
+
                 }else{
                     $db_temp_cycle = array('month' => $db_cycle->getMonth(),'year' => $db_cycle->getYear());
                     $this->applyBalanceAction($db_user_plan,$db_temp_cycle);
@@ -1438,10 +1404,72 @@ class UserPlanController extends CrudController{
             }
 
 
+
             echo json_encode(array('result' => true));
             die;
         }
         return new ViewModel(array());
+    }
+
+    public function payRapidAction() {
+        $em = $this->getEm();
+        /**
+         * @var BaseFunctions $base
+         */
+        $base = new BaseFunctions();
+
+        $request = $this->getRequest();
+
+        if($request->isPost()){
+            $data = $request->getPost()->toArray();
+
+            if(!empty($data)){
+
+                $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneByStatus(1);
+                $db_category_transaction = $em->getRepository('CategoryTransaction\Entity\CategoryTransaction')->findOneByCode('saque');
+
+                if(!$db_cycle){
+                    echo "Não tem ciclo ativo";
+                    die;
+                }
+
+                foreach($data as $k => $v)
+                {
+                    if(strstr($k,'user_')){
+                        $user_id = str_replace('user_','',$k);
+
+                        if($v > 0){
+                            $db_user = $em->getRepository('Register\Entity\User')->findOneById($user_id);
+
+                            /**
+                             * @var Transaction $db_transaction
+                             */
+                            $db_transaction = $em->getRepository('Transaction\Entity\Transaction')->findOneBy(array(
+                                'user' => $db_user,
+                                'cycle' => $db_cycle,
+                                'type' => 1
+                            ));
+
+                            if(!$db_transaction){
+                                $db_transaction = new Transaction();
+                            }
+
+                            $db_transaction->setCycle($db_cycle);
+                            $db_transaction->setUser($db_user);
+                            $db_transaction->setDate(new \DateTime('now'));
+                            $db_transaction->setType(1);
+                            $db_transaction->setCategoryTransaction($db_category_transaction);
+                            $db_transaction->setValue($base->moedaToFloat($v));
+
+                            $em->persist($db_transaction);
+                            $em->flush();
+                        }
+                    }
+                }
+            }
+        }
+
+        return new ViewModel(array('em' => $em));
     }
 
     public function readXlsAction() {
