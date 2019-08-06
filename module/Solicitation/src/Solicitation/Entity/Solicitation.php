@@ -50,11 +50,47 @@ class Solicitation
     /**
      * @var \UserPlan\Entity\UserPlan
      *
+     * @ORM\ManyToOne(targetEntity="Cycle\Entity\Cycle")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="cycle_id", referencedColumnName="id",
+     *      nullable=true,
+     *      onDelete="SET NULL")
+     * })
+     */
+    private $cycle;
+
+    /**
+     * @var \Wallet\Entity\Wallet
+     *
+     * @ORM\ManyToOne(targetEntity="Wallet\Entity\Wallet")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="cycle_id", referencedColumnName="id",
+     *      nullable=true,
+     *      onDelete="SET NULL")
+     * })
+     */
+    private $wallet;
+
+    /**
+     * @var \Account\Entity\Account
+     *
+     * @ORM\ManyToOne(targetEntity="Account\Entity\Account")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="cycle_id", referencedColumnName="id",
+     *      nullable=true,
+     *      onDelete="SET NULL")
+     * })
+     */
+    private $account;
+
+    /**
+     * @var \UserPlan\Entity\UserPlan
+     *
      * @ORM\ManyToOne(targetEntity="UserPlan\Entity\UserPlan")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="user_plan_id", referencedColumnName="id",
-     *      nullable=false,
-     *      onDelete="CASCADE")
+     *      nullable=true,
+     *      onDelete="SET NULL")
      * })
      */
     private $user_plan;
@@ -247,6 +283,38 @@ class Solicitation
     }
 
     /**
+     * @return \Wallet\Entity\Wallet
+     */
+    public function getWallet()
+    {
+        return $this->wallet;
+    }
+
+    /**
+     * @param \Wallet\Entity\Wallet $wallet
+     */
+    public function setWallet($wallet)
+    {
+        $this->wallet = $wallet;
+    }
+
+    /**
+     * @return \Account\Entity\Account
+     */
+    public function getAccount()
+    {
+        return $this->account;
+    }
+
+    /**
+     * @param \Account\Entity\Account $account
+     */
+    public function setAccount($account)
+    {
+        $this->account = $account;
+    }
+
+    /**
      * @return string
      */
     public function getClosed()
@@ -286,6 +354,22 @@ class Solicitation
     public function setReceiveMethod($receive_method)
     {
         $this->receive_method = $receive_method;
+    }
+
+    /**
+     * @return \UserPlan\Entity\UserPlan
+     */
+    public function getCycle()
+    {
+        return $this->cycle;
+    }
+
+    /**
+     * @param \UserPlan\Entity\UserPlan $cycle
+     */
+    public function setCycle($cycle)
+    {
+        $this->cycle = $cycle;
     }
 
     public function __toString()

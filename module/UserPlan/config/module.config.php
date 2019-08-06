@@ -116,6 +116,17 @@ $rotas = array(
                 )
             )
         ),
+        'send-rr' => array(
+            'type' => 'Segment',
+            'options' => array(
+                'route'=>'/admin/send-rr',
+                'defaults' => array(
+                    '__NAMESPACE__' => 'UserPlan\Controller',
+                    'controller' => 'UserPlan',
+                    'action' => 'send-rr'
+                )
+            )
+        ),
         'cash-out-panel' => array(
             'type' => 'Segment',
             'options' => array(

@@ -446,23 +446,33 @@ class UserPlanController extends CrudController{
         }
     }
 
+    /**
+     * Calcula o rendimento dos planos passado como parametro post
+     * O calculo é efetuado somando todas as transações relacionadas
+     * a aquele aporte - as transações de debito que é diluida entre todas transações de credito
+     * ou seja Ex. C - (D / [C + C + C + C + C]).
+     */
     public function balanceAction() {
-
         $em = $this->getEm();
         $request = $this->getRequest();
         $ids = [];
         if($request->isPost()) {
             $data = $request->getPost()->toArray();
-            if(!empty($data['ids'])){
-                foreach ($data['ids'] as $id){
-                    $ids[] = $id['id'];
-                }
+
+            if(!isset($data['ids']) && empty($data['ids']))
+            {
+                echo json_encode([]);
+                die;
             }
 
             /**
              * @var \UserPlan\Entity\UserPlan[] $db_user_plans
              * @var UserPlan $service
              */
+
+            foreach ($data['ids'] as $id){
+                $ids[] = $id['id'];
+            }
 
             $service = $this->getServiceLocator()->get("UserPlan/Service/UserPlan");
 
@@ -491,7 +501,7 @@ class UserPlanController extends CrudController{
         if($request->isPost()) {
             $data = $request->getPost()->toArray();
 
-            $comissions = array();
+            $extract = array();
 
             $db_patrocinador = $em->getRepository('Register\Entity\User')->findOneById($data['id_patrocinador']);
 
@@ -502,7 +512,7 @@ class UserPlanController extends CrudController{
                     $count = 0;
                     foreach($db_user_plans as $db_user_plan)
                     {
-                        $comissions[$count] = array(
+                        $extract['comissions'][$count] = array(
                             'user_plan' => $db_user_plan->getId(),
                             'value' => 0
                         );
@@ -517,7 +527,7 @@ class UserPlanController extends CrudController{
                             {
                                 $db_transaction->getValue();
 
-                                $comissions[$count]['value'] +=  $db_transaction->getValue();
+                                $extract['comissions'][$count]['value'] +=  $db_transaction->getValue();
                             }
                         }
                         $count++;
@@ -533,7 +543,7 @@ class UserPlanController extends CrudController{
                         if(!empty($db_user_plans)){
                             foreach($db_user_plans as $db_user_plan)
                             {
-                                $comissions[$count] = array(
+                                $extract['comissions'][$count] = array(
                                     'user_plan' => $db_user_plan->getId(),
                                     'value' => 0
                                 );
@@ -548,7 +558,7 @@ class UserPlanController extends CrudController{
                                     {
                                         $db_transaction->getValue();
 
-                                        $comissions[$count]['value'] +=  $db_transaction->getValue();
+                                        $extract['comissions'][$count]['value'] +=  $db_transaction->getValue();
                                     }
                                 }
                                 $count++;
@@ -558,12 +568,112 @@ class UserPlanController extends CrudController{
                 }
             }
 
-            echo json_encode($comissions);
+            /**
+             * @var UserPlan $service
+             */
+            $service = $this->getServiceLocator()->get("UserPlan/Service/UserPlan");
+
+            $tots = $service->getTots($db_patrocinador);
+
+            $tot_debito     = $tots['tot_debito'];
+            $tot_credito    = $tots['tot_credito'];
+
+            $debito = 0;
+            if(!empty($extract['comissions'])){
+                foreach($extract['comissions'] as $comission){
+                    $debito += $service->debitoDiluido($tot_debito,$tot_credito,$comission['value']);
+                }
+            }
+
+            $extract['debito'] = $debito;
+
+
+            echo json_encode($extract);
             die;
         }
     }
 
     public function sendCashOutAction(){
+        $em = $this->getEm();
+        $request = $this->getRequest();
+        if($request->isPost()) {
+            $data = $request->getPost()->toArray();
+
+            $value = $data['value'];
+
+            $receive_method = $data['receive_method'];
+
+            $account = $data['account'];
+            $wallet = $data['wallet'];
+
+            $user_id = $data['user_id'];
+            $db_user = $em->getRepository('Register\Entity\User')->findOneById($user_id);
+
+            $db_account = $em->getRepository('Account\Entity\Account')->findOneById($account);
+            $db_wallet = $em->getRepository('Wallet\Entity\Wallet')->findOneById($wallet);
+
+            $type = 0;
+
+            $db_cycle_active = $em->getRepository('Cycle\Entity\Cycle')->findOneByStatus(1);
+
+            if(!$db_cycle_active)
+            {
+                throw new \Exception('Não existe ciclo ativo');
+            }
+            /**
+             * @var Solicitation $db_solicitation
+             */
+            $db_solicitation = $em->getRepository('Solicitation\Entity\Solicitation')->findOneBy(array(
+                'type'      => $type,
+                'closed'    => 0,
+                'cycle'     => $db_cycle_active,
+                'user' => $db_user
+            ));
+
+            $msg = 'Solicitação efetuada com sucesso!';
+            if($db_solicitation){
+                $msg = 'Há uma solicitação ainda não atendida!';
+                $db_solicitation->setValue($value);
+                $db_solicitation->setReceiveMethod($receive_method);
+                $db_solicitation->setUser($db_user);
+                $db_solicitation->setWallet($db_wallet);
+
+                $em->persist($db_solicitation);
+                $em->flush();
+            }else{
+                $db_solicitation = new Solicitation();
+                $db_solicitation->setValue($value);
+                $db_solicitation->setType($type);
+                $db_solicitation->setUser($db_user);
+                $db_solicitation->setWallet($db_wallet);
+                $db_solicitation->setAccount($db_account);
+                $db_solicitation->setClosed(0);
+                $db_solicitation->setCycle($db_cycle_active);
+                $db_solicitation->setReceiveMethod($receive_method);
+
+                $em->persist($db_solicitation);
+                $em->flush();
+
+                /**
+                 * @var UserPlan $service
+                 */
+                $service = $this->getServiceLocator()->get("UserPlan/Service/UserPlan");
+                $rota = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$this->url()->fromRoute('cash-out-panel',array('id' => $db_solicitation->getId()));
+
+                $result = $service->sendWithdrawal($db_solicitation,$rota);
+
+                if(!$result['result']){
+                    echo json_encode(array('result' => false,'message' => 'Houve erro ao notificar o administrador, entre em contato conosco.'));
+                    die;
+                }
+            }
+
+            echo json_encode(array('result' => true,'message' => $msg));
+            die;
+        }
+    }
+
+    public function sendRrAction(){
         $em = $this->getEm();
         $request = $this->getRequest();
         if($request->isPost()) {
@@ -657,6 +767,9 @@ class UserPlanController extends CrudController{
     public function cashOutPanelAction() {
         $em = $this->getEm();
 
+        /**
+         * @var Solicitation $db_solicitation
+         */
         $db_solicitation_id = $this->params()->fromRoute('id',0);
         $db_solicitation = $em->getRepository('Solicitation\Entity\Solicitation')->findOneById($db_solicitation_id);
         $db_user = $db_solicitation->getUser();
@@ -666,27 +779,46 @@ class UserPlanController extends CrudController{
          */
         $db_user_plan = $db_solicitation->getUserPlan();
 
-        /** O usuário é diferente do dono do aporte **/
-        if($db_solicitation->getUserPlan()->getUser()->getId() != $db_user->getId()){
+        if($db_user_plan){
+            /** O usuário é diferente do dono do aporte **/
+            if($db_solicitation->getUserPlan()->getUser()->getId() != $db_user->getId()){
 
-            $db_account = $em->getRepository('Account\Entity\Account')->findOneBy(array(
-                'user' => $db_user
-            ),array(
-                'main' => 'DESC'
-            ));
+                $db_account = $em->getRepository('Account\Entity\Account')->findOneBy(array(
+                    'user' => $db_user
+                ),array(
+                    'main' => 'DESC'
+                ));
 
-            $db_wallet = $em->getRepository('Wallet\Entity\Wallet')->findOneBy(array(
-                'user' => $db_user
-            ));
+                $db_wallet = $em->getRepository('Wallet\Entity\Wallet')->findOneBy(array(
+                    'user' => $db_user
+                ));
+            }else{
+                $db_account = $db_user_plan->getAccount();
+                $db_wallet = $db_user_plan->getWallet();
+            }
         }else{
-            $db_account = $db_user_plan->getAccount();
-            $db_wallet = $db_user_plan->getWallet();
+
+            if($db_solicitation->getWallet()){
+                $db_wallet = $db_user_plan->getWallet();
+            }else{
+                $db_wallet = $em->getRepository('Wallet\Entity\Wallet')->findOneBy(array(
+                    'user' => $db_user
+                ));
+            }
+
+            if($db_solicitation->getAccount()){
+                $db_account = $db_user_plan->getAccount();
+            }else{
+                $db_account = $em->getRepository('Account\Entity\Account')->findOneBy(array(
+                    'user' => $db_user
+                ),array(
+                    'main' => 'DESC'
+                ));
+            }
+
         }
 
-        $db_cycles = $em->getRepository('Cycle\Entity\Cycle')->findBy(array(),array(
-            'year'  => 'DESC',
-            'month' => 'DESC'
-        ));
+        $db_cycles = $em->getRepository('Cycle\Entity\Cycle')->findByStatus(1);
 
         //$request = $this->getRequest();
         return new ViewModel(array(

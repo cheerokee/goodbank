@@ -64,10 +64,10 @@ class Solicitation extends \Solicitation\Entity\Solicitation implements \Doctrin
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'id', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'type', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'value', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'user_plan', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'user', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'closed', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'updated_at', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'created_at'];
+            return ['__isInitialized__', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'id', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'type', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'receive_method', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'value', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'cycle', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'wallet', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'account', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'user_plan', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'user', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'closed', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'updated_at', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'created_at'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'id', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'type', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'value', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'user_plan', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'user', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'closed', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'updated_at', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'created_at'];
+        return ['__isInitialized__', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'id', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'type', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'receive_method', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'value', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'cycle', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'wallet', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'account', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'user_plan', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'user', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'closed', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'updated_at', '' . "\0" . 'Solicitation\\Entity\\Solicitation' . "\0" . 'created_at'];
     }
 
     /**
@@ -367,6 +367,50 @@ class Solicitation extends \Solicitation\Entity\Solicitation implements \Doctrin
     /**
      * {@inheritDoc}
      */
+    public function getWallet()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getWallet', []);
+
+        return parent::getWallet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setWallet($wallet)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setWallet', [$wallet]);
+
+        return parent::setWallet($wallet);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getAccount()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getAccount', []);
+
+        return parent::getAccount();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setAccount($account)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setAccount', [$account]);
+
+        return parent::setAccount($account);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getClosed()
     {
 
@@ -395,6 +439,61 @@ class Solicitation extends \Solicitation\Entity\Solicitation implements \Doctrin
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setClosed', [$closed]);
 
         return parent::setClosed($closed);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getReceiveMethod()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getReceiveMethod', []);
+
+        return parent::getReceiveMethod();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getReceiveMethodStr()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getReceiveMethodStr', []);
+
+        return parent::getReceiveMethodStr();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setReceiveMethod($receive_method)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setReceiveMethod', [$receive_method]);
+
+        return parent::setReceiveMethod($receive_method);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getCycle()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCycle', []);
+
+        return parent::getCycle();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setCycle($cycle)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCycle', [$cycle]);
+
+        return parent::setCycle($cycle);
     }
 
     /**

@@ -70,7 +70,8 @@ class UserPlanRepository extends EntityRepository
         ))
             ->from($tabela,$alias)
             ->where($where)
-            ->orderBy('x.created_at','DESC');
+            ->orderBy('x.created_at','DESC')
+            ->addOrderBy('x.user','ASC');
 
         if(!empty($qb->getQuery()->getResult())){
             return $qb->getQuery()->getResult();

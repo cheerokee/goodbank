@@ -85,6 +85,88 @@ class Solicitation extends FormBase{
         ));
 
         $this->add(array(
+            'name' => 'wallet',
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',
+            'options' => array(
+                'disable_inarray_validator' => true,
+                'object_manager' => $objectManager,
+                'target_class' => 'Wallet\Entity\Wallet',
+                //'property' => 'name',
+                'display_empty_item' => true,
+                'empty_item_label' => 'Selecione...',
+                'is_method' => true,
+                'find_method' => array(
+                    'name' => 'findBy',
+                    'params' => array(
+                        'criteria' => array('status' => 1),
+                        'orderBy' => array('year' => 'DESC','month' => 'DESC')
+                    )
+                ),
+                'label' => 'Carteira: ',
+                'column-size' => 'sm-4',
+                'label_attributes' => array('class' => 'col-sm-2 input-sm')
+            ),
+            'attributes' => array(
+                'class' => 'form-control'
+            )
+        ));
+
+        $this->add(array(
+            'name' => 'account',
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',
+            'options' => array(
+                'disable_inarray_validator' => true,
+                'object_manager' => $objectManager,
+                'target_class' => 'Account\Entity\Account',
+                //'property' => 'name',
+                'display_empty_item' => true,
+                'empty_item_label' => 'Selecione...',
+                'is_method' => true,
+                'find_method' => array(
+                    'name' => 'findBy',
+                    'params' => array(
+                        'criteria' => array('status' => 1),
+                        'orderBy' => array('year' => 'DESC','month' => 'DESC')
+                    )
+                ),
+                'label' => 'Conta Bancária: ',
+                'column-size' => 'sm-4',
+                'label_attributes' => array('class' => 'col-sm-2 input-sm')
+            ),
+            'attributes' => array(
+                'class' => 'form-control'
+            )
+        ));
+
+        $this->add(array(
+            'name' => 'cycle',
+            'type' => 'DoctrineModule\Form\Element\ObjectSelect',
+            'options' => array(
+                'disable_inarray_validator' => true,
+                'object_manager' => $objectManager,
+                'target_class' => 'Cycle\Entity\Cycle',
+                //'property' => 'name',
+                'display_empty_item' => true,
+                'empty_item_label' => 'Selecione...',
+                'is_method' => true,
+                'find_method' => array(
+                    'name' => 'findBy',
+                    'params' => array(
+                        'criteria' => array('status' => 1),
+                        'orderBy' => array('year' => 'DESC','month' => 'DESC')
+                    )
+                ),
+                'label' => 'Ciclo: *',
+                'column-size' => 'sm-4',
+                'label_attributes' => array('class' => 'col-sm-2 input-sm')
+            ),
+            'attributes' => array(
+                'required' => 'required',
+                'class' => 'form-control'
+            )
+        ));
+
+        $this->add(array(
             'name' => 'user',
             'type' => 'DoctrineModule\Form\Element\ObjectSelect',
             'options' => array(
