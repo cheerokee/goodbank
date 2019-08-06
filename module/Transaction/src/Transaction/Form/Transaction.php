@@ -61,7 +61,6 @@ class Transaction extends FormBase{
             ),
             'attributes' => array(
                 'class' => 'form-control',
-                'required' => 'required',
                 'component' => 'autocomplete'
             )
         ));

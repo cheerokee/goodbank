@@ -73,10 +73,13 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                             <tbody>
                                                 <tr ng-class="{ 'g-color-red' : transaction.type,'g-color-green' : !transaction.type }"
                                                     ng-repeat="transaction in transactions">
-                                                    <th>{{ transaction._embedded.category_transaction.name }}</th>
                                                     <th>
-                                                        {{ formatDate(transaction.date) }}<br />
-                                                        ( {{ transaction._embedded.cycle.month }} / {{ transaction._embedded.cycle.year }} )
+                                                        {{ transaction._embedded.category_transaction.name }}
+                                                    </th>
+                                                    <th class="text-center">
+                                                        {{ formatDate(transaction.date) }}
+                                                        <hr class="m-0" />
+                                                        {{ getMonthStr(transaction._embedded.cycle.month) }}<br />{{ transaction._embedded.cycle.year }}
                                                     </th>
                                                     <th>{{ (transaction.type)?'Débito' : 'Crédito' }}</th>
                                                     <th>R$ {{ transaction.value | currency:'':2:'pt-BR' }}</th>

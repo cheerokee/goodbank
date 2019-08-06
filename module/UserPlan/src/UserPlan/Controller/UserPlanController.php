@@ -270,43 +270,43 @@ class UserPlanController extends CrudController{
             $em->persist($db_transaction);
             $em->flush();
 
-            $db_solicitations_para_deletar = $em
-                ->getRepository('Solicitation\Entity\Solicitation')
-                ->findBy(array(
-                    'user_plan' => $db_entity
-                ));
+//            $db_solicitations_para_deletar = $em
+//                ->getRepository('Solicitation\Entity\Solicitation')
+//                ->findBy(array(
+//                    'user_plan' => $db_entity
+//                ));
 
-            if(!empty($db_solicitations_para_deletar)){
-                foreach ($db_solicitations_para_deletar as $db_solicitation_para_deletar){
-                    if($db_solicitation_para_deletar->getUser()->getId() != $db_entity->getUser()->getId() && $db_solicitation_para_deletar->getUser()->getId() != $db_entity->getUser()->getSponsor()->getId()){
-                        $em->remove($db_solicitation_para_deletar);
-                        $em->flush();
-                    }
-                }
-            }
+//            if(!empty($db_solicitations_para_deletar)){
+//                foreach ($db_solicitations_para_deletar as $db_solicitation_para_deletar){
+//                    if($db_solicitation_para_deletar->getUser()->getId() != $db_entity->getUser()->getId() && $db_solicitation_para_deletar->getUser()->getId() != $db_entity->getUser()->getSponsor()->getId()){
+//                        $em->remove($db_solicitation_para_deletar);
+//                        $em->flush();
+//                    }
+//                }
+//            }
 
             /**
              * @var Solicitation $db_solicitation
              */
-            $db_solicitation = $em
-                ->getRepository('Solicitation\Entity\Solicitation')
-                ->findOneBy(array(
-                    'user_plan' => $db_entity,
-                    'user' => $db_sponsor
-                ));
-
-            if(!$db_solicitation){
-                $db_solicitation = new Solicitation();
-                $db_solicitation->setUser($db_sponsor);
-                $db_solicitation->setUserPlan($db_entity);
-            }
-
-            $db_solicitation->setValue($comission);
-            $db_solicitation->setType(3);
-            $db_solicitation->setClosed(0);
-
-            $em->persist($db_solicitation);
-            $em->flush();
+//            $db_solicitation = $em
+//                ->getRepository('Solicitation\Entity\Solicitation')
+//                ->findOneBy(array(
+//                    'user_plan' => $db_entity,
+//                    'user' => $db_sponsor
+//                ));
+//
+//            if(!$db_solicitation){
+//                $db_solicitation = new Solicitation();
+//                $db_solicitation->setUser($db_sponsor);
+//                $db_solicitation->setUserPlan($db_entity);
+//            }
+//
+//            $db_solicitation->setValue($comission);
+//            $db_solicitation->setType(3);
+//            $db_solicitation->setClosed(0);
+//
+//            $em->persist($db_solicitation);
+//            $em->flush();
         }
     }
 
