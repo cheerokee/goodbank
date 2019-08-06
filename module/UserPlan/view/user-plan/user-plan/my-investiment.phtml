@@ -64,7 +64,7 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                         <table class="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
-                                                    <th>Categoria</th>
+                                                    <th>Referência</th>
                                                     <th>Data</th>
                                                     <th>Tipo</th>
                                                     <th>Valor</th>
@@ -75,6 +75,9 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                                     ng-repeat="transaction in transactions">
                                                     <th>
                                                         {{ transaction._embedded.category_transaction.name }}
+                                                        <hr class="m-0" />
+                                                        {{ transaction._embedded.user_plan._embedded.user.name }}<br />
+                                                        {{ transaction._embedded.user_plan._embedded.plan.name }} {{ transaction._embedded.user_plan._embedded.plan.price | currency:'':2:'pt-BR'  }}
                                                     </th>
                                                     <th class="text-center">
                                                         {{ formatDate(transaction.date) }}
