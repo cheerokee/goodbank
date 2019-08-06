@@ -64,10 +64,10 @@ class Transaction extends \Transaction\Entity\Transaction implements \Doctrine\O
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'id', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'user', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'user_plan', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'cycle', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'category_transaction', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'type', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'value', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'date', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'updated_at', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'created_at'];
+            return ['__isInitialized__', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'id', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'user', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'user_plan', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'cycle', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'category_transaction', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'transaction_reference', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'type', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'value', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'date', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'updated_at', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'created_at'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'id', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'user', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'user_plan', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'cycle', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'category_transaction', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'type', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'value', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'date', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'updated_at', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'created_at'];
+        return ['__isInitialized__', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'id', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'user', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'user_plan', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'cycle', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'category_transaction', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'transaction_reference', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'type', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'value', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'date', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'updated_at', '' . "\0" . 'Transaction\\Entity\\Transaction' . "\0" . 'created_at'];
     }
 
     /**
@@ -428,6 +428,28 @@ class Transaction extends \Transaction\Entity\Transaction implements \Doctrine\O
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setUser', [$user]);
 
         return parent::setUser($user);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getTransactionReference()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTransactionReference', []);
+
+        return parent::getTransactionReference();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setTransactionReference($transaction_reference)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setTransactionReference', [$transaction_reference]);
+
+        return parent::setTransactionReference($transaction_reference);
     }
 
     /**
