@@ -32,8 +32,8 @@ $db_cycles      = $this->db_cycles;
 ?>
 <div ng-app="cash-out" ng-controller="CashOutController" class="col g-ml-45 g-ml-0--lg g-pb-65--md">
     <input type="hidden" id="type_solicitation" value="<?=$db_solicitation->getType()?>">
-    <input type="hidden" id="user_plan_id" value="<?=$db_solicitation->getUserPlan()->getId()?>">
-    <input type="hidden" id="user_id" value="<?=$db_solicitation->getUserPlan()->getUser()->getId()?>">
+    <input type="hidden" id="user_plan_id" value="<?=($db_solicitation->getUserPlan())?$db_solicitation->getUserPlan()->getId():''?>">
+    <input type="hidden" id="user_id" value="<?=($db_solicitation->getUserPlan()) ? $db_solicitation->getUserPlan()->getUser()->getId(): $db_solicitation->getUser()->getId()?>">
     <div class="g-pa-20">
         <div class="row">
             <div class="col-md-12 mb-4">
@@ -162,15 +162,17 @@ $db_cycles      = $this->db_cycles;
                             </div>
                             <?php
                         }
-                        ?>
 
-                        <div class="col-md-12">
-                            <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md g-mb-30">
-                                <h3 class="d-flex align-self-center text-uppercase g-font-size-12 g-font-size-default--md g-color-black g-mb-20">
-                                    <i class="hs-admin-money"></i>&nbsp;Detalhes do Aporte
-                                </h3>
-                                <table class="table table-striped table-bordered">
-                                    <thead>
+                        if($db_user_plan){
+                            ?>
+                            <div class="col-md-12">
+                                <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md g-mb-30">
+
+                                    <h3 class="d-flex align-self-center text-uppercase g-font-size-12 g-font-size-default--md g-color-black g-mb-20">
+                                        <i class="hs-admin-money"></i>&nbsp;Detalhes do Aporte
+                                    </h3>
+                                    <table class="table table-striped table-bordered">
+                                        <thead>
                                         <tr>
                                             <th>Plano</th>
                                             <th>Valor</th>
@@ -179,8 +181,8 @@ $db_cycles      = $this->db_cycles;
                                             <th>Vencimento Em</th>
                                             <th>Dias Restantes</th>
                                         </tr>
-                                    </thead>
-                                    <tbody>
+                                        </thead>
+                                        <tbody>
                                         <tr>
                                             <td><?=$db_user_plan->getName()?></td>
                                             <td><?=$db_user_plan->getPlan()->getPriceStr()?></td>
@@ -193,17 +195,376 @@ $db_cycles      = $this->db_cycles;
                                                 <strong><?=$db_user_plan->getDaysRemainingStr()?></strong>
                                             </td>
                                         </tr>
-                                    </tbody>
-                                </table>
-                                <hr />
-                                <h4 class="h6 g-font-weight-600 g-color-black g-mb-20">
-                                    Ações Disponíveis
-                                </h4>
-                                <div class="btn-group justified-content">
-                                    <?php
-                                    if($db_user_plan->getUser()->getId() == $db_user->getId())
-                                    {
+                                        </tbody>
+                                    </table>
+                                    <hr />
+
+                                    <h4 class="h6 g-font-weight-600 g-color-black g-mb-20">
+                                        Ações Disponíveis
+                                    </h4>
+                                    <div class="btn-group justified-content">
+                                        <?php
+                                        if($db_user_plan->getUser()->getId() == $db_user->getId())
+                                        {
+                                            ?>
+                                            <label class="u-check">
+                                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                                       name="action"
+                                                       type="radio"
+                                                       ng-model="action"
+                                                       value="1">
+                                                <span class="btn btn-md btn-block u-btn-outline-lightgray g-color-white--checked g-bg-primary--checked g-brd-left-none--md rounded-0">
+                                                    Renovação de Contrato
+                                                </span>
+                                            </label>
+                                            <label class="u-check">
+                                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                                       name="action"
+                                                       type="radio"
+                                                       ng-model="action"
+                                                       value="2">
+                                                <span class="btn btn-md btn-block u-btn-outline-lightgray g-color-white--checked g-bg-primary--checked g-brd-left-none--md rounded-0">
+                                                    Resgate Total
+                                                </span>
+                                            </label>
+                                            <?php
+                                        }else{
+                                            ?>
+                                            <label class="u-check">
+                                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                                       name="action"
+                                                       type="radio"
+                                                       ng-model="action"
+                                                       value="3">
+                                                <span class="btn btn-md btn-block u-btn-outline-lightgray g-color-white--checked g-bg-primary--checked g-brd-left-none--md rounded-0">
+                                                    Primeira Comissão
+                                                </span>
+                                            </label>
+                                            <label class="u-check">
+                                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                                       name="action"
+                                                       type="radio"
+                                                       ng-model="action"
+                                                       value="4">
+                                                <span class="btn btn-md btn-block u-btn-outline-lightgray g-color-white--checked g-bg-primary--checked g-brd-left-none--md rounded-0">
+                                                    Comissão
+                                                </span>
+                                            </label>
+                                            <?php
+                                        }
                                         ?>
+                                    </div>
+                                    <hr />
+                                    <div class="row">
+                                        <?php
+                                        if($db_user_plan->getUser()->getId() == $db_user->getId()) {
+                                            ?>
+                                            <div ng-if="action == 1" class="col-md-12">
+                                                <form method="post"
+                                                      id="renew"
+                                                      name="renew"
+                                                      action="<?=$this->url('renew');?>">
+                                                    <input type="hidden" name="solicitation_id" value="<?=$db_solicitation->getId()?>" >
+                                                    <div class="row">
+                                                        <div class="col-md-4">
+                                                            <label>Quantidade Solicitada<br/>(Aporte + Rendimento)</label>
+                                                            <h3 class="text-center g-color-green">
+                                                                <?='R$ ' . number_format($db_solicitation->getUserPlan()->getPlan()->getPrice() + $db_solicitation->getValue(), 2, ',', '.')?>
+                                                            </h3>
+                                                        </div>
+                                                        <div class="col-md-4 form-group">
+                                                            <label>Ciclo Inicial</label>
+                                                            <select name="cycle_start"
+                                                                    class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-px-14 g-py-10">
+                                                                <option value="">Selecione...</option>
+                                                                <?php
+                                                                if(!empty($db_cycles)){
+                                                                    $count = 1;
+                                                                    foreach ($db_cycles as $db_cycle)
+                                                                    {
+                                                                        ?>
+                                                                        <option <?=($count == 1)?'selected':''?> value="<?=$db_cycle->getId()?>">
+                                                                            <?=$db_cycle->getName()?>
+                                                                        </option>
+                                                                        <?php
+                                                                        $count++;
+                                                                    }
+                                                                }
+                                                                ?>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label>Solicitação Atendida?</label>
+                                                            <div class="g-mb-15">
+                                                                <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
+                                                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                                                           name="closed"
+                                                                           type="radio"
+                                                                           form="renew"
+                                                                           value="0">
+                                                                    <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
+                                                                        <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
+                                                                    </div>
+                                                                    Não
+                                                                </label>
+
+                                                                <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
+                                                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                                                           name="closed"
+                                                                           type="radio"
+                                                                           form="renew"
+                                                                           checked
+                                                                           value="1">
+                                                                    <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
+                                                                        <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
+                                                                    </div>
+                                                                    Sim
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label>Comprovante</label>
+                                                            <p>
+                                                                Para abrir o comprovante clique
+                                                                <a target="_blank" href="/uploads/<?=$db_user_plan->getReceipt()?>">aqui</a>
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-md-4 form-group">
+                                                            <label>&nbsp;</label>
+                                                            <button type="button"
+                                                                    form="renew"
+                                                                    ng-click="decisionAction('renew')"
+                                                                    class="btn btn-lg btn-primary g-bg-green form-control g-color-white">
+                                                                <i class="fa fa-money"></i>&nbsp;Pagar e Renovar
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div ng-if="action == 2" class="col-md-12">
+                                                <form method="post"
+                                                      id="rescue"
+                                                      name="rescue"
+                                                      action="<?=$this->url('rescue');?>">
+                                                    <input type="hidden" name="solicitation_id" value="<?=$db_solicitation->getId()?>" >
+                                                    <div class="row">
+                                                        <div class="col-md-4">
+                                                            <label>Quantidade Solicitada<br/>(Aporte + Rendimento)</label>
+                                                            <h3 class="text-center g-color-green">
+                                                                <?='R$ ' . number_format($db_solicitation->getUserPlan()->getPlan()->getPrice() + $db_solicitation->getValue(), 2, ',', '.')?>
+                                                            </h3>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label>Solicitação Atendida?</label>
+                                                            <div class="g-mb-15">
+                                                                <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
+                                                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                                                           name="closed"
+                                                                           type="radio"
+                                                                           form="renew"
+                                                                           value="0">
+                                                                    <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
+                                                                        <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
+                                                                    </div>
+                                                                    Não
+                                                                </label>
+
+                                                                <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
+                                                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                                                           name="closed"
+                                                                           type="radio"
+                                                                           form="renew"
+                                                                           checked
+                                                                           value="1">
+                                                                    <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
+                                                                        <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
+                                                                    </div>
+                                                                    Sim
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 form-group">
+                                                            <label>&nbsp;</label>
+                                                            <button type="button"
+                                                                    form="rescue"
+                                                                    ng-click="decisionAction('rescue')"
+                                                                    class="btn btn-lg btn-primary g-bg-green form-control g-color-white">
+                                                                <i class="fa fa-money"></i>&nbsp;Efetuar o Resgate
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <?php
+                                        }else{
+                                            ?>
+                                            <div ng-if="action == 3" class="col-md-12">
+                                                <form method="post"
+                                                      id="withdrawal3"
+                                                      name="withdrawal3"
+                                                      action="<?=$this->url('withdrawal');?>">
+                                                    <input type="hidden" name="solicitation_id" value="<?=$db_solicitation->getId()?>" >
+                                                    <div class="row">
+                                                        <div class="col-md-4">
+                                                            <label>Quantidade Solicitada</label>
+                                                            <div class="form-group mb-0">
+                                                                <div class="js-quantity input-group u-quantity--v2 g-brd-gray-light-v7 g-rounded-4">
+                                                                    <div class="input-group-addon d-flex justify-content-center align-items-center g-width-40 g-font-size-16 g-color-gray-light-v11 g-bg-gray-light-v8 rounded-0">
+                                                                        <span>$</span>
+                                                                    </div>
+                                                                    <input type="text"
+                                                                           name="price"
+                                                                           class="form-control moeda form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10"
+                                                                           onkeypress="mascara(this,moeda)"
+                                                                           form="withdrawal3"
+                                                                           required="required"
+                                                                           value="<?=$db_solicitation->getValue()?>">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label>Solicitação Atendida?</label>
+                                                            <div class="g-mb-15">
+                                                                <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
+                                                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                                                           name="closed"
+                                                                           type="radio"
+                                                                           form="withdrawal3"
+                                                                        <?=(!$db_solicitation->getClosed())?"checked":"";?>
+                                                                           value="0">
+                                                                    <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
+                                                                        <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
+                                                                    </div>
+                                                                    Não
+                                                                </label>
+
+                                                                <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
+                                                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                                                           name="closed"
+                                                                           type="radio"
+                                                                           form="withdrawal3"
+                                                                        <?=($db_solicitation->getClosed())?"checked":"";?>
+                                                                           value="1">
+                                                                    <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
+                                                                        <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
+                                                                    </div>
+                                                                    Sim
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 form-group">
+                                                            <label>&nbsp;</label>
+                                                            <button type="button"
+                                                                    form="withdrawal3"
+                                                                    ng-click="decisionAction('withdrawal3')"
+                                                                    class="btn btn-lg btn-primary g-bg-green form-control g-color-white">
+                                                                <i class="fa fa-money"></i>&nbsp;Efetuar Pagamento
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div ng-if="action == 4" class="col-md-12">
+                                                <form method="post"
+                                                      id="withdrawal4"
+                                                      name="withdrawal4"
+                                                      action="<?=$this->url('withdrawal');?>">
+                                                    <input type="hidden" name="solicitation_id" value="<?=$db_solicitation->getId()?>" >
+                                                    <div class="row">
+                                                        <div class="col-md-4">
+                                                            <label>Quantidade Solicitada</label>
+                                                            <div class="form-group mb-0">
+                                                                <div class="js-quantity input-group u-quantity--v2 g-brd-gray-light-v7 g-rounded-4">
+                                                                    <div class="input-group-addon d-flex justify-content-center align-items-center g-width-40 g-font-size-16 g-color-gray-light-v11 g-bg-gray-light-v8 rounded-0">
+                                                                        <span>$</span>
+                                                                    </div>
+                                                                    <input type="text"
+                                                                           name="price"
+                                                                           class="form-control moeda form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10"
+                                                                           onkeypress="mascara(this,moeda)"
+                                                                           form="withdrawal4"
+                                                                           required="required"
+                                                                           value="<?=$db_solicitation->getValue()?>">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 form-group">
+                                                            <label>Ciclo Representante</label>
+                                                            <select name="cycle"
+                                                                    class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-px-14 g-py-10">
+                                                                <option value="">Selecione...</option>
+                                                                <?php
+                                                                if(!empty($db_cycles)){
+                                                                    $count = 1;
+                                                                    foreach ($db_cycles as $db_cycle)
+                                                                    {
+                                                                        ?>
+                                                                        <option <?=($count == 1)?'selected':''?> value="<?=$db_cycle->getId()?>">
+                                                                            <?=$db_cycle->getName()?>
+                                                                        </option>
+                                                                        <?php
+                                                                        $count++;
+                                                                    }
+                                                                }
+                                                                ?>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <label>Solicitação Atendida?</label>
+                                                            <div class="g-mb-15">
+                                                                <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
+                                                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                                                           name="closed"
+                                                                           type="radio"
+                                                                           form="withdrawal4"
+                                                                           value="0">
+                                                                    <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
+                                                                        <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
+                                                                    </div>
+                                                                    Não
+                                                                </label>
+
+                                                                <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
+                                                                    <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
+                                                                           name="closed"
+                                                                           type="radio"
+                                                                           form="withdrawal4"
+                                                                           checked
+                                                                           value="1">
+                                                                    <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
+                                                                        <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
+                                                                    </div>
+                                                                    Sim
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 form-group">
+                                                            <label>&nbsp;</label>
+                                                            <button type="button"
+                                                                    form="withdrawal4"
+                                                                    ng-click="decisionAction('withdrawal4')"
+                                                                    class="btn btn-lg btn-primary g-bg-green form-control g-color-white">
+                                                                <i class="fa fa-money"></i>&nbsp;Efetuar Pagamento
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <?php
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php
+                        } else {
+                            ?>
+                            <div class="col-md-12">
+                                <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md g-mb-30">
+                                    <h3 class="d-flex align-self-center text-uppercase g-font-size-12 g-font-size-default--md g-color-black g-mb-20">
+                                        Ações Disponíveis
+                                    </h3>
+                                    <div class="btn-group justified-content">
                                         <label class="u-check">
                                             <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
                                                    name="action"
@@ -211,61 +572,12 @@ $db_cycles      = $this->db_cycles;
                                                    ng-model="action"
                                                    value="0">
                                             <span class="btn btn-md btn-block u-btn-outline-lightgray g-color-white--checked g-bg-primary--checked rounded-0">
-                                            Pagamento de Rendimento
-                                        </span>
+                                                Pagamento de Rendimento
+                                            </span>
                                         </label>
-                                        <label class="u-check">
-                                            <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                                                   name="action"
-                                                   type="radio"
-                                                   ng-model="action"
-                                                   value="1">
-                                            <span class="btn btn-md btn-block u-btn-outline-lightgray g-color-white--checked g-bg-primary--checked g-brd-left-none--md rounded-0">
-                                            Renovação de Contrato
-                                        </span>
-                                        </label>
-                                        <label class="u-check">
-                                            <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                                                   name="action"
-                                                   type="radio"
-                                                   ng-model="action"
-                                                   value="2">
-                                            <span class="btn btn-md btn-block u-btn-outline-lightgray g-color-white--checked g-bg-primary--checked g-brd-left-none--md rounded-0">
-                                            Resgate Total
-                                        </span>
-                                        </label>
-                                        <?php
-                                    }else{
-                                        ?>
-                                        <label class="u-check">
-                                            <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                                                   name="action"
-                                                   type="radio"
-                                                   ng-model="action"
-                                                   value="3">
-                                            <span class="btn btn-md btn-block u-btn-outline-lightgray g-color-white--checked g-bg-primary--checked g-brd-left-none--md rounded-0">
-                                            Primeira Comissão
-                                        </span>
-                                        </label>
-                                        <label class="u-check">
-                                            <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                                                   name="action"
-                                                   type="radio"
-                                                   ng-model="action"
-                                                   value="4">
-                                            <span class="btn btn-md btn-block u-btn-outline-lightgray g-color-white--checked g-bg-primary--checked g-brd-left-none--md rounded-0">
-                                            Comissão
-                                        </span>
-                                        </label>
-                                        <?php
-                                    }
-                                    ?>
-                                </div>
-                                <hr />
-                                <div class="row">
-                                    <?php
-                                    if($db_user_plan->getUser()->getId() == $db_user->getId()) {
-                                        ?>
+                                    </div>
+                                    <hr />
+                                    <div class="row">
                                         <div ng-if="action == 0" class="col-md-12">
                                             <form method="post"
                                                   id="withdrawal"
@@ -351,303 +663,15 @@ $db_cycles      = $this->db_cycles;
                                                 </div>
                                             </form>
                                         </div>
-                                        <div ng-if="action == 1" class="col-md-12">
-                                            <form method="post"
-                                                  id="renew"
-                                                  name="renew"
-                                                  action="<?=$this->url('renew');?>">
-                                                <input type="hidden" name="solicitation_id" value="<?=$db_solicitation->getId()?>" >
-                                                <div class="row">
-                                                    <div class="col-md-4">
-                                                        <label>Quantidade Solicitada<br/>(Aporte + Rendimento)</label>
-                                                        <h3 class="text-center g-color-green">
-                                                            <?='R$ ' . number_format($db_solicitation->getUserPlan()->getPlan()->getPrice() + $db_solicitation->getValue(), 2, ',', '.')?>
-                                                        </h3>
-                                                    </div>
-                                                    <div class="col-md-4 form-group">
-                                                        <label>Ciclo Inicial</label>
-                                                        <select name="cycle_start"
-                                                                class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-px-14 g-py-10">
-                                                            <option value="">Selecione...</option>
-                                                            <?php
-                                                            if(!empty($db_cycles)){
-                                                                $count = 1;
-                                                                foreach ($db_cycles as $db_cycle)
-                                                                {
-                                                                    ?>
-                                                                    <option <?=($count == 1)?'selected':''?> value="<?=$db_cycle->getId()?>">
-                                                                        <?=$db_cycle->getName()?>
-                                                                    </option>
-                                                                    <?php
-                                                                    $count++;
-                                                                }
-                                                            }
-                                                            ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label>Solicitação Atendida?</label>
-                                                        <div class="g-mb-15">
-                                                            <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
-                                                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                                                                       name="closed"
-                                                                       type="radio"
-                                                                       form="renew"
-                                                                       value="0">
-                                                                <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
-                                                                    <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
-                                                                </div>
-                                                                Não
-                                                            </label>
-
-                                                            <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
-                                                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                                                                       name="closed"
-                                                                       type="radio"
-                                                                       form="renew"
-                                                                       checked
-                                                                       value="1">
-                                                                <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
-                                                                    <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
-                                                                </div>
-                                                                Sim
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label>Comprovante</label>
-                                                        <p>
-                                                            Para abrir o comprovante clique
-                                                            <a target="_blank" href="/uploads/<?=$db_user_plan->getReceipt()?>">aqui</a>
-                                                        </p>
-                                                    </div>
-                                                    <div class="col-md-4 form-group">
-                                                        <label>&nbsp;</label>
-                                                        <button type="button"
-                                                                form="renew"
-                                                                ng-click="decisionAction('renew')"
-                                                                class="btn btn-lg btn-primary g-bg-green form-control g-color-white">
-                                                            <i class="fa fa-money"></i>&nbsp;Pagar e Renovar
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <div ng-if="action == 2" class="col-md-12">
-                                            <form method="post"
-                                                  id="rescue"
-                                                  name="rescue"
-                                                  action="<?=$this->url('rescue');?>">
-                                                <input type="hidden" name="solicitation_id" value="<?=$db_solicitation->getId()?>" >
-                                                <div class="row">
-                                                    <div class="col-md-4">
-                                                        <label>Quantidade Solicitada<br/>(Aporte + Rendimento)</label>
-                                                        <h3 class="text-center g-color-green">
-                                                            <?='R$ ' . number_format($db_solicitation->getUserPlan()->getPlan()->getPrice() + $db_solicitation->getValue(), 2, ',', '.')?>
-                                                        </h3>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label>Solicitação Atendida?</label>
-                                                        <div class="g-mb-15">
-                                                            <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
-                                                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                                                                       name="closed"
-                                                                       type="radio"
-                                                                       form="renew"
-                                                                       value="0">
-                                                                <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
-                                                                    <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
-                                                                </div>
-                                                                Não
-                                                            </label>
-
-                                                            <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
-                                                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                                                                       name="closed"
-                                                                       type="radio"
-                                                                       form="renew"
-                                                                       checked
-                                                                       value="1">
-                                                                <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
-                                                                    <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
-                                                                </div>
-                                                                Sim
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4 form-group">
-                                                        <label>&nbsp;</label>
-                                                        <button type="button"
-                                                                form="rescue"
-                                                                ng-click="decisionAction('rescue')"
-                                                                class="btn btn-lg btn-primary g-bg-green form-control g-color-white">
-                                                            <i class="fa fa-money"></i>&nbsp;Efetuar o Resgate
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <?php
-                                    }else{
-                                        ?>
-                                        <div ng-if="action == 3" class="col-md-12">
-                                            <form method="post"
-                                                  id="withdrawal3"
-                                                  name="withdrawal3"
-                                                  action="<?=$this->url('withdrawal');?>">
-                                                <input type="hidden" name="solicitation_id" value="<?=$db_solicitation->getId()?>" >
-                                                <div class="row">
-                                                    <div class="col-md-4">
-                                                        <label>Quantidade Solicitada</label>
-                                                        <div class="form-group mb-0">
-                                                            <div class="js-quantity input-group u-quantity--v2 g-brd-gray-light-v7 g-rounded-4">
-                                                                <div class="input-group-addon d-flex justify-content-center align-items-center g-width-40 g-font-size-16 g-color-gray-light-v11 g-bg-gray-light-v8 rounded-0">
-                                                                    <span>$</span>
-                                                                </div>
-                                                                <input type="text"
-                                                                       name="price"
-                                                                       class="form-control moeda form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10"
-                                                                       onkeypress="mascara(this,moeda)"
-                                                                       form="withdrawal3"
-                                                                       required="required"
-                                                                       value="<?=$db_solicitation->getValue()?>">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label>Solicitação Atendida?</label>
-                                                        <div class="g-mb-15">
-                                                            <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
-                                                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                                                                       name="closed"
-                                                                       type="radio"
-                                                                       form="withdrawal3"
-                                                                       <?=(!$db_solicitation->getClosed())?"checked":"";?>
-                                                                       value="0">
-                                                                <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
-                                                                    <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
-                                                                </div>
-                                                                Não
-                                                            </label>
-
-                                                            <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
-                                                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                                                                       name="closed"
-                                                                       type="radio"
-                                                                       form="withdrawal3"
-                                                                       <?=($db_solicitation->getClosed())?"checked":"";?>
-                                                                       value="1">
-                                                                <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
-                                                                    <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
-                                                                </div>
-                                                                Sim
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4 form-group">
-                                                        <label>&nbsp;</label>
-                                                        <button type="button"
-                                                                form="withdrawal3"
-                                                                ng-click="decisionAction('withdrawal3')"
-                                                                class="btn btn-lg btn-primary g-bg-green form-control g-color-white">
-                                                            <i class="fa fa-money"></i>&nbsp;Efetuar Pagamento
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <div ng-if="action == 4" class="col-md-12">
-                                            <form method="post"
-                                                  id="withdrawal4"
-                                                  name="withdrawal4"
-                                                  action="<?=$this->url('withdrawal');?>">
-                                                <input type="hidden" name="solicitation_id" value="<?=$db_solicitation->getId()?>" >
-                                                <div class="row">
-                                                    <div class="col-md-4">
-                                                        <label>Quantidade Solicitada</label>
-                                                        <div class="form-group mb-0">
-                                                            <div class="js-quantity input-group u-quantity--v2 g-brd-gray-light-v7 g-rounded-4">
-                                                                <div class="input-group-addon d-flex justify-content-center align-items-center g-width-40 g-font-size-16 g-color-gray-light-v11 g-bg-gray-light-v8 rounded-0">
-                                                                    <span>$</span>
-                                                                </div>
-                                                                <input type="text"
-                                                                       name="price"
-                                                                       class="form-control moeda form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-20 g-px-14 g-py-10"
-                                                                       onkeypress="mascara(this,moeda)"
-                                                                       form="withdrawal4"
-                                                                       required="required"
-                                                                       value="<?=$db_solicitation->getValue()?>">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4 form-group">
-                                                        <label>Ciclo Representante</label>
-                                                        <select name="cycle"
-                                                                class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-px-14 g-py-10">
-                                                            <option value="">Selecione...</option>
-                                                            <?php
-                                                            if(!empty($db_cycles)){
-                                                                $count = 1;
-                                                                foreach ($db_cycles as $db_cycle)
-                                                                {
-                                                                    ?>
-                                                                    <option <?=($count == 1)?'selected':''?> value="<?=$db_cycle->getId()?>">
-                                                                        <?=$db_cycle->getName()?>
-                                                                    </option>
-                                                                    <?php
-                                                                    $count++;
-                                                                }
-                                                            }
-                                                            ?>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <label>Solicitação Atendida?</label>
-                                                        <div class="g-mb-15">
-                                                            <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
-                                                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                                                                       name="closed"
-                                                                       type="radio"
-                                                                       form="withdrawal4"
-                                                                       value="0">
-                                                                <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
-                                                                    <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
-                                                                </div>
-                                                                Não
-                                                            </label>
-
-                                                            <label class="form-check-inline u-check g-pl-25 ml-0 g-mr-25">
-                                                                <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0"
-                                                                       name="closed"
-                                                                       type="radio"
-                                                                       form="withdrawal4"
-                                                                       checked
-                                                                       value="1">
-                                                                <div class="u-check-icon-radio-v4 g-absolute-centered--y g-left-0 g-width-18 g-height-18">
-                                                                    <i class="g-absolute-centered d-block g-width-10 g-height-10 g-bg-primary--checked"></i>
-                                                                </div>
-                                                                Sim
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4 form-group">
-                                                        <label>&nbsp;</label>
-                                                        <button type="button"
-                                                                form="withdrawal4"
-                                                                ng-click="decisionAction('withdrawal4')"
-                                                                class="btn btn-lg btn-primary g-bg-green form-control g-color-white">
-                                                            <i class="fa fa-money"></i>&nbsp;Efetuar Pagamento
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <?php
-                                    }
-                                    ?>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                            <?php
+                        }
+                        ?>
+
+
+
                         <div class="col-md-12">
                             <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md g-mb-30">
                                 <h3 class="d-flex align-self-center text-uppercase g-font-size-12 g-font-size-default--md g-color-black g-mb-20">

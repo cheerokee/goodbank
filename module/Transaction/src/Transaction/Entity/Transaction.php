@@ -38,8 +38,8 @@ class Transaction
      * @ORM\ManyToOne(targetEntity="UserPlan\Entity\UserPlan")
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="user_plan_id", referencedColumnName="id",
-     *      nullable=false,
-     *      onDelete="CASCADE")
+     *      nullable=true,
+     *      onDelete="SET NULL")
      * })
      */
     private $user_plan;

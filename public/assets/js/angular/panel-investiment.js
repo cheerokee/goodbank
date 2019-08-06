@@ -28,12 +28,18 @@ angular.module("panelInvestmentView", [])
     $scope.payment_methods = [];
     $scope.user_plans = [];
     $scope.total_balances = 0;
-    $scope.transactions = [];
     $scope.accounts = [];
     $scope.banks = [];
 
+    $scope.transactions = [];
+    $scope.transaction_links = {};
+    $scope.page_transaction = 1;
+    $scope.transaction_tot_pages = 0;
+    $scope.transaction_pages = [];
+
     $scope.comissions = [];
     $scope.total_comission = 0;
+    $scope.total_debito_comission = 0;
     $scope.comission_links = {};
     $scope.page_comission = 1;
     $scope.comission_tot_pages = 0;
@@ -46,10 +52,15 @@ angular.module("panelInvestmentView", [])
     $scope.comission_transaction_tot_pages = 0;
     $scope.comission_transaction_pages = [];
 
+    $scope.saldo = 0;
+    setInterval(function () {
+        $scope.saldo = $scope.total_balances + ($scope.total_comission - $scope.total_debito_comission);
+    },1000);
+
     $scope.receive_method = 0;
 
     /** Dias disponíveis para solicitar saque **/
-    $scope.canDays = [29,30,31,1];
+    $scope.canDays = [29,30,31,1,5];
 
     $scope.loadUser = function() {
         $http({
@@ -225,8 +236,12 @@ angular.module("panelInvestmentView", [])
                                 for(index in $scope.comissions){
                                     let user_plan = $scope.comissions[index];
                                     $timeout(function () {
-                                        var i = response.findIndex(x => x.user_plan === user_plan.id);
-                                        $scope.comissions[index].comission = response[i].value;
+                                        var i = response.comissions.findIndex(x => x.user_plan === user_plan.id);
+                                        if( typeof response.comissions[i].value !== 'undefined' && response.comissions[i].value !== null ){
+                                            $scope.comissions[index].comission = response.comissions[i].value;
+                                        }else{
+                                            $scope.comissions[index].comission = 0;
+                                        }
 
                                     },300);
                                 }
@@ -253,9 +268,14 @@ angular.module("panelInvestmentView", [])
             dataType: "json",
             data: {id_patrocinador : $scope.user_id},
             success: function (response) {
-                for(i in response){
-                    $scope.total_comission += response[i].value;
+                console.log(response);
+                for(i in response.comissions){
+                    $scope.total_comission += response.comissions[i].value;
                 }
+
+                $timeout(function () {
+                    $scope.total_debito_comission = response.debito;
+                },300);
             },
             error: function(jqXHR, textStatus, errorThrown) {
 
@@ -339,16 +359,20 @@ angular.module("panelInvestmentView", [])
         $scope.page_comission = pagination;
     };
 
-    $scope.loadTransactions = function(user_plan_id) {
+    $scope.loadTransactions = function(url = '') {
+        if(url == ''){
+            url = "/api/transaction";
+        }
+        console.log(url);
+
         $.ajax({
-            url: "/api/transaction",
+            url: url,
             type: "GET",
             data: {
                 'filter'    :   [
                     {
                         'type' : 'andx',
                         'conditions' : [
-                            {'field' :'user_plan', 'type':'eq', 'value' : user_plan_id},
                             {'field' :'user', 'type':'eq', 'value' : $scope.user_id }
                         ],
                         'where'  :  'and'
@@ -365,6 +389,11 @@ angular.module("panelInvestmentView", [])
             dataType: "json",
             success: function (response) {
                 $timeout(function(){
+                    $scope.transaction_pages = $scope.numberArray(response.page_count);
+                    $scope.transaction_tot_pages = response.page_count;
+                    $scope.transaction_links = response._links;
+
+                    console.log($scope.transaction_pages,$scope.transaction_tot_pages,$scope.transaction_links);
                     $scope.transactions = response._embedded.transaction;
                 },600);
             },
@@ -373,15 +402,45 @@ angular.module("panelInvestmentView", [])
             }
         });
     };
+    $scope.loadTransactions();
 
-    $scope.viewExtract = function(user_plan_id) {
-        $scope.loadTransactions(user_plan_id);
+    $scope.previous_transactions = function() {
+        console.log($scope.transaction_links);
+        $scope.loadTransactions($scope.transaction_links.prev.href);
+        $scope.page_transaction--;
     };
 
-    $scope.viewCashOut = function (user_plan) {
+    $scope.next_transactions = function() {
+        $scope.loadTransactions($scope.transaction_links.next.href);
+        $scope.page_transaction++;
+    };
+
+    $scope.page_transactions = function(pagination) {
+        $scope.loadTransactions('/api/transaction?page=' + pagination);
+        $scope.page_transaction = pagination;
+    };
+
+    $scope.viewCashOut = function () {
         $timeout(function () {
-            $scope.user_plan = user_plan;
+            $.HSCore.components.HSRangeSlider.init('.js-range-slider');
+        },600);
+
+        $scope.loadAccounts();
+        $scope.loadWallets();
+        $scope.account = {};
+        $scope.wallet = {};
+        $("#modal_cash_out").modal();
+    };
+    $('#modal_cash_out').on('hidden.bs.modal', function (e) {
+    });
+
+    $scope.viewRR = function (user_plan = null) {
+        $timeout(function () {
             $timeout(function () {
+                if(user_plan){
+                    $scope.user_plan = user_plan;
+                }
+
                 $.HSCore.components.HSRangeSlider.init('.js-range-slider');
             },600);
         },300);
@@ -390,8 +449,15 @@ angular.module("panelInvestmentView", [])
         $scope.loadWallets();
         $scope.account = {};
         $scope.wallet = {};
-        $("#modal_cash_out").modal();
+        $("#modal_rr").modal();
     };
+
+    $('#modal_rr').on('hidden.bs.modal', function (e) {
+        $scope.renew = false;
+        $scope.cash_out = false;
+        $scope.receive_method = 0;
+        $scope.user_plan = {};
+    });
 
     $scope.loadAccounts = function() {
         $.ajax({
@@ -579,6 +645,7 @@ angular.module("panelInvestmentView", [])
             let total = 365;
 
             let restante = calculaDias(current_date, future_date);
+
             restante = (restante > 0)?restante:0;
             let percent = restante * 100 / 365;
 
@@ -729,30 +796,16 @@ angular.module("panelInvestmentView", [])
         }
 
         let data = {
-            'renew' : $scope.renew,
-            'cash_out'  :   $scope.cash_out,
-            'user_plan_id' : $scope.user_plan.id,
             'account': $scope.user_plan.account,
             'wallet' : $scope.user_plan.wallet,
-            'receive_method' : $scope.receive_method
+            'receive_method' : $scope.receive_method,
+            'user_id' : $scope.user_id
         };
 
         let msg = '';
 
-        if($scope.renew || $scope.cash_out){
-            if($scope.renew){
-                msg = 'Você tem certeza que deseja renovar o contrato do aporte e sacar o rendimento total?';
-            }
-
-            if($scope.cash_out){
-                msg = 'Você tem certeza que deseja efetuar o resgate do aporte e sacar o rendimento total?';
-            }
-
-            data.value = $scope.user_plan.balance;
-        }else{
-            msg = 'Você deseja realmente efetuar o saque?';
-            data.value = Number($("#result2min").val());
-        }
+        msg = 'Você deseja realmente efetuar o saque?';
+        data.value = Number($("#result2min").val());
 
         bootbox.confirm({
             message: msg,
@@ -799,19 +852,95 @@ angular.module("panelInvestmentView", [])
         });
     };
 
+    $scope.sendRR = function() {
+        if($scope.user_plan.account == null && $scope.user_plan.wallet == null){
+            errorNotify('Você precisa selecionar alguma conta ou carteira para finalizar saque');
+            return false;
+        }
+
+        let data = {
+            'renew' : $scope.renew,
+            'cash_out'  :   $scope.cash_out,
+            'user_plan_id' : $scope.user_plan.id,
+            'account': $scope.user_plan.account,
+            'wallet' : $scope.user_plan.wallet,
+            'receive_method' : $scope.receive_method
+        };
+
+        let msg = '';
+
+        if($scope.renew || $scope.cash_out){
+            if($scope.renew){
+                msg = 'Você tem certeza que deseja renovar o contrato do aporte e sacar o rendimento total?';
+            }
+
+            if($scope.cash_out){
+                msg = 'Você tem certeza que deseja efetuar o resgate do aporte e sacar o rendimento total?';
+            }
+
+            data.value = $scope.user_plan.balance;
+        }else{
+            msg = 'Você deseja realmente efetuar o saque?';
+            data.value = Number($("#result2min").val());
+        }
+
+        bootbox.confirm({
+            message: msg,
+            buttons: {
+                cancel: {
+                    label: "Não",
+                    className: "btn-danger"
+                },
+                confirm: {
+                    label: "Sim",
+                    className: "btn-success btnConfirm",
+                }
+            },
+            callback: function (result) {
+                if(!result){
+                    this.modal("hide");
+                    $("#modal_cash_out").modal("hide");
+                }else{
+                    $timeout(function () {
+                        $scope.enableSolicitation = false;
+                    },300);
+                    $.ajax({
+                        url: "/admin/send-rr",
+                        type: "POST",
+                        dataType: "json",
+                        data: data,
+                        success: function (response) {
+                            if(response.result){
+                                successNotify(response.message);
+                            }else{
+                                errorNotify(response.message);
+                            }
+                            $timeout(function () {
+                                $scope.enableSolicitation = true;
+                            },300);
+                            $("#modal_cash_out").modal("hide");
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            $("#modal_cash_out").modal("hide");
+                        }
+                    });
+                }
+            }
+        });
+    };
+
     function calculaDias(date1, date2) {
 
-        // The number of milliseconds in one day
-        var ONE_DAY = 1000 * 60 * 60 * 24;
+        //formato do brasil 'pt-br'
+        moment.locale('pt-br');
+        //setando data1
+        var data1 = moment(date1,'DD/MM/YYYY');
+        //setando data2
+        var data2 = moment(date2,'DD/MM/YYYY');
+        //tirando a diferenca da data2 - data1 em dias
+        var diff  = data2.diff(data1, 'days');
 
-        // Convert both dates to milliseconds
-        var date1_ms = date1.getTime();
-        var date2_ms = date2.getTime();
-
-        // Calculate the difference in milliseconds
-        var difference_ms = Math.abs(date1_ms - date2_ms);
-        // Convert back to days and return
-        return Math.round(difference_ms/ONE_DAY);
+        return diff;
     }
 
     function in_array(needle, haystack){
@@ -832,12 +961,6 @@ angular.module("panelInvestmentView", [])
 
         return arr
     };
-
-    $('#modal_cash_out').on('hidden.bs.modal', function (e) {
-        $scope.renew = false;
-        $scope.cash_out = false;
-        $scope.receive_method = 0;
-    });
 
     $(document).ready(function () {
         setTimeout(function () {

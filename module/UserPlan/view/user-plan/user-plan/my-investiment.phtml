@@ -25,26 +25,110 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                 <div class="g-pos-rel h-100 g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-30--md">
                     <header>
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-md-12">
                                 <h2>
                                     Meus Investimentos
                                 </h2>
                                 <p>Gerencie seus investimentos</p>
                             </div>
-                            <div class="col-md-4">
-                                <h3 class="text-center text-uppercase">
-                                    Seu Saldo
-                                </h3>
-                                <h3 class="text-center">
-                                    <strong class="text-success">
-                                        R$ {{ total_balances + total_comission | currency:'':2:'pt-BR' }}
-                                    </strong>
-                                </h3>
-                            </div>
                         </div>
                     </header>
                     <hr class="d-flex g-brd-gray-light-v7 g-my-15 g-mt-25--md g-mb-30--md">
                     <div class="row g-mx-minus-10 g-mb-60">
+                        <div class="col-sm-6">
+                            <div class="card g-brd-gray-light-v7 h-100 g-pa-15 g-pa-25-30--md">
+                                <h3 class="text-center text-uppercase">
+                                    Seu Saldo
+                                </h3>
+                                <h2 class="text-center g-font-weight-300 g-font-size-40 g-color-black g-color-green">
+                                    <strong class="text-success">
+                                        R$ {{ total_balances + (total_comission - total_debito_comission) | currency:'':2:'pt-BR' }}
+                                    </strong>
+                                </h2>
+                                <div class="row mt-3">
+                                    <div class="col-md-8">
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button ng-click="viewCashOut()" class="btn btn-primary g-color-white form-control">
+                                            <strong>
+                                                <i class="hs-admin-money"></i>&nbsp;SACAR
+                                            </strong>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <hr />
+                                        <h5>Transações</h5>
+                                        <table class="table table-bordered table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Categoria</th>
+                                                    <th>Data</th>
+                                                    <th>Tipo</th>
+                                                    <th>Valor</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-class="{ 'g-color-red' : transaction.type,'g-color-green' : !transaction.type }"
+                                                    ng-repeat="transaction in transactions">
+                                                    <th>{{ transaction._embedded.category_transaction.name }}</th>
+                                                    <th>{{ formatDate(transaction.date) }}</th>
+                                                    <th>{{ (transaction.type)?'Débito' : 'Crédito' }}</th>
+                                                    <th>R$ {{ transaction.value | currency:'':2:'pt-BR' }}</th>
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="4">
+                                                        <nav class="d-flex ml-auto"
+                                                             aria-label="Page Navigation">
+                                                            <ul class="list-inline text-right mb-0">
+                                                                <li class="list-inline-item">
+                                                                    <a id="datatablePagination7Next"
+                                                                       class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                                                                       href=""
+                                                                       aria-label="Previous"
+                                                                       ng-click="previous_transactions()">
+                                                                        <span class="g-line-height-1 g-valign-middle" aria-hidden="true">
+                                                                            <i class="hs-admin-angle-left"></i>
+                                                                        </span>
+                                                                        <span class="sr-only">Anterior</span>
+                                                                    </a>
+                                                                </li>
+                                                                <li ng-repeat="i in transaction_pages" class="list-inline-item g-hidden-sm-down">
+                                                                    <a class="u-pagination-v1__item u-pagination-v1-2 g-bg-primary--active g-color-white--active g-brd-gray-light-v7 g-brd-primary--hover g-brd-primary--active g-rounded-4 g-py-8 g-px-15"
+                                                                       href=""
+                                                                       ng-class="{'active' : i == page_transaction }"
+                                                                       ng-click="page_transactions(i)"
+                                                                       data-dt-page-to="{{ i }}">
+                                                                        {{ i }}
+                                                                    </a>
+                                                                </li>
+                                                                <li class="list-inline-item">
+                                                                    <a id="datatablePagination7Next"
+                                                                       class="u-pagination-v1__item u-pagination-v1-2 g-brd-gray-light-v7 g-brd-secondary--hover g-rounded-4 g-py-8 g-px-12"
+                                                                       href=""
+                                                                       aria-label="Next"
+                                                                       ng-click="next_transactions()">
+                                                                        <span class="g-line-height-1 g-valign-middle" aria-hidden="true">
+                                                                            <i class="hs-admin-angle-right"></i>
+                                                                        </span>
+                                                                        <span class="sr-only">Próximo</span>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </nav>
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End Project Card -->
+                        </div>
                         <div class="col-md-6">
                             <div class="row">
                                 <div class="col-md-12">
@@ -96,21 +180,11 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                                              style="display: none;">
                                                             <ul class="list-unstyled g-nowrap mb-0">
                                                                 <li>
-                                                                    <a ng-click="viewExtract(user_plan.id)"
-                                                                       data-toggle="modal"
-                                                                       data-target="#modal_extract"
-                                                                       class="d-flex align-items-center u-link-v5 g-bg-gray-light-v8--hover g-font-size-12 g-font-size-default--md g-color-gray-dark-v6 g-px-25 g-py-14"
-                                                                       href="#">
-                                                                        <i class="hs-admin-layout-list-thumb-alt g-font-size-18 g-color-gray-light-v6 g-mr-10 g-mr-15--md"></i>
-                                                                        Visualizar Extrato
-                                                                    </a>
-                                                                </li>
-                                                                <li>
-                                                                    <a ng-click="viewCashOut(user_plan)"
+                                                                    <a ng-click="viewRR(user_plan)"
                                                                        class="d-flex align-items-center u-link-v5 g-bg-gray-light-v8--hover g-font-size-12 g-font-size-default--md g-color-gray-dark-v6 g-px-25 g-py-14"
                                                                        href="#">
                                                                         <i class="hs-admin-money g-font-size-18 g-color-gray-light-v6 g-mr-10 g-mr-15--md"></i>
-                                                                        Solicitar Saque
+                                                                        Solicitar Renovação / Resgate
                                                                     </a>
                                                                 </li>
                                                             </ul>
@@ -148,13 +222,11 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                         </a>
                                     </h2>
                                 </div>
-                                <?=$this->partial('partials/modal-extract');?>
                                 <?=$this->partial('partials/modal-cash_out');?>
+                                <?=$this->partial('partials/modal-rr');?>
                                 <?=$this->partial('partials/modal-select-account');?>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="col-md-12">
+                            <div class="col-md-12 mt-5">
                                 <div class="row">
                                     <table class="table table-bordered">
                                         <thead>
@@ -170,7 +242,7 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                                         </h5>
                                                         <h3 class="text-center">
                                                             <strong class="text-success">
-                                                                R$ {{ total_comission | currency:'':2:'pt-BR' }}
+                                                                R$ {{ total_comission - total_debito_comission | currency:'':2:'pt-BR' }}
                                                             </strong>
                                                         </h3>
                                                     </div>
@@ -279,7 +351,6 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                     </table>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
