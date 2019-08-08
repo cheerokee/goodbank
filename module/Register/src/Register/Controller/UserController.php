@@ -144,7 +144,7 @@ class UserController extends CrudController
             {
                 $has_user = $em->getRepository('Register\Entity\User')->findOneByDocument($data_arr['document']);
 
-                if($has_user){
+                if($has_user && $has_user->getId() != $data_arr['id']){
                     $this->flashMessenger()->addErrorMessage('Já existe um usuário com o CPF ' .  $data_arr['document']);
 
                     if(isset($data_arr['redirect']) && $data_arr['redirect'] != '')
