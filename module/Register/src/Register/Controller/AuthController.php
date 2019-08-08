@@ -14,6 +14,9 @@ use Zend\Authentication\AuthenticationService,
 use Register\Form\Login as LoginForm;
 use Register\Entity\User;
 
+use Zend\Http\Client;
+use Zend\Http\Request;
+
 class AuthController extends AbstractActionController
 {
 
@@ -31,6 +34,16 @@ class AuthController extends AbstractActionController
 
             if($form->isValid()){
                 $data = $request->getPost()->toArray();
+
+                $drequest['response'] = $data['g-recaptcha-response'];
+                $drequest['secret'] = '6LfbBbIUAAAAAA9EAXb4Wfr3A94J64zbTGZQb0zL';
+
+                $response = $this->postService($drequest);
+
+                if($response->success) {
+                    var_dump("FOI");
+                    die;
+                }
 
                 // Criando Storage para gravar sessão da autenticação
                 $sessionStorage = new SessionStorage("User");
@@ -240,5 +253,26 @@ class AuthController extends AbstractActionController
             $this->em = $this->getServiceLocator ()->get ('Doctrine\ORM\EntityManager');
     
             return $this->em;
+    }
+
+    public function postService($data){
+
+        $request = new Request();
+        $request->setMethod(Request::METHOD_POST);
+        $request->setUri('https://www.google.com/recaptcha/api/siteverify?secret='.$data['secret'].'&response='.$data['response']);
+        $request->getHeaders()->addHeaderLine('Content-Type:  application/json');
+
+        $config = array(
+            'adapter'   => 'Zend\Http\Client\Adapter\Curl',
+            'curloptions' => array(CURLOPT_FOLLOWLOCATION => true),
+        );
+
+        $client = new Client();
+        $client->setRequest($request);
+        $client->setOptions($config);
+        $client->send();
+        $response = $client->getResponse()->getBody();
+
+        return json_decode($response);
     }
 }
