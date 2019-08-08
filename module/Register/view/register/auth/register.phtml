@@ -85,9 +85,22 @@ $db_sponsor = $this->db_sponsor;
                         </div>
 
                         <div class="mb-4">
-                            <button type="submit" id="login" class="btn btn-md btn-block u-btn-primary rounded g-py-13">
-                                Cadastrar
-                            </button>
+                            <?php
+                            if($db_sponsor){
+                                ?>
+                                <button type="submit" id="login" class="btn btn-md btn-block u-btn-primary rounded g-py-13">
+                                    Cadastrar
+                                </button>
+                                <?php
+                            }else{
+                                ?>
+                                <p class="alert alert-danger">
+                                    Não é possível se cadastrar no sistema sem um patrocinador, por favor providencie o link de indicação.
+                                </p>
+                                <?php
+                            }
+                            ?>
+
                         </div>
                     </form>
                     <footer class="text-center">
