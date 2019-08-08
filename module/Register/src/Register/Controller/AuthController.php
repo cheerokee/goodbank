@@ -36,7 +36,7 @@ class AuthController extends AbstractActionController
                 $data = $request->getPost()->toArray();
 
                 $drequest['response'] = $data['g-recaptcha-response'];
-                $drequest['secret'] = '6LfbBbIUAAAAAA9EAXb4Wfr3A94J64zbTGZQb0zL';
+                $drequest['secret'] = '6Le7B7IUAAAAADCnt0Kv4ZiiT_eYSbPuizJcnRfd';
 
                 $response = $this->postService($drequest);
 
