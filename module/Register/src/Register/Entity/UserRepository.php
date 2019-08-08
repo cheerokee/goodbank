@@ -19,22 +19,35 @@ class UserRepository extends EntityRepository
 
         $where = "1=1";
 
+        $views = array('user','customer','administrator');
+
+        if(!empty($views)){
+            foreach($views as $view){
+                if(isset($data[$view . '_name_id']) && $data[$view . '_name_id'] != ''){
+                    $where .= " AND x.id = " . $data[$view . '_name_id'];
+                }
+
+                if(isset($data[$view . '_email']) && $data[$view . '_email'] != ''){
+                    $where .= " AND x.email LIKE '%" . $data[$view . '_email'] . "%'";
+                }
+
+                if(isset($data[$view . '_email']) && $data[$view . '_email'] != ''){
+                    $where .= " AND x.email LIKE '%" . $data[$view . '_email'] . "%'";
+                }
+
+                if(isset($data[$view . '_document']) && $data[$view . '_document'] != ''){
+                    $where .= " AND x.document LIKE '%" . $functions->soNumero($data[$view . '_document']) . "%'";
+                }
+
+                if(isset($data[$view . '_active']) && $data[$view . '_active'] != ''){
+                    $where .= " AND x.active = " . $data[$view . '_active'];
+                }
+            }
+        }
+
         if(isset($data['user_user_id']) && $data['user_user_id'] != ''){
             $where .= " AND x.id = " . $data['user_user_id'];
         }
-
-        if(isset($data['user_email']) && $data['user_email'] != ''){
-            $where .= " AND x.email LIKE '%" . $data['user_email'] . "%'";
-        }
-
-        if(isset($data['user_document']) && $data['user_document'] != ''){
-            $where .= " AND x.document LIKE '%" . $functions->soNumero($data['user_document']) . "%'";
-        }
-
-        if(isset($data['user_active']) && $data['user_active'] != ''){
-            $where .= " AND x.active = " . $data['user_active'];
-        }
-
 
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select(array(
