@@ -38,6 +38,13 @@ if(isset($_SESSION['filter-form'][$controller . '_' . $chave])) {
 $db_login = $em->getRepository('Register\Entity\User')->findOneById($this->UserIdentity('User'));
 
 switch($controller){
+    case 'customer': // Listar funcionários da mesma empresa
+        switch ($chave){
+            case 'name':
+                $db_entities = $em->getRepository('Register\Entity\User')->findAll();
+                break;
+        }
+        break;
     case 'solicitation':
         switch ($chave){
             case 'user_plan':
@@ -101,6 +108,7 @@ switch($controller){
                 break;
         }
         break;
+
     default:
         echo 'CONFIGURE O FILTRO AUTOCOMPLETE PARA ESSE CONTROLLER';
         break;
