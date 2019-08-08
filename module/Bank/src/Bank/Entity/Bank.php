@@ -30,6 +30,13 @@ class Bank
     /**
      * @var string
      *
+     * @ORM\Column(name="friendly_url", type="string", length=255, nullable=true)
+     */
+    private $friendly_url;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="active", type="boolean", nullable=true)
      */
     private $active;
@@ -142,6 +149,22 @@ class Bank
     public function __toString()
     {
         return $this->getName();
+    }
+
+    /**
+     * @return string
+     */
+    public function getFriendlyUrl()
+    {
+        return $this->friendly_url;
+    }
+
+    /**
+     * @param string $friendly_url
+     */
+    public function setFriendlyUrl($friendly_url)
+    {
+        $this->friendly_url = $friendly_url;
     }
 }
 
