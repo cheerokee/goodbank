@@ -61,16 +61,17 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                     <div class="col-md-12">
                                         <hr />
                                         <h5>Transações</h5>
-                                        <table class="table table-bordered table-striped">
-                                            <thead>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped">
+                                                <thead>
                                                 <tr>
                                                     <th>Referência</th>
                                                     <th>Data</th>
                                                     <th>Tipo</th>
                                                     <th>Valor</th>
                                                 </tr>
-                                            </thead>
-                                            <tbody>
+                                                </thead>
+                                                <tbody>
                                                 <tr ng-class="{ 'g-color-red' : transaction.type,'g-color-green' : !transaction.type }"
                                                     ng-repeat="transaction in transactions">
                                                     <th>
@@ -87,8 +88,8 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                                     <th>{{ (transaction.type)?'Débito' : 'Crédito' }}</th>
                                                     <th>R$ {{ transaction.value | currency:'':2:'pt-BR' }}</th>
                                                 </tr>
-                                            </tbody>
-                                            <tfoot>
+                                                </tbody>
+                                                <tfoot>
                                                 <tr>
                                                     <td colspan="4">
                                                         <nav class="d-flex ml-auto"
@@ -131,8 +132,9 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                                         </nav>
                                                     </td>
                                                 </tr>
-                                            </tfoot>
-                                        </table>
+                                                </tfoot>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
