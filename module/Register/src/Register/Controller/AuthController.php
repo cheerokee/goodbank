@@ -124,12 +124,14 @@ class AuthController extends AbstractActionController
 
             if($service->getByMail($data['email'])){
                 $this->flashmessenger()->addErrorMessage("O e-mail já está sendo utilizado!");
-                return $this->redirect()->toRoute('user-register');
+                header('Location: /register?sponsor=' . $data['sponsor']->getFriendlyUrl());
+                die;
             }
 
             if(isset($data['password']) && $data['password'] != $data['confirmation']){
                 $this->flashmessenger()->addErrorMessage("As senhas não conferem!");
-                return $this->redirect()->toRoute('user-register');
+                header('Location: /register?sponsor=' . $data['sponsor']->getFriendlyUrl());
+                die;
             }
 
             $entity = $service->insert($data);
@@ -143,11 +145,16 @@ class AuthController extends AbstractActionController
                 $msg = "Houve um erro ao tentar se cadastrar, entre em contato com o administrador";
                 $this->flashmessenger()->addErrorMessage($msg);
 
-                return $this->redirect()->toRoute('user-register');
+                header('Location: /register?sponsor=' . $data['sponsor']->getFriendlyUrl());
+                die;
             }
         }
 
-        $db_sponsor = $em->getRepository('Register\Entity\User')->findOneByFriendlyUrl($_GET['sponsor']);
+        if(isset($_GET['sponsor']) && $_GET['sponsor'] != ''){
+            $db_sponsor = $em->getRepository('Register\Entity\User')->findOneByFriendlyUrl($_GET['sponsor']);
+        }else{
+            $db_sponsor = null;
+        }
 
         return new ViewModel(array('db_sponsor' => $db_sponsor));
     }
