@@ -41,63 +41,65 @@ class AuthController extends AbstractActionController
                 $response = $this->postService($drequest);
 
                 if($response->success) {
-                    var_dump("FOI");
-                    die;
-                }
 
-                // Criando Storage para gravar sessão da autenticação
-                $sessionStorage = new SessionStorage("User");
 
-                $auth = new AuthenticationService();
-                $auth->setStorage($sessionStorage);//Definindo o SessionStorage para a auth
+                    // Criando Storage para gravar sessão da autenticação
+                    $sessionStorage = new SessionStorage("User");
 
-                /**
-                 * @var Adapter
-                 */
-                $authAdapter = $this->getServiceLocator()->get('Register\Auth\Adapter');
-                $authAdapter->setUsername($data['email']);
-                $authAdapter->setPassword($data['password']);
-
-                /**
-                 * @var Result $result
-                 */
-                $result = $authAdapter->authenticate();
-
-                if($result->isValid()){
+                    $auth = new AuthenticationService();
+                    $auth->setStorage($sessionStorage);//Definindo o SessionStorage para a auth
 
                     /**
-                     * @var User $user
-                     * @var User $userService
+                     * @var Adapter
                      */
-                    $user = $result->getIdentity();
+                    $authAdapter = $this->getServiceLocator()->get('Register\Auth\Adapter');
+                    $authAdapter->setUsername($data['email']);
+                    $authAdapter->setPassword($data['password']);
 
-                    $user = $this->getServiceLocator()->get('Register\Service\User')->getUser($user['user']->getId());
+                    /**
+                     * @var Result $result
+                     */
+                    $result = $authAdapter->authenticate();
 
-                    $sessionStorage->write($user,null);
+                    if ($result->isValid()) {
 
-                    return $this->redirect()->toRoute('admin',array('controller'=>'admin'));
-                }else{
-                    if(!empty($result->getMessages())){
-                        $_SESSION['link_ativacao_resend'] = false;
-                        foreach ($result->getMessages() as $message){
+                        /**
+                         * @var User $user
+                         * @var User $userService
+                         */
+                        $user = $result->getIdentity();
 
-                            if(strstr($message,'Usuário inativo')){
-                                $_SESSION['link_ativacao_resend'] = true;
-                                $_SESSION['email_ativacao_resend'] = $data['email'];
+                        $user = $this->getServiceLocator()->get('Register\Service\User')->getUser($user['user']->getId());
+
+                        $sessionStorage->write($user, null);
+
+                        return $this->redirect()->toRoute('admin', array('controller' => 'admin'));
+                    } else {
+                        if (!empty($result->getMessages())) {
+                            $_SESSION['link_ativacao_resend'] = false;
+                            foreach ($result->getMessages() as $message) {
+
+                                if (strstr($message, 'Usuário inativo')) {
+                                    $_SESSION['link_ativacao_resend'] = true;
+                                    $_SESSION['email_ativacao_resend'] = $data['email'];
+                                }
+
+                                $this->flashMessenger()->addErrorMessage($message);
                             }
+                        } else {
+                            $db_user = $this->getEm()->getRepository('Register\Entity\User')->findOneByEmail($data['email']);
+                            if ($db_user && $db_user->getPassword() == md5('123')) {
+                                $this->flashMessenger()->addErrorMessage('Você é um usuário antigo no sistema, sua senha foi alterada devido a importação de dados entre sistemas, por favor clique em "Esqueceu a senha?" para gerar uma nova senha.');
+                            } else {
+                                $this->flashMessenger()->addErrorMessage('Usuário ou senha inválido');
+                            }
+                        }
 
-                            $this->flashMessenger()->addErrorMessage($message);
-                        }
-                    }else{
-                        $db_user = $this->getEm()->getRepository('Register\Entity\User')->findOneByEmail($data['email']);
-                        if($db_user && $db_user->getPassword() == md5('123')){
-                            $this->flashMessenger()->addErrorMessage('Você é um usuário antigo no sistema, sua senha foi alterada devido a importação de dados entre sistemas, por favor clique em "Esqueceu a senha?" para gerar uma nova senha.');
-                        }else{
-                            $this->flashMessenger()->addErrorMessage('Usuário ou senha inválido');
-                        }
+                        return $this->redirect()->toRoute('user-auth');
                     }
-
-                    return $this->redirect()->toRoute('user-auth');
+                }else{
+                    $this->flashMessenger()->addErrorMessage('Por favor faça a verificação se você não for um robo');
+                    return $this->redirect()->toRoute('admin', array('controller' => 'admin'));
                 }
             }
         }
