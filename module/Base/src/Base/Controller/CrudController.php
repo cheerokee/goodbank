@@ -249,22 +249,26 @@ abstract class CrudController extends AbstractActionController{
                     {
                         $data['friendlyUrl'] = $this->functions->strToFriendlyUrl($element->getValue());
 
-                        $tmp = $em->getRepository($this->entity)->findOneByFriendlyUrl($data['friendlyUrl']);
+                        $class = new $this->entity();
 
-                        if($tmp){
-                            if($action == 'new' || ($action == 'edit' && $tmp->getId() != $data['id'])) {
-                                $count_friendly = 1;
-                                while ($tmp) {
+                        if(in_array('getFriendlyUrl',get_class_methods($class))){
+                            $tmp = $em->getRepository($this->entity)->findOneByFriendlyUrl($data['friendlyUrl']);
 
-                                    $data['friendlyUrl'] = $this->functions->strToFriendlyUrl($element->getValue()) . '-' . $count_friendly;
+                            if($tmp){
+                                if($action == 'new' || ($action == 'edit' && $tmp->getId() != $data['id'])) {
+                                    $count_friendly = 1;
+                                    while ($tmp) {
 
-                                    $tmp = $em->getRepository($this->entity)->findOneBy(array('friendly_url' => $data['friendlyUrl']));
-                                    $count_friendly++;
+                                        $data['friendlyUrl'] = $this->functions->strToFriendlyUrl($element->getValue()) . '-' . $count_friendly;
+
+                                        $tmp = $em->getRepository($this->entity)->findOneByFriendlyUrl($data['friendlyUrl']);
+                                        $count_friendly++;
+                                    }
                                 }
                             }
-                        }
 
-                        $data['friendly_url'] = $data['friendlyUrl'];
+                            $data['friendly_url'] = $data['friendlyUrl'];
+                        }
                     }
 
                     if($element->getAttributes()['moeda']){
@@ -305,7 +309,6 @@ abstract class CrudController extends AbstractActionController{
                         }
                         break;
                     case 'edit':
-
                         $result = $service->update($data,$this->controller);
 
                         if($result) {
