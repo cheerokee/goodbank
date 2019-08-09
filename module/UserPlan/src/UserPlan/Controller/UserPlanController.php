@@ -992,6 +992,11 @@ class UserPlanController extends CrudController{
             ));
         }
 
+        // DEBUGAR
+//        $db_user_plans = $em->getRepository('UserPlan\Entity\UserPlan')->findBy(array(
+//            'id' => 202
+//        ));
+
         /** Se vier o cicle no parametro **/
         if($cycle){
             $db_cycle = $em->getRepository('Cycle\Entity\Cycle')->findOneBy(array(
@@ -1165,7 +1170,7 @@ class UserPlanController extends CrudController{
                                 //FORMULA ANTIGA
                                 //$horas_a_remover = (($day_approved-1)*24) + $approved_date->format('H');
                                 //FORMULA NOVA
-                                $horas_a_remover = ($day_approved*24) + $approved_date->format('H');
+                                $horas_a_remover = (($day_approved)*24) + $approved_date->format('H');
                             }else{
                                 $horas_a_remover = $approved_date->format('H');
                             }
@@ -1177,7 +1182,7 @@ class UserPlanController extends CrudController{
 
                         if($db_cycle->getStatus() == 1){
                             if($day != 1){
-                                $horas_total_atual = (($day-1)*24) + $hour;
+                                $horas_total_atual = (($day)*24) + $hour;
                             }else{
                                 $horas_total_atual = $hour;
                             }
