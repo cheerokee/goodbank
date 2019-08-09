@@ -249,7 +249,7 @@ abstract class CrudController extends AbstractActionController{
                     {
                         $data['friendlyUrl'] = $this->functions->strToFriendlyUrl($element->getValue());
 
-                        $tmp = $em->getRepository($this->entity)->findOneBy(array('friendly_url' => $data['friendlyUrl']));
+                        $tmp = $em->getRepository($this->entity)->findOneByFriendlyUrl($data['friendlyUrl']);
 
                         if($tmp){
                             if($action == 'new' || ($action == 'edit' && $tmp->getId() != $data['id'])) {
@@ -294,9 +294,7 @@ abstract class CrudController extends AbstractActionController{
                         continue;
                     }
                 }
-
                 $service = $this->getServiceLocator()->get($this->service);
-
 
                 switch ($action){
                     case 'new':
@@ -307,11 +305,14 @@ abstract class CrudController extends AbstractActionController{
                         }
                         break;
                     case 'edit':
+
                         $result = $service->update($data,$this->controller);
+
                         if($result) {
                             $_SESSION['entity_id'] = $result->getId();
                             $this->flashMessenger()->addSuccessMessage("Registro alterado com sucesso!");
                         }
+
                         break;
                 }
             }else{
@@ -323,7 +324,6 @@ abstract class CrudController extends AbstractActionController{
                         $this->flashMessenger()->addErrorMessage("Houve um erro na atualização do registro!");
                         break;
                 }
-
             }
 
             if($redirect === null){
@@ -341,7 +341,6 @@ abstract class CrudController extends AbstractActionController{
             }else{
                 return $redirect;
             }
-
         }
     }
 
