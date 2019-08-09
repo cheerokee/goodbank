@@ -993,9 +993,9 @@ class UserPlanController extends CrudController{
         }
 
         // DEBUGAR
-        $db_user_plans = $em->getRepository('UserPlan\Entity\UserPlan')->findBy(array(
-            'id' => 202
-        ));
+//        $db_user_plans = $em->getRepository('UserPlan\Entity\UserPlan')->findBy(array(
+//            'id' => 202
+//        ));
 
         /** Se vier o cicle no parametro **/
         if($cycle){
