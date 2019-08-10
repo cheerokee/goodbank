@@ -1287,6 +1287,41 @@ class UserPlanController extends CrudController{
                     $em->flush();
                 }
 
+                $db_category_first_comission = $em
+                    ->getRepository('CategoryTransaction\Entity\CategoryTransaction')
+                    ->findOneBy(array(
+                        'code' => 'first_commission'
+                    ));
+
+                if($db_category_first_comission && $db_user->getSponsor()){
+                    /** SE HOUVE A MUDANÇA DE PATROCINADOR, DELETAR AS TRANSAÇÕES DO PATROCINADOR ERRADO **/
+                    /**
+                     * @var Transaction[] $db_transactions_para_deletar
+                     */
+                    $db_transactions_first_comission = $em
+                        ->getRepository('Transaction\Entity\Transaction')
+                        ->findBy(array(
+                            'category_transaction' => $db_category_first_comission,
+                            'user_plan' => $db_user_plan,
+                            'cycle' => $db_user_plan->getFirstCycle()
+                        ));
+
+                    if(!$db_transactions_first_comission){
+                        $db_transaction_sponsor = new Transaction();
+                        $db_transaction_sponsor->setUserPlan($db_user_plan);
+                        $db_transaction_sponsor->setUser($db_user->getSponsor());
+                        $db_transaction_sponsor->setCategoryTransaction($db_category_first_comission);
+                        $db_transaction_sponsor->setCycle($db_user_plan->getFirstCycle());
+                        $db_transaction_sponsor->setType(0);
+
+                        $db_transaction_sponsor->setValue($db_user_plan->getPlan()->getPrice() * 0.10);
+                        $db_transaction_sponsor->setDate(new \DateTime('now'));
+
+                        $em->persist($db_transaction_sponsor);
+                        $em->flush();
+                    }
+                }
+
                 $expitarion_date = $db_user_plan->getExpirationDate();
                 $date_now = date('Y-m-d');
 
