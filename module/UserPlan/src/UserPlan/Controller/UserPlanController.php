@@ -742,6 +742,7 @@ class UserPlanController extends CrudController{
          */
         $db_user_plan = $db_solicitation->getUserPlan();
 
+        $db_wallet = null;
         if($db_user_plan){
             /** O usuário é diferente do dono do aporte **/
             if($db_solicitation->getUserPlan()->getUser()->getId() != $db_user->getId()){
@@ -762,7 +763,7 @@ class UserPlanController extends CrudController{
         }else{
 
             if($db_solicitation->getWallet()){
-                $db_wallet = $db_user_plan->getWallet();
+                $db_wallet = $em->getRepository('Wallet\Entity\Wallet')->findOneById($db_solicitation->getWallet()->getId());
             }else{
                 $db_wallet = $em->getRepository('Wallet\Entity\Wallet')->findOneBy(array(
                     'user' => $db_user
@@ -770,7 +771,7 @@ class UserPlanController extends CrudController{
             }
 
             if($db_solicitation->getAccount()){
-                $db_account = $db_user_plan->getAccount();
+                $db_account = $em->getRepository('Account\Entity\Account')->findOneById($db_solicitation->getAccount()->getId());
             }else{
                 $db_account = $em->getRepository('Account\Entity\Account')->findOneBy(array(
                     'user' => $db_user

@@ -64,10 +64,10 @@ class Bank extends \Bank\Entity\Bank implements \Doctrine\ORM\Proxy\Proxy
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'id', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'name', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'active', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'updatedAt', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'createdAt'];
+            return ['__isInitialized__', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'id', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'name', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'friendly_url', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'active', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'updatedAt', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'createdAt'];
         }
 
-        return ['__isInitialized__', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'id', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'name', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'active', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'updatedAt', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'createdAt'];
+        return ['__isInitialized__', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'id', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'name', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'friendly_url', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'active', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'updatedAt', '' . "\0" . 'Bank\\Entity\\Bank' . "\0" . 'createdAt'];
     }
 
     /**
@@ -307,6 +307,28 @@ class Bank extends \Bank\Entity\Bank implements \Doctrine\ORM\Proxy\Proxy
         $this->__initializer__ && $this->__initializer__->__invoke($this, '__toString', []);
 
         return parent::__toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getFriendlyUrl()
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getFriendlyUrl', []);
+
+        return parent::getFriendlyUrl();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setFriendlyUrl($friendly_url)
+    {
+
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setFriendlyUrl', [$friendly_url]);
+
+        return parent::setFriendlyUrl($friendly_url);
     }
 
 }

@@ -102,6 +102,7 @@ $db_cycles      = $this->db_cycles;
                         </div>
                         <?php
                         if($db_account) {
+
                             ?>
                             <div class="col-md-12">
                                 <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md g-mb-30">
@@ -154,7 +155,7 @@ $db_cycles      = $this->db_cycles;
                                         </thead>
                                         <tbody>
                                         <tr>
-                                            <td><?=$db_wallet->getAccount()?></td>
+                                            <td><?//=$db_wallet->getAccount()?></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -164,6 +165,7 @@ $db_cycles      = $this->db_cycles;
                         }
 
                         if($db_user_plan){
+
                             ?>
                             <div class="col-md-12">
                                 <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md g-mb-30">
@@ -607,6 +609,7 @@ $db_cycles      = $this->db_cycles;
                                                         <select name="cycle" class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-px-14 g-py-10">
                                                             <option value="">Selecione...</option>
                                                             <?php
+
                                                             if(!empty($db_cycles)){
                                                                 $count = 1;
                                                                 foreach ($db_cycles as $db_cycle)
