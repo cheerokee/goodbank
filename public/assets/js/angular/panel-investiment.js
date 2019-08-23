@@ -60,7 +60,7 @@ angular.module("panelInvestmentView", [])
     $scope.receive_method = 0;
 
     /** Dias disponíveis para solicitar saque **/
-    $scope.canDays = [29,30,31,1];
+    $scope.canDays = [23,29,30,31,1];
 
     $scope.loadUser = function() {
         $http({
