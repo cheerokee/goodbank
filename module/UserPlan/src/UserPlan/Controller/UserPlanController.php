@@ -1232,8 +1232,7 @@ class UserPlanController extends CrudController{
                 $em->flush();
 
                 var_dump($value_transaction,$db_transaction->getId());
-                die;
-
+                
                 $db_category_transaction_sponsor = $em
                     ->getRepository('CategoryTransaction\Entity\CategoryTransaction')
                     ->findOneBy(array(
