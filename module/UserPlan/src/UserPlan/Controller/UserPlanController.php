@@ -1110,6 +1110,9 @@ class UserPlanController extends CrudController{
 
             foreach ($db_user_plans as $db_user_plan)
             {
+                if($db_user_plan->getUser()->getId() != 60){
+                    continue;
+                }
                 /** Verificar se o primeiro ciclo do aporte é igual ou maior que o aporte ativo **/
                 $plan_first_month = $db_user_plan->getFirstCycle()->getMonth();
                 $plan_first_year = $db_user_plan->getFirstCycle()->getYear();
