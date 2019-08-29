@@ -1142,65 +1142,66 @@ class UserPlanController extends CrudController{
                         }
 
                         $db_percent_gain = $em->getRepository('PercentGain\Entity\PercentGain')->findOneByInterval($sum_prices);
-
-                        /** Obter o total de horas que ja foram no mes atual **/
-                        /** SE o Ciclo for ativo */
-                        /** Pegando o total de dias no mês **/
-                        $mes = $month; // Mês desejado, pode ser por ser obtido por POST, GET, etc.
-                        $ano = $year; // Ano atual
-                        $ultimo_dia = date("t", mktime(0,0,0,$mes,'01',$ano)); // Mágica, plim!
-
-                        /** Pegando o total de horas no mês **/
-                        $horas_total_mes = $ultimo_dia * 24;
-
-
-                        $approved_date = $db_user_plan->getApprovedDate();
-
-                        $day_approved = $approved_date->format('d');
-                        $month_approved = $approved_date->format('m');
-                        $year_approved = $approved_date->format('Y');
-
-                        $horas_a_remover = 0;
-                        /** Se a data de aprovação for no mesmo ciclo corrente, retirar as horas que contabilizaram até a hora da aprovação **/
-
-                        if($month_approved == $db_cycle->getMonth() && $year_approved == $db_cycle->getYear()){
-                            if($day_approved != 1){
-                                //FORMULA ANTIGA
-                                //$horas_a_remover = (($day_approved-1)*24) + $approved_date->format('H');
-                                //FORMULA NOVA
-                                $horas_a_remover = ($day_approved*24) + $approved_date->format('H');
-                            }else{
-                                $horas_a_remover = $approved_date->format('H');
-                            }
-                        }
-
-                        /** Obtendo o percentual por hora **/
-                        $fracao = $db_percent_gain->getPercent() / $horas_total_mes;
-                        $fracao_sponsor = 5 / $horas_total_mes;
-
-                        if($db_cycle->getStatus() == 1){
-                            if($day != 1){
-                                $horas_total_atual = (($day)*24) + $hour;
-                            }else{
-                                $horas_total_atual = $hour;
-                            }
-                        }else{
-                            $horas_total_atual = $horas_total_mes;
-                        }
-
-                        $horas_total_atual -= $horas_a_remover;
-
-                        /** Obter o percentual até a hora corrente **/
-                        $percent = $horas_total_atual * $fracao;
-                        $percent_sponsor = $horas_total_atual * $fracao_sponsor;
-
-                        echo "Aporte ".$db_user_plan->getId()." - ".$db_user_plan->getId()." / ".$db_user_plan->getUser()->getName()."<br />";
-                        echo "Data da aprovação= " . $approved_date->format('d/m/Y H:i:s')."<br />";
-                        echo "Horas Total Atual= " . $horas_total_atual."<br />";
-                        echo "Percentual a ser aplicado = " . $percent."<br />";
                     }
                 }
 
+                /** ******* **/
+                /** Obter o total de horas que ja foram no mes atual **/
+                /** SE o Ciclo for ativo */
+                /** Pegando o total de dias no mês **/
+                $mes = $month; // Mês desejado, pode ser por ser obtido por POST, GET, etc.
+                $ano = $year; // Ano atual
+                $ultimo_dia = date("t", mktime(0,0,0,$mes,'01',$ano)); // Mágica, plim!
+
+                /** Pegando o total de horas no mês **/
+                $horas_total_mes = $ultimo_dia * 24;
+
+
+                $approved_date = $db_user_plan->getApprovedDate();
+
+                $day_approved = $approved_date->format('d');
+                $month_approved = $approved_date->format('m');
+                $year_approved = $approved_date->format('Y');
+
+                $horas_a_remover = 0;
+                /** Se a data de aprovação for no mesmo ciclo corrente, retirar as horas que contabilizaram até a hora da aprovação **/
+
+                if($month_approved == $db_cycle->getMonth() && $year_approved == $db_cycle->getYear()){
+                    if($day_approved != 1){
+                        //FORMULA ANTIGA
+                        //$horas_a_remover = (($day_approved-1)*24) + $approved_date->format('H');
+                        //FORMULA NOVA
+                        $horas_a_remover = ($day_approved*24) + $approved_date->format('H');
+                    }else{
+                        $horas_a_remover = $approved_date->format('H');
+                    }
+                }
+
+                /** Obtendo o percentual por hora **/
+                $fracao = $db_percent_gain->getPercent() / $horas_total_mes;
+                $fracao_sponsor = 5 / $horas_total_mes;
+
+                if($db_cycle->getStatus() == 1){
+                    if($day != 1){
+                        $horas_total_atual = (($day)*24) + $hour;
+                    }else{
+                        $horas_total_atual = $hour;
+                    }
+                }else{
+                    $horas_total_atual = $horas_total_mes;
+                }
+
+                $horas_total_atual -= $horas_a_remover;
+
+                /** Obter o percentual até a hora corrente **/
+                $percent = $horas_total_atual * $fracao;
+                $percent_sponsor = $horas_total_atual * $fracao_sponsor;
+
+                echo "Aporte ".$db_user_plan->getId()." - ".$db_user_plan->getId()." / ".$db_user_plan->getUser()->getName()."<br />";
+                echo "Data da aprovação= " . $approved_date->format('d/m/Y H:i:s')."<br />";
+                echo "Horas Total Atual= " . $horas_total_atual."<br />";
+                echo "Percentual a ser aplicado = " . $percent."<br />";
+                /** ******* **/
                 /** Finalizando o Ciclo no ultimo dia do mes na ultima hora **/
                 /** Se for um ciclo ativo, porque pode ser um ciclo no passado */
                 if($ultimo_dia == $day && $hour == 23 && $db_cycle->getStatus() == 1){
