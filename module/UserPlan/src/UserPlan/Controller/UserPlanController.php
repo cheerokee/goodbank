@@ -987,9 +987,9 @@ class UserPlanController extends CrudController{
         }
 
         // DEBUGAR
-        $db_user_plans = $em->getRepository('UserPlan\Entity\UserPlan')->findBy(array(
-            'id' => 206
-        ));
+//        $db_user_plans = $em->getRepository('UserPlan\Entity\UserPlan')->findBy(array(
+//            'id' => 206
+//        ));
 
         /** Se vier o cicle no parametro **/
         if($cycle){
@@ -1232,7 +1232,7 @@ class UserPlanController extends CrudController{
                 $em->flush();
 
                 var_dump($value_transaction,$db_transaction->getId());
-                
+
                 $db_category_transaction_sponsor = $em
                     ->getRepository('CategoryTransaction\Entity\CategoryTransaction')
                     ->findOneBy(array(
