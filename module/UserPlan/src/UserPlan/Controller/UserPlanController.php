@@ -1193,7 +1193,11 @@ class UserPlanController extends CrudController{
                         /** Obter o percentual até a hora corrente **/
                         $percent = $horas_total_atual * $fracao;
                         $percent_sponsor = $horas_total_atual * $fracao_sponsor;
-                        var_dump($horas_total_atual,$percent);
+
+                        echo "Aporte ".$db_user_plan->getId()." - ".$db_user_plan->getId()." / ".$db_user_plan->getUser()->getName()."<br />";
+                        echo "Data da aprovação= " . $approved_date->format('d/m/Y H:i:s')."<br />";
+                        echo "Horas Total Atual= " . $horas_total_atual."<br />";
+                        echo "Percentual a ser aplicado = " . $percent."<br />";
                     }
                 }
 
@@ -1234,7 +1238,8 @@ class UserPlanController extends CrudController{
                 $em->persist($db_transaction);
                 $em->flush();
 
-                var_dump($value_transaction,$db_transaction->getId());
+                echo "Valor de Transação: ".$value_transaction."<br />";
+                echo "Código da Transação: ".$db_transaction->getId()."<br /><br /><br />";
 
                 $db_category_transaction_sponsor = $em
                     ->getRepository('CategoryTransaction\Entity\CategoryTransaction')
