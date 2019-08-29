@@ -1227,10 +1227,12 @@ class UserPlanController extends CrudController{
 
                 $db_transaction->setValue($value_transaction);
                 $db_transaction->setDate((new \DateTime('now')));
-                var_dump($value_transaction);
-                die;
+
                 $em->persist($db_transaction);
                 $em->flush();
+
+                var_dump($value_transaction,$db_transaction->getId());
+                die;
 
                 $db_category_transaction_sponsor = $em
                     ->getRepository('CategoryTransaction\Entity\CategoryTransaction')
