@@ -1110,9 +1110,10 @@ class UserPlanController extends CrudController{
 
             foreach ($db_user_plans as $db_user_plan)
             {
-                if($db_user_plan->getUser()->getId() != 60){
-                    continue;
-                }
+                //DEBUG
+//                if($db_user_plan->getUser()->getId() != 60){
+//                    continue;
+//                }
                 /** Verificar se o primeiro ciclo do aporte é igual ou maior que o aporte ativo **/
                 $plan_first_month = $db_user_plan->getFirstCycle()->getMonth();
                 $plan_first_year = $db_user_plan->getFirstCycle()->getYear();
@@ -1197,10 +1198,10 @@ class UserPlanController extends CrudController{
                 $percent = $horas_total_atual * $fracao;
                 $percent_sponsor = $horas_total_atual * $fracao_sponsor;
 
-                echo "Aporte ".$db_user_plan->getId()." - ".$db_user_plan->getId()." / ".$db_user_plan->getUser()->getName()."<br />";
-                echo "Data da aprovação= " . $approved_date->format('d/m/Y H:i:s')."<br />";
-                echo "Horas Total Atual= " . $horas_total_atual."<br />";
-                echo "Percentual a ser aplicado = " . $percent."<br />";
+//                echo "Aporte ".$db_user_plan->getId()." - ".$db_user_plan->getId()." / ".$db_user_plan->getUser()->getName()."<br />";
+//                echo "Data da aprovação= " . $approved_date->format('d/m/Y H:i:s')."<br />";
+//                echo "Horas Total Atual= " . $horas_total_atual."<br />";
+//                echo "Percentual a ser aplicado = " . $percent."<br />";
                 /** ******* **/
                 /** Finalizando o Ciclo no ultimo dia do mes na ultima hora **/
                 /** Se for um ciclo ativo, porque pode ser um ciclo no passado */
@@ -1239,8 +1240,8 @@ class UserPlanController extends CrudController{
                 $em->persist($db_transaction);
                 $em->flush();
 
-                echo "Valor de Transação: ".$value_transaction."<br />";
-                echo "Código da Transação: ".$db_transaction->getId()."<br /><br /><br />";
+//                echo "Valor de Transação: ".$value_transaction."<br />";
+//                echo "Código da Transação: ".$db_transaction->getId()."<br /><br /><br />";
 
                 $db_category_transaction_sponsor = $em
                     ->getRepository('CategoryTransaction\Entity\CategoryTransaction')
