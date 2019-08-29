@@ -38,7 +38,9 @@ class AuthController extends AbstractActionController
                 $drequest['response'] = $data['g-recaptcha-response'];
                 $drequest['secret'] = '6Le7B7IUAAAAADCnt0Kv4ZiiT_eYSbPuizJcnRfd';
 
-                $response = $this->postService($drequest);
+                if($_SERVER["SERVER_NAME"] != 'goodbank.dev.br'){
+                    $response = $this->postService($drequest);
+                }
 
                 if($response->success || $_SERVER["SERVER_NAME"] == 'goodbank.dev.br') {
 
