@@ -68,20 +68,12 @@ class UserPlanController extends CrudController{
                     'label' => $this->translate('Plano'),
                     'list' => true,
                 ),
-                'paymentMethod'=>array(
-                    'label' => $this->translate('Forma de Pagamento'),
-                    'list' => true,
-                ),
                 'statusStr'=>array(
                     'label' => $this->translate('Status'),
                     'list' => true,
                 ),
                 'wallet'=>array(
                     'label' => $this->translate('Carteira'),
-                    'list' => true,
-                ),
-                'firstCycle'=>array(
-                    'label' => $this->translate('Primeiro Ciclo'),
                     'list' => true,
                 ),
                 'approvedDateStr'=>array(
@@ -995,9 +987,9 @@ class UserPlanController extends CrudController{
         }
 
         // DEBUGAR
-//        $db_user_plans = $em->getRepository('UserPlan\Entity\UserPlan')->findBy(array(
-//            'id' => 202
-//        ));
+        $db_user_plans = $em->getRepository('UserPlan\Entity\UserPlan')->findBy(array(
+            'id' => 206
+        ));
 
         /** Se vier o cicle no parametro **/
         if($cycle){
@@ -1158,6 +1150,7 @@ class UserPlanController extends CrudController{
                         /** Pegando o total de horas no mês **/
                         $horas_total_mes = $ultimo_dia * 24;
 
+
                         $approved_date = $db_user_plan->getApprovedDate();
 
                         $day_approved = $approved_date->format('d');
@@ -1172,7 +1165,7 @@ class UserPlanController extends CrudController{
                                 //FORMULA ANTIGA
                                 //$horas_a_remover = (($day_approved-1)*24) + $approved_date->format('H');
                                 //FORMULA NOVA
-                                $horas_a_remover = (($day_approved)*24) + $approved_date->format('H');
+                                $horas_a_remover = ($day_approved*24) + $approved_date->format('H');
                             }else{
                                 $horas_a_remover = $approved_date->format('H');
                             }
@@ -1193,9 +1186,11 @@ class UserPlanController extends CrudController{
                         }
 
                         $horas_total_atual -= $horas_a_remover;
+
                         /** Obter o percentual até a hora corrente **/
                         $percent = $horas_total_atual * $fracao;
                         $percent_sponsor = $horas_total_atual * $fracao_sponsor;
+                        var_dump($horas_total_atual,$percent);
                     }
                 }
 
@@ -1232,7 +1227,8 @@ class UserPlanController extends CrudController{
 
                 $db_transaction->setValue($value_transaction);
                 $db_transaction->setDate((new \DateTime('now')));
-
+                var_dump($value_transaction);
+                die;
                 $em->persist($db_transaction);
                 $em->flush();
 
