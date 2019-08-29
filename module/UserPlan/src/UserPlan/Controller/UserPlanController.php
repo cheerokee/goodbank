@@ -498,6 +498,7 @@ class UserPlanController extends CrudController{
                 }
             }else{
                 $db_indicados = $em->getRepository('Register\Entity\User')->findBySponsor($db_patrocinador);
+
                 if(!empty($db_indicados)){
                     $count = 0;
                     foreach( $db_indicados as $db_indicado){

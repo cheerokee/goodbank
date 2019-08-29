@@ -117,7 +117,9 @@ class UserPlan extends AbstractService{
      * @return float $debito_diluido
      */
     public function debitoDiluido($tot_debito,$tot_credito,$residual){
+
         $debito_diluido = ($tot_debito > 0)? ( $tot_debito * $residual ) / $tot_credito : 0;
+
         return $debito_diluido;
     }
 
