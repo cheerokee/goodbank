@@ -209,6 +209,15 @@ return [
                     ],
                 ],
             ],
+            'api.rest.doctrine.solicitation' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/api/solicitation[/:solicitation_id]',
+                    'defaults' => [
+                        'controller' => 'api\\V1\\Rest\\Solicitation\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'zf-versioning' => [
@@ -236,6 +245,7 @@ return [
             43 => 'api.rest.doctrine.transaction',
             44 => 'api.rest.doctrine.cycle',
             45 => 'api.rest.doctrine.category-transaction',
+            46 => 'api.rest.doctrine.solicitation',
         ],
     ],
     'zf-rest' => [
@@ -768,6 +778,29 @@ return [
             'collection_class' => \api\V1\Rest\CategoryTransaction\CategoryTransactionCollection::class,
             'service_name' => 'CategoryTransaction',
         ],
+        'api\\V1\\Rest\\Solicitation\\Controller' => [
+            'listener' => \api\V1\Rest\Solicitation\SolicitationResource::class,
+            'route_name' => 'api.rest.doctrine.solicitation',
+            'route_identifier_name' => 'solicitation_id',
+            'entity_identifier_name' => 'id',
+            'collection_name' => 'solicitation',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Solicitation\Entity\Solicitation::class,
+            'collection_class' => \api\V1\Rest\Solicitation\SolicitationCollection::class,
+            'service_name' => 'Solicitation',
+        ],
     ],
     'zf-content-negotiation' => [
         'controllers' => [
@@ -794,6 +827,7 @@ return [
             'api\\V1\\Rest\\Transaction\\Controller' => 'HalJson',
             'api\\V1\\Rest\\Cycle\\Controller' => 'HalJson',
             'api\\V1\\Rest\\CategoryTransaction\\Controller' => 'HalJson',
+            'api\\V1\\Rest\\Solicitation\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'api\\V1\\Rest\\User\\Controller' => [
@@ -911,6 +945,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'api\\V1\\Rest\\Solicitation\\Controller' => [
+                0 => 'application/vnd.api.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'api\\V1\\Rest\\User\\Controller' => [
@@ -1002,6 +1041,10 @@ return [
                 1 => 'application/json',
             ],
             'api\\V1\\Rest\\CategoryTransaction\\Controller' => [
+                0 => 'application/vnd.api.v1+json',
+                1 => 'application/json',
+            ],
+            'api\\V1\\Rest\\Solicitation\\Controller' => [
                 0 => 'application/vnd.api.v1+json',
                 1 => 'application/json',
             ],
@@ -1262,6 +1305,17 @@ return [
                 'route_name' => 'api.rest.doctrine.category-transaction',
                 'is_collection' => true,
             ],
+            \Solicitation\Entity\Solicitation::class => [
+                'route_identifier_name' => 'solicitation_id',
+                'entity_identifier_name' => 'id',
+                'route_name' => 'api.rest.doctrine.solicitation',
+                'hydrator' => 'api\\V1\\Rest\\Solicitation\\SolicitationHydrator',
+            ],
+            \api\V1\Rest\Solicitation\SolicitationCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'api.rest.doctrine.solicitation',
+                'is_collection' => true,
+            ],
         ],
     ],
     'zf-apigility' => [
@@ -1357,6 +1411,10 @@ return [
             \api\V1\Rest\CategoryTransaction\CategoryTransactionResource::class => [
                 'object_manager' => 'doctrine.entitymanager.orm_default',
                 'hydrator' => 'api\\V1\\Rest\\CategoryTransaction\\CategoryTransactionHydrator',
+            ],
+            \api\V1\Rest\Solicitation\SolicitationResource::class => [
+                'object_manager' => 'doctrine.entitymanager.orm_default',
+                'hydrator' => 'api\\V1\\Rest\\Solicitation\\SolicitationHydrator',
             ],
         ],
     ],
@@ -1522,6 +1580,13 @@ return [
             'strategies' => [],
             'use_generated_hydrator' => true,
         ],
+        'api\\V1\\Rest\\Solicitation\\SolicitationHydrator' => [
+            'entity_class' => \Solicitation\Entity\Solicitation::class,
+            'object_manager' => 'doctrine.entitymanager.orm_default',
+            'by_value' => true,
+            'strategies' => [],
+            'use_generated_hydrator' => true,
+        ],
     ],
     'zf-content-validation' => [
         'api\\V1\\Rest\\User\\Controller' => [
@@ -1592,6 +1657,9 @@ return [
         ],
         'api\\V1\\Rest\\CategoryTransaction\\Controller' => [
             'input_filter' => 'api\\V1\\Rest\\CategoryTransaction\\Validator',
+        ],
+        'api\\V1\\Rest\\Solicitation\\Controller' => [
+            'input_filter' => 'api\\V1\\Rest\\Solicitation\\Validator',
         ],
     ],
     'input_filter_specs' => [
@@ -2984,6 +3052,58 @@ return [
             ],
             3 => [
                 'name' => 'createdAt',
+                'required' => true,
+                'filters' => [],
+                'validators' => [],
+            ],
+        ],
+        'api\\V1\\Rest\\Solicitation\\Validator' => [
+            0 => [
+                'name' => 'type',
+                'required' => true,
+                'filters' => [
+                    0 => [
+                        'name' => \Zend\Filter\StripTags::class,
+                    ],
+                    1 => [
+                        'name' => \Zend\Filter\Digits::class,
+                    ],
+                ],
+                'validators' => [],
+            ],
+            1 => [
+                'name' => 'receive_method',
+                'required' => false,
+                'filters' => [
+                    0 => [
+                        'name' => \Zend\Filter\StripTags::class,
+                    ],
+                    1 => [
+                        'name' => \Zend\Filter\Digits::class,
+                    ],
+                ],
+                'validators' => [],
+            ],
+            2 => [
+                'name' => 'value',
+                'required' => true,
+                'filters' => [],
+                'validators' => [],
+            ],
+            3 => [
+                'name' => 'closed',
+                'required' => false,
+                'filters' => [],
+                'validators' => [],
+            ],
+            4 => [
+                'name' => 'updated_at',
+                'required' => true,
+                'filters' => [],
+                'validators' => [],
+            ],
+            5 => [
+                'name' => 'created_at',
                 'required' => true,
                 'filters' => [],
                 'validators' => [],
