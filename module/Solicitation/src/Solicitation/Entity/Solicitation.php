@@ -64,7 +64,7 @@ class Solicitation
      *
      * @ORM\ManyToOne(targetEntity="Wallet\Entity\Wallet")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="cycle_id", referencedColumnName="id",
+     *   @ORM\JoinColumn(name="wallet_id", referencedColumnName="id",
      *      nullable=true,
      *      onDelete="SET NULL")
      * })
@@ -76,7 +76,7 @@ class Solicitation
      *
      * @ORM\ManyToOne(targetEntity="Account\Entity\Account")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="cycle_id", referencedColumnName="id",
+     *   @ORM\JoinColumn(name="account_id", referencedColumnName="id",
      *      nullable=true,
      *      onDelete="SET NULL")
      * })

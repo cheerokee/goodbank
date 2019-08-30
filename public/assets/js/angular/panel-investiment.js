@@ -52,6 +52,8 @@ angular.module("panelInvestmentView", [])
     $scope.comission_transaction_tot_pages = 0;
     $scope.comission_transaction_pages = [];
 
+    $scope.solicitacao_saque = 0;
+
     $scope.saldo = 0;
     setInterval(function () {
         $scope.saldo = $scope.total_balances + ($scope.total_comission - $scope.total_debito_comission);
@@ -835,6 +837,7 @@ angular.module("panelInvestmentView", [])
                         success: function (response) {
                             if(response.result){
                                 successNotify(response.message);
+                                $scope.calculaSolicitacaoSaque();
                             }else{
                                 errorNotify(response.message);
                             }
@@ -1019,4 +1022,37 @@ angular.module("panelInvestmentView", [])
         return month_str;
     };
 
+    $scope.calculaSolicitacaoSaque = function() {
+        $scope.solicitacao_saque = 0;
+        $.ajax({
+            url: "/api/solicitation",
+            type: "GET",
+            data: {
+                'filter'    :   [
+                    {
+                        'type' : 'andx',
+                        'conditions' : [
+                            {'field' :'user', 'type':'eq', 'value' : $scope.user_id},
+                            {'field' :'closed', 'type':'eq', 'value' : 0}
+                        ],
+                        'where'  :  'and'
+                    }
+                ]
+            },
+            dataType: "json",
+            success: function (response) {
+                $timeout(function () {
+                    let solicitations = response._embedded.solicitation;
+                    for(solicitation of solicitations)
+                    {
+                        $scope.solicitacao_saque += solicitation.value;
+                    }
+                },300);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                errorNotify('Erro ao carregar as solicitações');
+            }
+        });
+    };
+    $scope.calculaSolicitacaoSaque();
 }]);

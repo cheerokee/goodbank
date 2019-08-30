@@ -582,8 +582,7 @@ class UserPlanController extends CrudController{
             $db_solicitation = $em->getRepository('Solicitation\Entity\Solicitation')->findOneBy(array(
                 'type'      => $type,
                 'closed'    => 0,
-                'cycle'     => $db_cycle_active,
-                'user' => $db_user
+                'user'      => $db_user
             ));
 
             $msg = 'Solicitação efetuada com sucesso!';
@@ -593,6 +592,7 @@ class UserPlanController extends CrudController{
                 $db_solicitation->setReceiveMethod($receive_method);
                 $db_solicitation->setUser($db_user);
                 $db_solicitation->setWallet($db_wallet);
+                $db_solicitation->setCycle($db_cycle_active);
 
                 $em->persist($db_solicitation);
                 $em->flush();

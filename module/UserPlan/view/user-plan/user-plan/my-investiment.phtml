@@ -42,9 +42,12 @@ $url_sponsor .= '?sponsor=' . $this->userIdentity('User')->getFriendlyUrl();
                                 </h3>
                                 <h2 class="text-center g-font-weight-300 g-font-size-40 g-color-black g-color-green">
                                     <strong class="text-success">
-                                        R$ {{ total_balances + (total_comission - total_debito_comission) | currency:'':2:'pt-BR' }}
+                                        R$ {{ total_balances + (total_comission - total_debito_comission) - solicitacao_saque | currency:'':2:'pt-BR' }}
                                     </strong>
                                 </h2>
+                                <p ng-if="solicitacao_saque > 0" class="text-danger text-center font-weight-bold">
+                                    Solicitação de Saque Pendente {{ solicitacao_saque | currency:'':2:'pt-BR' }}
+                                </p>
                                 <div class="row mt-3">
                                     <div class="col-md-8">
 
