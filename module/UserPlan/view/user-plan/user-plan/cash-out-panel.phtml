@@ -155,7 +155,7 @@ $db_cycles      = $this->db_cycles;
                                         </thead>
                                         <tbody>
                                         <tr>
-                                            <td><?//=$db_wallet->getAccount()?></td>
+                                            <td><?=($db_wallet)?$db_wallet->getAccount():""?></td>
                                         </tr>
                                         </tbody>
                                     </table>
