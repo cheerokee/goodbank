@@ -5,11 +5,11 @@ return array(
         'host' => 'smtp.gmail.com',
         'connection_class' => 'login',
         'connection_config' => array(
-            'username' => 'contato@inovensti.com.br',
-            'password' => 'inovensti123456',
+            'username' => 'contato@goodbankonline.com',
+            'password' => '777e777k$',
             'ssl' => 'tls',
             'port' => 587,
-            'from' => 'contato@inovensti.com.br',
+            'from' => 'contato@goodbankonline.com',
             'name_from' => 'GoodBank',
             'charset' => 'UTF8',
             'driverOptions' => array(
