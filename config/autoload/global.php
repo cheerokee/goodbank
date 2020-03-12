@@ -6,7 +6,7 @@ return array(
         'connection_class' => 'login',
         'connection_config' => array(
             'username' => 'contato@goodbankonline.com',
-            'password' => '777e777k$',
+            'password' => '',
             'ssl' => 'tls',
             'port' => 587,
             'from' => 'contato@goodbankonline.com',
