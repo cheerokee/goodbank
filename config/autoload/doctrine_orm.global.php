@@ -11,7 +11,7 @@ return array(
                     'host'     => 'localhost',
                     'port'     => '3306',
                     'user'     => 'root',
-                    'password' => '',
+                    'password' => 'Jonas.160592',
                     'dbname'   => 'goodbank',
                     'charset'  => 'utf8',
                 )
