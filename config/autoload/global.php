@@ -5,8 +5,8 @@ return array(
         'host' => 'smtp.gmail.com',
         'connection_class' => 'login',
         'connection_config' => array(
-            'username' => 'contato@goodbankonline.com',
-            'password' => '',
+            'username' => 'contato@inovensti.com.br',
+            'password' => 'inovensti123456',
             'ssl' => 'tls',
             'port' => 587,
             'from' => 'contato@goodbankonline.com',
