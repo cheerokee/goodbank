@@ -168,7 +168,10 @@ class AuthController extends AbstractActionController
         }
 
         if(isset($_GET['sponsor']) && $_GET['sponsor'] != ''){
-            $db_sponsor = $em->getRepository('Register\Entity\User')->findOneByFriendlyUrl($_GET['sponsor']);
+            $db_sponsor = $em->getRepository('Register\Entity\User')
+                ->findOneBy([
+                    'friendly_url' => $_GET['sponsor']
+                ]);
         }else{
             $db_sponsor = null;
         }

@@ -252,7 +252,9 @@ abstract class CrudController extends AbstractActionController{
                         $class = new $this->entity();
 
                         if(in_array('getFriendlyUrl',get_class_methods($class))){
-                            $tmp = $em->getRepository($this->entity)->findOneByFriendlyUrl($data['friendlyUrl']);
+                            $tmp = $em->getRepository($this->entity)->findOneBy([
+                                'friendly_url' => $data['friendlyUrl']
+                            ]);
 
                             if($tmp){
                                 if($action == 'new' || ($action == 'edit' && $tmp->getId() != $data['id'])) {
@@ -261,7 +263,9 @@ abstract class CrudController extends AbstractActionController{
 
                                         $data['friendlyUrl'] = $this->functions->strToFriendlyUrl($element->getValue()) . '-' . $count_friendly;
 
-                                        $tmp = $em->getRepository($this->entity)->findOneByFriendlyUrl($data['friendlyUrl']);
+                                        $tmp = $em->getRepository($this->entity)->findOneBy([
+                                            'friendly_url' => $data['friendlyUrl']
+                                        ]);
                                         $count_friendly++;
                                     }
                                 }
